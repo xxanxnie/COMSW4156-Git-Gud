@@ -1,0 +1,9 @@
+.vscode/
+build/*
+!build/README.md
+external_libraries/boost
+external_libraries/Crow
+external_libraries/asio
+external_libraries/boost
+!external_libraries/README.txt
+!external_libraries/install_libraries.sh
