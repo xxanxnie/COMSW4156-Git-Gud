@@ -48,9 +48,20 @@ If you ever need to clean up some files `make clean` is always an option
 
 # Endpoints
 
+# Branch Coverage
+
+This project uses **GCOV** (coverage tool) and **LCOV** (graphical front-end for GCOV) to generate branch coverage reports for C++ code. After building the project using CMake in the build folder, run `make coverage` which will automatically open the HTML file to view the branch coverage report. If coverage needs to be run again, it may be necessary to clean previous coverage data by using the following commands to delete old `.gcda` and `.gcno` files and rebuild the project:
+
+```bash
+find . -name "*.gcda" -delete
+find . -name "*.gcno" -delete
+```
+
 # Style Checking Analysis
 
-## Setup MongoDb
+The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files.
+
+## Setup MongoDb Database
 1. Install docker
 ``` bash
 # In Linux

@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 
     // Initialize route controller
     // Create RouteController with the database path and MongoDB URI
-    RouteController routeController("/path/to/db", "mongodb://localhost:27017");
+    RouteController routeController("mongodb://localhost:27017");
     routeController.initRoutes(app);  // Pass the MongoDB database
 
     // Start the server

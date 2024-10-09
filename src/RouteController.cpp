@@ -1,14 +1,32 @@
 #include "RouteController.h"
 
 // Constructor
-RouteController::RouteController(const std::string& dbPath, const std::string& uri)
-    : databaseManager(dbPath), mongoClient(mongocxx::uri{uri}) {
-    DatabaseManager.start(); // Start MongoDB
+RouteController::RouteController(const std::string& uri)
+    : mongoClient(mongocxx::uri{uri}) {
+    initializeDatabase(); // Call to initialize the database
 }
 
-// Destructor
-RouteController::~RouteController() {
-    DatabaseManager.stop(); // Stop MongoDB when done
+// Initialize database
+void RouteController::initializeDatabase() {  // Definition
+    try {
+        auto db = mongoClient["your_database_name"]; // Replace with your database name
+
+        // Create a collection if it doesn't exist
+        db.create_collection("your_collection_name"); // Replace with your collection name
+
+        // Optionally insert initial data
+        bsoncxx::builder::stream::document document{};
+        document << "key" << "value"; // Adjust this as necessary for your data
+
+        // Insert initial document
+        auto result = db["your_collection_name"].insert_one(document.view());
+        if (result) {
+            std::cout << "Inserted document with id: " 
+                      << result->inserted_id().get_oid().value.to_string() << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error initializing database: " << e.what() << std::endl;
+    }
 }
 
 // Initialize routes
@@ -31,7 +49,7 @@ void RouteController::index(crow::response& res) {
 // Data fetching route handler
 void RouteController::getData(crow::response& res) {
     try {
-        auto collection = mongoClient["database_name"]["collection_name"];
+        auto collection = mongoClient["your_database_name"]["your_collection_name"];
         auto cursor = collection.find({}); // Find all documents
 
         // Create a JSON array to store results
