@@ -18,18 +18,37 @@ Our services cater to a diverse range of users, each with unique needs:
 - **Clinics (CLN)**: Healthcare facilities that partner with our services to provide medical support.
 - **Government (GOV)**: Local and state agencies that help coordinate resources and services.
 
-# Building and Running a Local Instance
+# External Libraries Installation
 
-# Running a Cloud Based Instance
+The following libraries need to be installed:
+
+External Libraries:
+- **Boost**: A set of C++ libraries designed to enhance the standard C++ library. (https://www.boost.org/)
+- **Crow**: A C++ micro web framework. (https://crowcpp.org/master/)
+- **Asio**: A cross-platform C++ library for network and low-level I/O programming. (https://think-async.com/Asio/)
+
+These libraries are already gathered in `external_libraries/install_libraries.sh`. First, give the script executable permissions with `chmod +x install_libraries.sh`, and then run the script to automatically download and install the required libraries using `./install_libraries.sh`.
+
+brew tap mongodb/brew
+brew install mongo-c-driver
+brew install mongo-cxx-driver
+brew install --cask mongodb-realm-studio
 
 # Running Tests
+
+To build the project, navigate to the build folder and run the following command:
+
+`cmake ..` 
+`make`
+`make cpplint` (for style checking)
+
+If you ever need to clean up some files `make clean` is always an option
+
+# Running a Cloud Based Instance
 
 # Endpoints
 
 # Style Checking Analysis
-
-
-
 
 ## Setup MongoDb
 1. Install docker
