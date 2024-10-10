@@ -6,3 +6,4 @@ external_libraries/Crow
 external_libraries/asio
 external_libraries/boost
 !external_libraries/install_libraries.sh
+!app.out

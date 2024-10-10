@@ -1,33 +1,29 @@
 #ifndef ROUTECONTROLLER_H
 #define ROUTECONTROLLER_H
 
-#include "../external_libraries/Crow/include/crow.h"
-#include <mongocxx/client.hpp>
-#include <mongocxx/uri.hpp>
+#include <map>
 #include <string>
+#include <exception>
 #include <iostream>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include "../external_libraries/Crow/include/crow.h"
+#include "DatabaseManager.h"
 
 class RouteController {
-public:
-    // Constructor that accepts the MongoDB URI
-    RouteController(const std::string& uri);
-    
-    // Destructor
-    ~RouteController();
+    private:
+        DatabaseManager& dbManager;  // Reference to the database manager
 
-    // Method to initialize the HTTP routes
-    void initRoutes(crow::App<>& app);
 
-private:
-    // Method to initialize the database and collections
-    void initializeDatabase();  // Declaration
-
-    // Route handlers
-    void index(crow::response& res);
-    void getData(crow::response& res);
-
-    // MongoDB client instance
-    mongocxx::client mongoClient; 
+    public:        
+        // Route handlers
+        void index(crow::response& res);
+        void getResources(const crow::request& req, crow::response& res);
+        void addResource(const crow::request& req, crow::response& res);
+        void updateResource(const crow::request& req, crow::response& res);
+        void deleteResource(const crow::request& req, crow::response& res);
 };
 
-#endif
+#endif 
+

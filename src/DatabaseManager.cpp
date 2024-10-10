@@ -1,44 +1,65 @@
-#include "include/DatabaseManager.h"
-#include <unistd.h> // For sleep
-#include <sys/types.h>
-#include <sys/wait.h>
+// DatabaseManager.cpp
+#include "DatabaseManager.h"
+#include <iostream>
+#include <algorithm>
 
-MongoDBManager::MongoDBManager(const std::string& dbPath) : dbPath(dbPath), running(false) {}
+DatabaseManager::DatabaseManager(const std::string& uri)
+    : conn(mongocxx::uri{uri}) {}
 
-MongoDBManager::~MongoDBManager() {
-    stop();
+bsoncxx::document::value DatabaseManager::createDocument(const std::vector<std::pair<std::string, std::string>>& keyValues) {
+    bsoncxx::builder::stream::document document{};
+    for (const auto& keyValue : keyValues) {
+        document << keyValue.first << keyValue.second;
+    }
+    return document << bsoncxx::builder::stream::finalize;
 }
 
-void MongoDBManager::start() {
-    if (running) {
-        std::cout << "MongoDB is already running." << std::endl;
+void DatabaseManager::createCollection(const std::string& collectionName) {
+    conn["GitGud"][collectionName];  // Create collection if it doesn't exist
+}
+
+void DatabaseManager::printCollection(const std::string& collectionName) {
+    auto collection = conn["GitGud"][collectionName];
+    if (collection.count_documents({}) == 0) {
+        std::cout << "Collection " << collectionName << " is empty." << std::endl;
         return;
     }
 
-    pid_t pid = fork();
-    if (pid == 0) {
-        // Child process
-        std::string command = "mongod --dbpath " + dbPath;
-        execl("/bin/sh", "sh", "-c", command.c_str(), (char*)nullptr);
-        exit(0); // Should not reach here if execl is successful
-    } else if (pid > 0) {
-        // Parent process
-        running = true;
-        std::cout << "Starting MongoDB..." << std::endl;
-        sleep(2); // Give MongoDB time to start
-    } else {
-        std::cerr << "Failed to fork process." << std::endl;
+    auto cursor = collection.find({});
+    for (auto&& doc : cursor) {
+        std::cout << bsoncxx::to_json(doc) << std::endl;
     }
 }
 
-void MongoDBManager::stop() {
-    if (!running) return;
-
-    system("pkill mongod");
-    running = false;
-    std::cout << "MongoDB stopped." << std::endl;
+void DatabaseManager::insertResource(const std::string& collectionName, const std::vector<std::pair<std::string, std::string>>& keyValues) {
+    auto collection = conn["GitGud"][collectionName];
+    collection.insert_one(createDocument(keyValues).view());
 }
 
-bool MongoDBManager::isRunning() const {
-    return running;
+void DatabaseManager::deleteResource(const std::string& collectionName, const std::string& resourceId) {
+    auto collection = conn["GitGud"][collectionName];
+    collection.delete_one(createDocument({{"_id", resourceId}}).view());
+}
+
+void DatabaseManager::updateResource(const std::string& collectionName, const std::string& resourceId, const std::vector<std::pair<std::string, std::string>>& updates) {
+    auto collection = conn["GitGud"][collectionName];
+    bsoncxx::builder::stream::document updateDoc{};
+    updateDoc << "$set" << bsoncxx::builder::stream::open_document;
+    for (const auto& update : updates) {
+        updateDoc << update.first << update.second;
+    }
+    updateDoc << bsoncxx::builder::stream::close_document;
+
+    collection.update_one(
+        bsoncxx::builder::stream::document{} << "_id" << resourceId << bsoncxx::builder::stream::finalize,
+        updateDoc.view());
+}
+
+void DatabaseManager::findResource(const std::string& collectionName, const std::string& resourceId) {
+    auto collection = conn["GitGud"][collectionName];
+    auto filter = bsoncxx::builder::stream::document{} << "_id" << resourceId << bsoncxx::builder::stream::finalize;
+    auto cursor = collection.find(filter.view());
+    for (auto&& doc : cursor) {
+        std::cout << bsoncxx::to_json(doc) << std::endl;
+    }
 }

@@ -40,13 +40,22 @@ int main(int argc, char* argv[]) {
     // Initialize MongoDB driver
     mongocxx::instance instance{};
 
+    // Initialize the DatabaseManager
+    DatabaseManager dbManager("mongodb://localhost:27017");
+
+    // Create collections for social welfare initiatives
+    dbManager.createCollection("Food");
+    dbManager.createCollection("Healthcare");
+    dbManager.createCollection("Outreach");
+    dbManager.createCollection("Shelter");
+    dbManager.createCollection("Counseling");
+
     // Initialize the HTTP server
     crow::SimpleApp app;
 
-    // Initialize route controller
-    // Create RouteController with the database path and MongoDB URI
-    RouteController routeController("mongodb://localhost:27017");
-    routeController.initRoutes(app);  // Pass the MongoDB database
+    // Initialize route controller with DatabaseManager
+    RouteController routeController(dbManager);
+    routeController.initRoutes(app);  // Pass the DatabaseManager to the RouteController
 
     // Start the server
     app.port(8080).multithreaded().run();

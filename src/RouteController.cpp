@@ -1,72 +1,143 @@
+// C++ System Header
+#include <map>
+#include <string>
+#include <exception>
+#include <iostream>
+
 #include "RouteController.h"
 
-// Constructor
-RouteController::RouteController(const std::string& uri)
-    : mongoClient(mongocxx::uri{uri}) {
-    initializeDatabase(); // Call to initialize the database
+// Utility function to handle exceptions
+crow::response handleException(const std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return crow::response{500, "An error has occurred: " + std::string(e.what())};
 }
 
-// Initialize database
-void RouteController::initializeDatabase() {  // Definition
-    try {
-        auto db = mongoClient["your_database_name"]; // Replace with your database name
-
-        // Create a collection if it doesn't exist
-        db.create_collection("your_collection_name"); // Replace with your collection name
-
-        // Optionally insert initial data
-        bsoncxx::builder::stream::document document{};
-        document << "key" << "value"; // Adjust this as necessary for your data
-
-        // Insert initial document
-        auto result = db["your_collection_name"].insert_one(document.view());
-        if (result) {
-            std::cout << "Inserted document with id: " 
-                      << result->inserted_id().get_oid().value.to_string() << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << "Error initializing database: " << e.what() << std::endl;
-    }
-}
-
-// Initialize routes
-void RouteController::initRoutes(crow::App<>& app) {
-    CROW_ROUTE(app, "/")([this](const crow::request& req, crow::response& res) {
-        index(res);
-    });
-
-    CROW_ROUTE(app, "/data")([this](const crow::request& req, crow::response& res) {
-        getData(res); // Fetch data from MongoDB
-    });
-}
-
-// Index route handler
+/**
+ * Redirects to the homepage.
+ *
+ * @return A string containing the name of the html file to be loaded.
+ */
 void RouteController::index(crow::response& res) {
-    res.write("Welcome to the service!");
+    res.write("Welcome to the GitGud API. Use the appropriate endpoints to access resources.");
     res.end();
 }
 
-// Data fetching route handler
-void RouteController::getData(crow::response& res) {
+// Get resources route
+void RouteController::getResources(const crow::request& req, crow::response& res) {
     try {
-        auto collection = mongoClient["your_database_name"]["your_collection_name"];
-        auto cursor = collection.find({}); // Find all documents
-
-        // Create a JSON array to store results
-        bsoncxx::builder::stream::array resultArray;
-        for (const auto& doc : cursor) {
-            resultArray.append(doc);
+        const char* resourceType = req.url_params.get("type");
+        if (!resourceType) {
+            res.code = 400;
+            res.write("Error: Resource type is required.");
+            res.end();
+            return;
         }
 
-        // Convert BSON array to JSON
-        auto jsonString = bsoncxx::to_json(resultArray.view());
-
-        // Write JSON response
-        res.set_header("Content-Type", "application/json");
-        res.write(jsonString);
+        auto resources = dbManager.getResources(resourceType);
+        res.code = 200;
+        res.write(bsoncxx::to_json(resources));
+        res.end();
     } catch (const std::exception& e) {
-        res.code = 500; // Internal Server Error
-        res.write("Error fetching data: " + std::string(e.what()));
+        res = handleException(e);
     }
-    res.end();
+}
+
+// Add resource route
+void RouteController::addResource(const crow::request& req, crow::response& res) {
+    try {
+        if (!validateInputs(req, &res)) {
+            return;
+        }
+
+        auto resource = bsoncxx::from_json(req.body);
+        dbManager.insertDocument("Resources", resource);
+
+        res.code = 201; // Created
+        res.write("Resource added successfully.");
+        res.end();
+    } catch (const bsoncxx::exception& e) {
+        res.code = 400;
+        res.write("Error: Invalid JSON format.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+// Update resource route
+void RouteController::updateResource(const crow::request& req, crow::response& res) {
+    try {
+        if (!validateInputs(req, &res)) {
+            return;
+        }
+
+        auto resource = bsoncxx::from_json(req.body);
+        if (!resource["id"]) {
+            res.code = 400;
+            res.write("Error: Resource ID is required.");
+            res.end();
+            return;
+        }
+
+        auto id = resource["id"].get_oid().value.to_string();
+        dbManager.updateResource("Resources", id, resource);
+
+        res.code = 200;
+        res.write("Resource updated successfully.");
+        res.end();
+    } catch (const bsoncxx::exception& e) {
+        res.code = 400;
+        res.write("Error: Invalid JSON format.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+// Delete resource route
+void RouteController::deleteResource(const crow::request& req, crow::response& res) {
+    try {
+        const char* resourceId = req.url_params.get("id");
+        if (!resourceId) {
+            res.code = 400;
+            res.write("Error: Resource ID is required.");
+            res.end();
+            return;
+        }
+
+        dbManager.deleteDocument("Resources", resourceId);
+        res.code = 200;
+        res.write("Resource deleted successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+// Initialize API Routes
+void RouteController::initRoutes(crow::SimpleApp& app) {
+    CROW_ROUTE(app, "/")
+        .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+            index(res);
+        });
+
+    CROW_ROUTE(app, "/resources")
+        .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+            getResources(req, res);
+        });
+
+    CROW_ROUTE(app, "/resources/add")
+        .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+            addResource(req, res);
+        });
+
+    CROW_ROUTE(app, "/resources/update")
+        .methods(crow::HTTPMethod::PATCH)([this](const crow::request& req, crow::response& res) {
+            updateResource(req, res);
+        });
+
+    CROW_ROUTE(app, "/resources/delete")
+        .methods(crow::HTTPMethod::DELETE)([this](const crow::request& req, crow::response& res) {
+            deleteResource(req, res);
+        });
 }

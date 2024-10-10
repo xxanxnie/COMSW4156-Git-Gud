@@ -1,22 +1,26 @@
-#ifndef MONGODB_MANAGER_H
-#define MONGODB_MANAGER_H
+#pragma once
 
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include <vector>
 #include <string>
-#include <iostream>
-#include <cstdlib>
 
-class MongoDBManager {
+class DatabaseManager {
 public:
-    MongoDBManager(const std::string& dbPath);
-    ~MongoDBManager();
-
-    void start();
-    void stop();
-    bool isRunning() const;
-
+    DatabaseManager(const std::string& uri);
+    
+    void createCollection(const std::string& collectionName);
+    void printCollection(const std::string& collectionName);
+    void insertResource(const std::string& collectionName, const std::vector<std::pair<std::string, std::string>>& keyValues);
+    void deleteResource(const std::string& collectionName, const std::string& resourceId);
+    void updateResource(const std::string& collectionName, const std::string& resourceId, const std::vector<std::pair<std::string, std::string>>& updates);
+    void findResource(const std::string& collectionName, const std::string& resourceId);
+    
 private:
-    std::string dbPath;
-    bool running;
-};
+    mongocxx::client conn;
 
-#endif // MONGODB_MANAGER_H
+    bsoncxx::document::value createDocument(const std::vector<std::pair<std::string, std::string>>& keyValues);
+};
