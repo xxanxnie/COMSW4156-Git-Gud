@@ -1,5 +1,4 @@
 #pragma once
-
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -18,6 +17,8 @@ public:
     void deleteResource(const std::string& collectionName, const std::string& resourceId);
     void updateResource(const std::string& collectionName, const std::string& resourceId, const std::vector<std::pair<std::string, std::string>>& updates);
     void findResource(const std::string& collectionName, const std::string& resourceId);
+    void deleteDocument(const std::string& collectionName, const std::string& resourceId);
+    bsoncxx::document::value getResources(const std::string& resourceType);
     
 private:
     mongocxx::client conn;

@@ -23,3 +23,5 @@ TEST_F(FoodUnitTests, GetType) {
 TEST_F(FoodUnitTests, GetQuantity) {
     EXPECT_EQ(food->getQuantity(), "10 loaves");
 }
+
+Food* FoodUnitTests::food = nullptr;

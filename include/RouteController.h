@@ -15,8 +15,13 @@ class RouteController {
     private:
         DatabaseManager& dbManager;  // Reference to the database manager
 
+    public:
+        // Add a constructor
+        RouteController(DatabaseManager& dbManager) : dbManager(dbManager) {}
 
-    public:        
+        // Add the initRoutes method declaration
+        void initRoutes(crow::SimpleApp& app);
+
         // Route handlers
         void index(crow::response& res);
         void getResources(const crow::request& req, crow::response& res);
