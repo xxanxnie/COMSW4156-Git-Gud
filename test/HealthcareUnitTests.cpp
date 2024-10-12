@@ -23,3 +23,5 @@ TEST_F(HealthcareUnitTests, GetProvider) {
 TEST_F(HealthcareUnitTests, GetServiceType) {
     EXPECT_EQ(healthcare->getServiceType(), "General Checkup");
 }
+
+Healthcare* HealthcareUnitTests::healthcare = nullptr;

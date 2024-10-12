@@ -23,3 +23,5 @@ TEST_F(OutreachUnitTests, GetProgramName) {
 TEST_F(OutreachUnitTests, GetTargetGroup) {
     EXPECT_EQ(outreach->getTargetGroup(), "Low-income families");
 }
+
+Outreach* OutreachUnitTests::outreach;

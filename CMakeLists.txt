@@ -2,26 +2,55 @@ cmake_minimum_required(VERSION 3.15)
 
 project(GitGud)
 
-set(MONGO_CXX_DRIVER_PATH "/opt/homebrew/include/mongocxx/v_noabi")
-set(MONGO_C_DRIVER_PATH "/opt/homebrew/include/libmongoc-1.0")
-
-set(INCLUDE_PATHS 
-    external_libraries/boost 
-    external_libraries/Crow/include
-    external_libraries/asio/include
-    ${MONGO_CXX_DRIVER_PATH}
-    ${MONGO_C_DRIVER_PATH}
-)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+
+# Set paths for external libraries
+set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/external_libraries/boost)
+set(CROW_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/Crow/include)
+set(ASIO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/asio/include)
+
+# MongoDB C++ Driver paths (adjust these based on the find command results)
+set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.dylib")
+set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.dylib")
+
+# Include directories
+set(INCLUDE_PATHS 
+    ${BOOST_ROOT}
+    ${CROW_INCLUDE_DIR}
+    ${ASIO_INCLUDE_DIR}
+    /usr/local/include/mongocxx/v_noabi
+    /usr/local/include/bsoncxx/v_noabi
+    /usr/local/include/libmongoc-1.0
+    /usr/local/include/libbson-1.0
+    include
+)
+
+# Add these lines to find MongoDB C++ driver
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
+
+
+# Include directories
+set(INCLUDE_PATHS 
+    ${BOOST_ROOT}
+    ${CROW_INCLUDE_DIR}
+    ${ASIO_INCLUDE_DIR}
+    /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
+    include
+)
+
+include_directories ("/usr/local/include/mongocxx/v_noabi")
+include_directories("/usr/local/include/libmongoc-1.0")
+include_directories("/usr/local/include/bsoncxx/v_noabi")
+include_directories("/usr/local/include/libbson-1.0")
+include_directories("/usr/local/lib -lmongocxx -lbsoncxx")
+
 
 set(SOURCE_FILES 
     src/main.cpp 
     src/RouteController.cpp
     src/DatabaseManager.cpp
-
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
@@ -41,26 +70,24 @@ set(TEST_FILES
 # Main project executable
 add_executable(GitGud ${SOURCE_FILES})
 
+# Google Test setup
 include(FetchContent)
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
-
 FetchContent_MakeAvailable(googletest)
 
 # Include directories for main executable
-target_include_directories(GitGud PUBLIC 
-    ${INCLUDE_PATHS} 
-    include
-    #/opt/homebrew/Cellar/asio/1.30.211
-    /opt/homebrew/opt/asio/include
-)
+target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 
+# Link libraries
 target_link_libraries(GitGud PRIVATE 
     gtest 
     gtest_main
+    ${MONGOCXX_LIB_PATH}
+    ${BSONCXX_LIB_PATH}
 )
 
 enable_testing()
@@ -68,20 +95,18 @@ enable_testing()
 # Test executable
 add_executable(GitGudTests ${TEST_FILES} ${SOURCE_FILES})
 
-target_include_directories(GitGudTests PRIVATE 
-    ${INCLUDE_PATHS} 
-    include
-    #/opt/homebrew/opt/asio/1.30.2/include
-    /opt/homebrew/opt/asio/include
-)
+target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 
 target_link_libraries(GitGudTests PRIVATE 
     gtest 
     gtest_main
+    ${MONGOCXX_LIB_PATH}
+    ${BSONCXX_LIB_PATH}
 )
 
 include(GoogleTest)
 gtest_discover_tests(GitGudTests)
+
 
 add_custom_target(
     run_tests

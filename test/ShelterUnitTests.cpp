@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "Shelter.h"
 
+
+
 class ShelterUnitTests : public ::testing::Test {
 protected:
     static Shelter* shelter;
@@ -23,3 +25,5 @@ TEST_F(ShelterUnitTests, GetName) {
 TEST_F(ShelterUnitTests, GetLocation) {
     EXPECT_EQ(shelter->getLocation(), "123 Main St");
 }
+
+Shelter* ShelterUnitTests::shelter = nullptr;

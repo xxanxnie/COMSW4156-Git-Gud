@@ -2,6 +2,8 @@
 #include "DatabaseManager.h"
 #include <iostream>
 #include <algorithm>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
 
 DatabaseManager::DatabaseManager(const std::string& uri)
     : conn(mongocxx::uri{uri}) {}
@@ -62,4 +64,27 @@ void DatabaseManager::findResource(const std::string& collectionName, const std:
     for (auto&& doc : cursor) {
         std::cout << bsoncxx::to_json(doc) << std::endl;
     }
+}
+
+bsoncxx::document::value DatabaseManager::getResources(const std::string& resourceType) {
+    auto collection = conn["GitGud"]["Resources"];
+    auto filter = bsoncxx::builder::stream::document{} << "type" << resourceType << bsoncxx::builder::stream::finalize;
+    auto cursor = collection.find(filter.view());
+
+    using bsoncxx::builder::stream::document;
+    using bsoncxx::builder::stream::finalize;
+    using bsoncxx::builder::stream::array;
+
+    auto result = document{};
+    auto resources_array = array{};
+
+    for (auto&& doc : cursor) {
+        resources_array << bsoncxx::builder::stream::open_document
+                        << bsoncxx::builder::stream::concatenate(doc)
+                        << bsoncxx::builder::stream::close_document;
+    }
+
+    result << "resources" << resources_array;
+
+    return result << finalize;
 }

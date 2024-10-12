@@ -23,3 +23,5 @@ TEST_F(CounselingUnitTests, GetCounselorName) {
 TEST_F(CounselingUnitTests, GetSpecialty) {
     EXPECT_EQ(counseling->getSpecialty(), "Mental Health");
 }
+
+Counseling* CounselingUnitTests::counseling = nullptr;

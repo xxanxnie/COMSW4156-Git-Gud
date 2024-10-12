@@ -3,6 +3,7 @@
 #include <string>
 #include <exception>
 #include <iostream>
+#include <bsoncxx/json.hpp>
 
 #include "RouteController.h"
 
@@ -33,6 +34,7 @@ void RouteController::getResources(const crow::request& req, crow::response& res
             return;
         }
 
+        // Implement this method in DatabaseManager
         auto resources = dbManager.getResources(resourceType);
         res.code = 200;
         res.write(bsoncxx::to_json(resources));
@@ -45,19 +47,21 @@ void RouteController::getResources(const crow::request& req, crow::response& res
 // Add resource route
 void RouteController::addResource(const crow::request& req, crow::response& res) {
     try {
-        if (!validateInputs(req, &res)) {
-            return;
-        }
+        // Remove or implement validateInputs
+        // if (!validateInputs(req, &res)) {
+        //     return;
+        // }
 
         auto resource = bsoncxx::from_json(req.body);
-        dbManager.insertDocument("Resources", resource);
+        // Convert bsoncxx::document::value to vector of pairs
+        std::vector<std::pair<std::string, std::string>> keyValues;
+        for (auto element : resource.view()) {
+            keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
+        }
+        dbManager.insertResource("Resources", keyValues);
 
         res.code = 201; // Created
         res.write("Resource added successfully.");
-        res.end();
-    } catch (const bsoncxx::exception& e) {
-        res.code = 400;
-        res.write("Error: Invalid JSON format.");
         res.end();
     } catch (const std::exception& e) {
         res = handleException(e);
@@ -67,9 +71,10 @@ void RouteController::addResource(const crow::request& req, crow::response& res)
 // Update resource route
 void RouteController::updateResource(const crow::request& req, crow::response& res) {
     try {
-        if (!validateInputs(req, &res)) {
-            return;
-        }
+        // Remove or implement validateInputs
+        // if (!validateInputs(req, &res)) {
+        //     return;
+        // }
 
         auto resource = bsoncxx::from_json(req.body);
         if (!resource["id"]) {
@@ -79,15 +84,18 @@ void RouteController::updateResource(const crow::request& req, crow::response& r
             return;
         }
 
-        auto id = resource["id"].get_oid().value.to_string();
-        dbManager.updateResource("Resources", id, resource);
+        auto id = resource["id"].get_utf8().value.to_string();
+        // Convert bsoncxx::document::value to vector of pairs
+        std::vector<std::pair<std::string, std::string>> updates;
+        for (auto element : resource.view()) {
+            if (element.key().to_string() != "id") {
+                updates.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
+            }
+        }
+        dbManager.updateResource("Resources", id, updates);
 
         res.code = 200;
         res.write("Resource updated successfully.");
-        res.end();
-    } catch (const bsoncxx::exception& e) {
-        res.code = 400;
-        res.write("Error: Invalid JSON format.");
         res.end();
     } catch (const std::exception& e) {
         res = handleException(e);
@@ -105,7 +113,7 @@ void RouteController::deleteResource(const crow::request& req, crow::response& r
             return;
         }
 
-        dbManager.deleteDocument("Resources", resourceId);
+        dbManager.deleteResource("Resources", resourceId);
         res.code = 200;
         res.write("Resource deleted successfully.");
         res.end();
