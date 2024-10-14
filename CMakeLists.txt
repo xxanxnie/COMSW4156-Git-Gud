@@ -67,6 +67,16 @@ set(TEST_FILES
     test/RouteControllerUnitTests.cpp
 )
 
+set(SOURCE_FILES_NO_MAIN
+    src/RouteController.cpp
+    src/DatabaseManager.cpp
+    src/services/Counseling.cpp
+    src/services/Food.cpp
+    src/services/Healthcare.cpp
+    src/services/Outreach.cpp
+    src/services/Shelter.cpp
+)
+
 # Main project executable
 add_executable(GitGud ${SOURCE_FILES})
 
@@ -93,7 +103,7 @@ target_link_libraries(GitGud PRIVATE
 enable_testing()
 
 # Test executable
-add_executable(GitGudTests ${TEST_FILES} ${SOURCE_FILES})
+add_executable(GitGudTests ${TEST_FILES} ${SOURCE_FILES_NO_MAIN})
 
 target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 
