@@ -4,15 +4,15 @@
 #include <string>
 
 class Food {
-public:
-    Food(const std::string& type, const std::string& quantity);
-    
-    std::string getType() const;
-    std::string getQuantity() const;
+ public:
+  Food(const std::string& type, const std::string& quantity);
 
-private:
-    std::string type;
-    std::string quantity;
+  std::string getType() const;
+  std::string getQuantity() const;
+
+ private:
+  std::string type;
+  std::string quantity;
 };
 
-#endif 
+#endif
