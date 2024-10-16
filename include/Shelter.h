@@ -12,14 +12,16 @@ class Shelter {
   Shelter(DatabaseManager& dbManager)
       : dbManager(dbManager), collection_name("Shelter") {}
 
-  std::string addShelter(std::string ORG, std::string target,
+  std::string addShelter(std::string ORG, std::string User,
                          std::string location, int capacity, int curUse);
   std::string deleteShelter();
-  std::string searchShelter() const;
+  std::string searchShelterAll();
   std::string updateShelter();
   std::vector<std::pair<std::string, std::string>> createDBContent(
-      std::string ORG, std::string target, std::string location,
+      std::string ORG, std::string User, std::string location,
       std::string capacity, std::string curUse);
+  void printShelters(std::vector<bsoncxx::document::view>& shelters) const;
+  std::string getShelterID(bsoncxx::document::view& shelter);
 
  private:
   DatabaseManager& dbManager;

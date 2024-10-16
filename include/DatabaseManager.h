@@ -13,6 +13,10 @@ class DatabaseManager {
 
   void createCollection(const std::string& collectionName);
   void printCollection(const std::string& collectionName);
+  void findCollection(
+      const std::string& collectionName,
+      const std::vector<std::pair<std::string, std::string>>& keyValues,
+      std::vector < bsoncxx::document::view > &result);
   void insertResource(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues);
