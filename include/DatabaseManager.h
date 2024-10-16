@@ -16,7 +16,7 @@ class DatabaseManager {
   void findCollection(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues,
-      std::vector < bsoncxx::document::view > &result);
+      std::vector < bsoncxx::document::value > &result);
   void insertResource(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues);

@@ -5,6 +5,8 @@
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
 #include "DatabaseManager.h"
+#include <bsoncxx/json.hpp>
+#include <sstream>
 
 Counseling::Counseling(DatabaseManager& dbManager)
     : dbManager(dbManager), collection_name("Counseling") {}
@@ -34,12 +36,13 @@ std::string Counseling::deleteCounselor(const std::string& counselorId) {
 }
 
 std::string Counseling::searchCounselorsAll() {
-  std::vector<bsoncxx::document::view> result;
+  std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
   std::string ret;
   if (!result.empty()) {
     ret = printCounselors(result);
-    getCounselorID(result[0]);
+  } else {
+    ret = "[]"; // Return an empty JSON array if no results
   }
   return ret;
 }
@@ -55,11 +58,20 @@ std::string Counseling::getCounselorID(const bsoncxx::document::view& counselor)
   return id;
 }
 
-std::string Counseling::printCounselors(const std::vector<bsoncxx::document::view>& counselors) const {
-  std::string ret;
-  for (const auto& counselor : counselors) {
-    ret += bsoncxx::to_json(counselor) + "\n";
-    // Implementation for printing counselors
-  }
-  return ret;
+std::string Counseling::printCounselors(std::vector<bsoncxx::document::value>& counselors) const {
+    std::string ret = "[";
+    for (const auto& counselor : counselors) {
+        try {
+            ret += bsoncxx::to_json(counselor.view()) + ",";
+        } catch (const std::exception& e) {
+            std::cerr << "Error processing counselor document: " << e.what() << std::endl;
+            ret += "{\"error\":\"Unable to process this counselor data\"},";
+        }
+    }
+    
+    if (ret.back() == ',') {
+        ret.pop_back(); // Remove the trailing comma
+    }
+    ret += "]";
+    return ret;
 }

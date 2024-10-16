@@ -38,7 +38,7 @@ std::string Shelter::updateShelter() { return "Update"; }
 std::string Shelter::deleteShelter() { return "Delete"; }
 std::string Shelter::searchShelterAll() {
   std::vector<bsoncxx::document::view> result;
-  dbManager.findCollection(collection_name, {}, result);
+  //dbManager.findCollection(collection_name, {}, result);
   std::string ret;
   if (result.size() > 0) {
     ret = printShelters(result);

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/document/value.hpp>
 
 class DatabaseManager;
 
@@ -23,7 +23,7 @@ class Counseling {
 
   std::vector<std::pair<std::string, std::string>> createDBContent(const std::string& counselorName, const std::string& specialty);
   std::string getCounselorID(const bsoncxx::document::view& counselor);
-  std::string printCounselors(const std::vector<bsoncxx::document::view>& counselors) const;
+  std::string printCounselors(std::vector<bsoncxx::document::value>& counselors) const;
 };
 
 #endif
