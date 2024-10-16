@@ -12,10 +12,10 @@
 #include "DatabaseManager.h"
 
 class RouteController {
-    private:
+    private: 
         DatabaseManager& dbManager;  // Reference to the database manager
 
-    public:
+    public: 
         // Add a constructor
         RouteController(DatabaseManager& dbManager) : dbManager(dbManager) {}
 
@@ -28,6 +28,8 @@ class RouteController {
         void addResource(const crow::request& req, crow::response& res);
         void updateResource(const crow::request& req, crow::response& res);
         void deleteResource(const crow::request& req, crow::response& res);
+
+        void addOutreach(const crow::request& req, crow::response& res);
 };
 
 #endif 

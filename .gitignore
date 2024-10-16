@@ -5,5 +5,6 @@ external_libraries/boost
 external_libraries/Crow
 external_libraries/asio
 external_libraries/boost
+external_libraries/mongo-cxx-driver
 !external_libraries/install_libraries.sh
 !app.out

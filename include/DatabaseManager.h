@@ -1,4 +1,5 @@
 #pragma once
+
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -19,7 +20,13 @@ public:
     void findResource(const std::string& collectionName, const std::string& resourceId);
     void deleteDocument(const std::string& collectionName, const std::string& resourceId);
     bsoncxx::document::value getResources(const std::string& resourceType);
+
+    void findCollection(const std::string& collectionName,
+                        const std::vector<std::pair<std::string, std::string>>& keyValues,
+                        std::vector<bsoncxx::document::value>& result);
     
+    void insertOutreachPrograms();
+
 private:
     mongocxx::client conn;
 
