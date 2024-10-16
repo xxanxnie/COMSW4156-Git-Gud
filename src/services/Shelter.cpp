@@ -5,7 +5,7 @@
  * Add the shelter information to our database
  *
  * @param ORG     The organization who gave the infomation.
- * @param target     The target this service provide.
+ * @param User     The target this service provide for.
  * @param location     The location of the shelter.
  * @param capacity     The maximum number of users that the shelter can handle.
  * @param curUse       The current users that using this shelter.
@@ -16,7 +16,11 @@ std::string Shelter::addShelter(std::string ORG, std::string User,
                                 int curUse) {
   auto content = createDBContent(ORG, User, location, std::to_string(capacity),
                                  std::to_string(curUse));
-  dbManager.insertResource(collection_name, content);
+  try {
+    dbManager.insertResource(collection_name, content);
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << '\n';
+  }
   return "Success";
 }
 std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
@@ -35,20 +39,24 @@ std::string Shelter::deleteShelter() { return "Delete"; }
 std::string Shelter::searchShelterAll() {
   std::vector<bsoncxx::document::view> result;
   dbManager.findCollection(collection_name, {}, result);
+  std::string ret;
   if (result.size() > 0) {
-    printShelter(result);
+    ret = printShelters(result);
     getShelterID(result[0]);
   }
-  return "Search";
+  return ret;
 }
 std::string Shelter::getShelterID(bsoncxx::document::view &shelter) {
   std::string id = shelter["_id"].get_oid().value.to_string();
   std::cout << id << std::endl;
   return id;
 }
-void Shelter::printShelters(
+std::string Shelter::printShelters(
     std::vector<bsoncxx::document::view> &shelters) const {
+  std::string ret;
   for (auto shelter : shelters) {
-    std::cout << bsoncxx::to_json(shelter) << std::endl;
+    ret +=bsoncxx::to_json(shelter)+"\n";
   }
+  std::cout << ret << std::endl;
+  return ret;
 }

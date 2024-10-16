@@ -20,7 +20,7 @@ class Shelter {
   std::vector<std::pair<std::string, std::string>> createDBContent(
       std::string ORG, std::string User, std::string location,
       std::string capacity, std::string curUse);
-  void printShelters(std::vector<bsoncxx::document::view>& shelters) const;
+  std::string printShelters(std::vector<bsoncxx::document::view>& shelters) const;
   std::string getShelterID(bsoncxx::document::view& shelter);
 
  private:

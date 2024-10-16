@@ -50,19 +50,17 @@ int main(int argc, char* argv[]) {
   dbManager.createCollection("Outreach");
   dbManager.createCollection("Shelter");
   dbManager.createCollection("Counseling");
-  Shelter s(dbManager);
-//   s.addShelter("tmp", "poor", "New York", 20, 10);
-  s.searchShelterAll();
+
   // Initialize the HTTP server
-  // crow::SimpleApp app;
+  crow::SimpleApp app;
 
-  // // Initialize route controller with DatabaseManager
-  // RouteController routeController(dbManager);
-  // routeController.initRoutes(app);  // Pass the DatabaseManager to the
-  // RouteController
+  // Initialize route controller with DatabaseManager
+  RouteController routeController(dbManager);
+  routeController.initRoutes(
+      app);  // Pass the DatabaseManager to the RouteController
 
-  // // Start the server
-  // app.port(8080).multithreaded().run();
+  // Start the server
+  app.port(8080).multithreaded().run();
 
   return 0;
 }

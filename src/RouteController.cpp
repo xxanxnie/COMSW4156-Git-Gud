@@ -72,7 +72,40 @@ void RouteController::addResource(const crow::request& req,
     res = handleException(e);
   }
 }
-
+void RouteController::getShelter(const crow::request& req,
+                                 crow::response& res) {
+  try {
+    // Parse the request body into a BSON document
+    Shelter s(dbManager);
+    std::string response = s.searchShelterAll();
+    res.code = 200;
+    res.write(response);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
+void RouteController::addShelter(const crow::request& req,
+                                 crow::response& res) {
+  try {
+    // Parse the request body into a BSON document
+    auto resource = bsoncxx::from_json(req.body);
+    Shelter s(dbManager);
+    std::vector<std::string> content;
+    for (auto element : resource.view()) {
+      if (element.key().to_string() != "id") {
+        content.push_back(element.get_utf8().value.to_string());
+      }
+    }
+    s.addShelter(content[0], content[1], content[2], atoi(content[3].c_str()),
+                 atoi(content[4].c_str()));
+    res.code = 201;  // Created
+    res.write("Shelter resource added successfully.");
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
 // Update resource route
 void RouteController::updateResource(const crow::request& req,
                                      crow::response& res) {
@@ -157,5 +190,15 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::DELETE)(
           [this](const crow::request& req, crow::response& res) {
             deleteResource(req, res);
+          });
+  CROW_ROUTE(app, "/resources/shelter")
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
+            addShelter(req, res);
+          });
+  CROW_ROUTE(app, "/resources/shelter")
+      .methods(crow::HTTPMethod::GET)(
+          [this](const crow::request& req, crow::response& res) {
+            getShelter(req, res);
           });
 }
