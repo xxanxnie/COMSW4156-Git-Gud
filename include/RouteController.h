@@ -28,6 +28,8 @@ class RouteController {
         void addResource(const crow::request& req, crow::response& res);
         void updateResource(const crow::request& req, crow::response& res);
         void deleteResource(const crow::request& req, crow::response& res);
+
+        void addFood(const crow::request& req, crow::response& res);
 };
 
 #endif 

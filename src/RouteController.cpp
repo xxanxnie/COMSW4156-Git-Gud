@@ -6,7 +6,7 @@
 #include <bsoncxx/json.hpp>
 
 #include "RouteController.h"
-
+#include "Food.h"
 // Utility function to handle exceptions
 crow::response handleException(const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -122,6 +122,31 @@ void RouteController::deleteResource(const crow::request& req, crow::response& r
     }
 }
 
+// Add food route
+void RouteController::addFood(const crow::request& req, crow::response& res) {
+    try {
+        // Parse the request body into a BSON document
+        auto resource = bsoncxx::from_json(req.body);
+
+        // Convert bsoncxx::document::value to vector of pairs
+        std::vector<std::pair<std::string, std::string>> keyValues;
+        for (auto element : resource.view()) {
+            keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
+        }
+
+        Food food(keyValues, dbManager);
+
+        food.insertFood();
+
+        res.code = 201; // Created
+        res.write("Food resource added successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+
 // Initialize API Routes
 void RouteController::initRoutes(crow::SimpleApp& app) {
     CROW_ROUTE(app, "/")
@@ -148,4 +173,9 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
         .methods(crow::HTTPMethod::DELETE)([this](const crow::request& req, crow::response& res) {
             deleteResource(req, res);
         });
+    
+    CROW_ROUTE(app, "/resources/food")
+    .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+        addFood(req, res);
+    });
 }

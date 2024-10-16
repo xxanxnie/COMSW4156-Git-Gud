@@ -1,12 +1,18 @@
 #include "Food.h"
+#include <iostream>
 
-Food::Food(const std::string& type, const std::string& quantity)
-    : type(type), quantity(quantity) {}
-
-std::string Food::getType() const {
-    return type;
+Food::Food(const std::vector<std::pair<std::string, std::string>>& resource, DatabaseManager& db)
+    : resource(resource), db(db) {
 }
 
-std::string Food::getQuantity() const {
-    return quantity;
+void Food::insertFood() {
+    try {
+        db.insertResource("Food", resource);
+        std::cout << "Food resource inserted successfully." << std::endl;  
+    } catch (const std::exception& e) {
+        std::cerr << "Error inserting food resource: " << e.what() << std::endl;
+        throw;  
+    }
 }
+
+
