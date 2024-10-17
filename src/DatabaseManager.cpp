@@ -24,12 +24,12 @@ void DatabaseManager::createCollection(const std::string& collectionName) {
 void DatabaseManager::findCollection(
     const std::string& collectionName,
     const std::vector<std::pair<std::string, std::string>>& keyValues,
-    std::vector<bsoncxx::document::view>& result) {
+    std::vector<bsoncxx::document::value>& result) {
   auto collection = conn["GitGud"][collectionName];
   auto cursor = collection.find(createDocument(keyValues).view());
   for (auto&& doc : cursor) {
     //   std::cout << bsoncxx::to_json(doc) << std::endl;
-    result.push_back(doc);
+    result.push_back(bsoncxx::document::value(doc));
   }
 }
 void DatabaseManager::printCollection(const std::string& collectionName) {
@@ -57,7 +57,10 @@ void DatabaseManager::deleteResource(const std::string& collectionName,
   auto collection = conn["GitGud"][collectionName];
   collection.delete_one(createDocument({{"_id", resourceId}}).view());
 }
-
+void DatabaseManager::deleteCollection(const std::string& collectionName) {
+  auto collection = conn["GitGud"][collectionName];
+  collection.drop();
+}
 void DatabaseManager::updateResource(
     const std::string& collectionName, const std::string& resourceId,
     const std::vector<std::pair<std::string, std::string>>& updates) {

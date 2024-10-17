@@ -76,7 +76,7 @@ void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
   try {
     // Parse the request body into a BSON document
-    Shelter s(dbManager);
+    Shelter s(dbManager, "Shelter");
     std::string response = s.searchShelterAll();
     res.code = 200;
     res.write(response);
@@ -90,7 +90,7 @@ void RouteController::addShelter(const crow::request& req,
   try {
     // Parse the request body into a BSON document
     auto resource = bsoncxx::from_json(req.body);
-    Shelter s(dbManager);
+    Shelter s(dbManager, "Shelter");
     std::vector<std::string> content;
     for (auto element : resource.view()) {
       if (element.key().to_string() != "id") {

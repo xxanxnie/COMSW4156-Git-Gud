@@ -14,12 +14,13 @@
 std::string Shelter::addShelter(std::string ORG, std::string User,
                                 std::string location, int capacity,
                                 int curUse) {
-  auto content = createDBContent(ORG, User, location, std::to_string(capacity),
-                                 std::to_string(curUse));
   try {
+    auto content = createDBContent(
+        ORG, User, location, std::to_string(capacity), std::to_string(curUse));
     dbManager.insertResource(collection_name, content);
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
+    return "Error: " + std::string(e.what());
   }
   return "Success";
 }
@@ -34,29 +35,36 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
   content.push_back({"curUse", curUse});
   return content;
 }
-std::string Shelter::updateShelter() { return "Update"; }
-std::string Shelter::deleteShelter() { return "Delete"; }
 std::string Shelter::searchShelterAll() {
-  std::vector<bsoncxx::document::view> result;
+  std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
-  std::string ret;
+  std::string ret = "[]";
   if (result.size() > 0) {
     ret = printShelters(result);
-    getShelterID(result[0]);
+    // getShelterID(result[0]);
   }
   return ret;
 }
-std::string Shelter::getShelterID(bsoncxx::document::view &shelter) {
+std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
   std::string id = shelter["_id"].get_oid().value.to_string();
   std::cout << id << std::endl;
   return id;
 }
 std::string Shelter::printShelters(
-    std::vector<bsoncxx::document::view> &shelters) const {
+    std::vector<bsoncxx::document::value> &shelters) const {
   std::string ret;
   for (auto shelter : shelters) {
-    ret +=bsoncxx::to_json(shelter)+"\n";
+    for (auto element : shelter.view()) {
+      if (element.type() != bsoncxx::type::k_oid) {
+        std::cout << element.get_string().value << " ";
+        ret += element.get_string().value.to_string()+" ";
+      }
+    }
+    ret += "\n";
+    // ret += bsoncxx::to_json(shelter) + "\n";
   }
   std::cout << ret << std::endl;
   return ret;
 }
+std::string Shelter::updateShelter() { return "Update"; }
+std::string Shelter::deleteShelter() { return "Delete"; }

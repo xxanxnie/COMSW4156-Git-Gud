@@ -16,12 +16,13 @@ class DatabaseManager {
   void findCollection(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues,
-      std::vector < bsoncxx::document::view > &result);
+      std::vector<bsoncxx::document::value>& result);
   void insertResource(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues);
   void deleteResource(const std::string& collectionName,
                       const std::string& resourceId);
+  void deleteCollection(const std::string& collectionName);
   void updateResource(
       const std::string& collectionName, const std::string& resourceId,
       const std::vector<std::pair<std::string, std::string>>& updates);
