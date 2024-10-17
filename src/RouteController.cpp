@@ -134,12 +134,30 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
             keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
         }
 
-        Food food(keyValues, dbManager);
+        Food food(dbManager);
 
-        food.insertFood();
+        food.insertFood(keyValues);
 
         res.code = 201; // Created
         res.write("Food resource added successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+// Get all food resources route
+void RouteController::getAllFood(const crow::request& req, crow::response& res) {
+    try {
+        // Instantiate the Food class and pass the dbManager
+        Food food(dbManager);
+
+        // Fetch all food resources from the database
+        std::string response = food.getAllFood();
+
+        // Send the response
+        res.code = 200;
+        res.write(response);
         res.end();
     } catch (const std::exception& e) {
         res = handleException(e);
@@ -174,8 +192,14 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             deleteResource(req, res);
         });
     
-    CROW_ROUTE(app, "/resources/food")
+    CROW_ROUTE(app, "/resources/addFood")
     .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
         addFood(req, res);
+    });
+
+        // New route to get all food resources
+    CROW_ROUTE(app, "/resources/getAllFood")
+        .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+            getAllFood(req, res);
     });
 }

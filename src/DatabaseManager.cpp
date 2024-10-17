@@ -33,6 +33,17 @@ void DatabaseManager::printCollection(const std::string& collectionName) {
     }
 }
 
+void DatabaseManager::findCollection(
+    const std::string& collectionName,
+    const std::vector<std::pair<std::string, std::string>>& keyValues,
+    std::vector<bsoncxx::document::value>& result) {
+  auto collection = conn["GitGud"][collectionName];
+  auto cursor = collection.find(createDocument(keyValues).view());
+
+  for (auto&& doc : cursor) {
+    result.push_back(bsoncxx::document::value(doc));
+  }
+}
 void DatabaseManager::insertResource(const std::string& collectionName, const std::vector<std::pair<std::string, std::string>>& keyValues) {
     auto collection = conn["GitGud"][collectionName];
     collection.insert_one(createDocument(keyValues).view());

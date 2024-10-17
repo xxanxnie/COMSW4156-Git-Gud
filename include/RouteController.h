@@ -30,6 +30,7 @@ class RouteController {
         void deleteResource(const crow::request& req, crow::response& res);
 
         void addFood(const crow::request& req, crow::response& res);
+        void getAllFood(const crow::request& req, crow::response& res);
 };
 
 #endif 

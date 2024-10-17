@@ -8,13 +8,16 @@
 
 class Food {
 private:
-    std::vector<std::pair<std::string, std::string>> resource;  
+    // std::vector<std::pair<std::string, std::string>> resource;  
     DatabaseManager& db;  // Reference to the database manager
 
 public:
-    Food(const std::vector<std::pair<std::string, std::string>>& reasource, DatabaseManager& db);
+    Food(DatabaseManager& db);
 
-    void insertFood();
+    void insertFood(const std::vector<std::pair<std::string, std::string>>& reasource);
+
+    std::string getAllFood();
+
 };
 
 #endif 

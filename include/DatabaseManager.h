@@ -18,6 +18,10 @@ public:
     void updateResource(const std::string& collectionName, const std::string& resourceId, const std::vector<std::pair<std::string, std::string>>& updates);
     void findResource(const std::string& collectionName, const std::string& resourceId);
     void deleteDocument(const std::string& collectionName, const std::string& resourceId);
+    void findCollection(
+    const std::string& collectionName,
+    const std::vector<std::pair<std::string, std::string>>& keyValues,
+    std::vector < bsoncxx::document::value > &result);
     bsoncxx::document::value getResources(const std::string& resourceType);
     
 private:
