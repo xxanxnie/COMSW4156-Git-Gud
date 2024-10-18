@@ -377,17 +377,17 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
         addCounseling(req, res);
       });
 
-  CROW_ROUTE(app, "/resources/counseling")
-    .methods(crow::HTTPMethod::PATCH)(
-      [this](const crow::request& req, crow::response& res) {
-        updateCounseling(req, res);
-      });
+  // CROW_ROUTE(app, "/resources/counseling")
+  //   .methods(crow::HTTPMethod::PATCH)(
+  //     [this](const crow::request& req, crow::response& res) {
+  //       updateCounseling(req, res);
+  //     });
 
-  CROW_ROUTE(app, "/resources/counseling")
-    .methods(crow::HTTPMethod::DELETE)(
-      [this](const crow::request& req, crow::response& res) {
-        deleteCounseling(req, res);
-        });
+  // CROW_ROUTE(app, "/resources/counseling")
+  //   .methods(crow::HTTPMethod::DELETE)(
+  //     [this](const crow::request& req, crow::response& res) {
+  //       deleteCounseling(req, res);
+  //       });
 
   CROW_ROUTE(app, "/resources/outreach/add")
       .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
