@@ -47,6 +47,32 @@ If you ever need to clean up some files `make clean` is always an option
 # Running a Cloud Based Instance
 
 # Endpoints
+
+**Outreach**
+
+* Expected Input json:
+{ 
+ "targetAudience", "HML", 
+ "ProgramName", "Emergency Shelter Access", 
+ "description", "Provide information and assistance for accessing shelters.", 
+ "programDate", "05/01/24 - 12/31/24",
+ "location", "Bowery Mission, 227 Bowery, NY",
+ "contactInfo", "Sarah Johnson, sarah@email.com"
+}
+
+1. Add Outreach Service
+- **Endpoint:** `POST /resources/outreach/add`
+- **Description:** This endpoint allows clients to add a new outreach service to the system. It expects a POST request containing the necessary details about the outreach service in the request body (e.g., target audience, program name, description, program date, location, and contact informationn). Upon successful addition, the server will respond with a confirmation message.
+* Upon Success: HTTP 201 Status Code is returned string Success
+* Upon Failure: returned string error msg
+
+2. Get All Outreach Services
+- **Endpoint:** `GET /resources/outreach/getAll`
+- **Description:** This endpoint retrieves all outreach services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details such as the target audience, program name, description, program date, location, and contact information.
+* Upon Success: HTTP 201 Status Code is returned string Success
+* Upon Failure: returned string error msg
+
+**Shelter**
 POST /resources/shelter
 * Expected Input json:
 { 
@@ -66,6 +92,7 @@ GET /resources/shelter
 
 * Upon Success: HTTP 200 Status Code is returned string concat all data content
 * Upon Failure: returned string error msg
+
 # Branch Coverage
 
 This project uses **GCOV** (coverage tool) and **LCOV** (graphical front-end for GCOV) to generate branch coverage reports for C++ code. After building the project using CMake in the build folder, run `make coverage` which will automatically open the HTML file to view the branch coverage report. If coverage needs to be run again, it may be necessary to clean previous coverage data by using the following commands to delete old `.gcda` and `.gcno` files and rebuild the project:
