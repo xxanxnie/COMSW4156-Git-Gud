@@ -10,15 +10,15 @@
 #include <string>
 
 #include "../external_libraries/Crow/include/crow.h"
+#include "Counseling.h"
 #include "DatabaseManager.h"
 #include "Shelter.h"
-#include "Counseling.h"
 
 class RouteController {
- private: 
+ private:
   DatabaseManager& dbManager;  // Reference to the database manager
 
- public: 
+ public:
   // Constructor
   RouteController(DatabaseManager& dbManager) : dbManager(dbManager) {}
 

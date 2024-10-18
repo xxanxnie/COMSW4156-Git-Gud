@@ -3,33 +3,36 @@
 
 #include <string>
 #include <vector>
+
 #include "DatabaseManager.h"
 
 class HealthcareService {
-public:
+ public:
+  std::string collection_name;
 
-    std::string collection_name;
+  HealthcareService(DatabaseManager& dbManager,
+                    const std::string& collection_name)
+      : dbManager(dbManager), collection_name(collection_name) {}
 
-    HealthcareService(DatabaseManager& dbManager, const std::string& collection_name)
-        : dbManager(dbManager), collection_name(collection_name) {}
+  std::string addHealthcareService(const std::string& provider,
+                                   const std::string& serviceType,
+                                   const std::string& location,
+                                   const std::string& operatingHours,
+                                   const std::string& eligibilityCriteria,
+                                   const std::string& contactInfo);
 
-    std::string addHealthcareService(const std::string& provider, const std::string& serviceType, 
-                                     const std::string& location, const std::string& operatingHours, 
-                                     const std::string& eligibilityCriteria, const std::string& contactInfo);
+  std::string getAllHealthcareServices();
 
-    std::string getAllHealthcareServices();
+  std::vector<std::pair<std::string, std::string>> createDBContent(
+      const std::string& provider, const std::string& serviceType,
+      const std::string& location, const std::string& operatingHours,
+      const std::string& eligibilityCriteria, const std::string& contactInfo);
 
-    std::vector<std::pair<std::string, std::string>> createDBContent(const std::string& provider, 
-                                                                     const std::string& serviceType, 
-                                                                     const std::string& location, 
-                                                                     const std::string& operatingHours, 
-                                                                     const std::string& eligibilityCriteria, 
-                                                                     const std::string& contactInfo);
+  std::string printHealthcareServices(
+      std::vector<bsoncxx::document::value>& services) const;
 
-    std::string printHealthcareServices(std::vector<bsoncxx::document::value>& services) const;
-
-private:
-    DatabaseManager& dbManager;
+ private:
+  DatabaseManager& dbManager;
 };
 
 #endif

@@ -1,3 +1,4 @@
+// Copyright 2024 COMSW4156-Git-Gud
 #include <gtest/gtest.h>
 
 #include "Food.h"
@@ -6,13 +7,13 @@ class FoodUnitTests : public ::testing::Test {
  protected:
   static Food* food;
 
-    // static void SetUpTestSuite() {
-    //     food = new Food("Bread", "10 loaves");
-    // }
+  // static void SetUpTestSuite() {
+  //     food = new Food("Bread", "10 loaves");
+  // }
 
-    // static void TearDownTestSuite() {
-    //     delete food;
-    // }
+  // static void TearDownTestSuite() {
+  //     delete food;
+  // }
 };
 
 // // Example test case for Food type
@@ -24,6 +25,5 @@ class FoodUnitTests : public ::testing::Test {
 // TEST_F(FoodUnitTests, GetQuantity) {
 //     EXPECT_EQ(food->getQuantity(), "10 loaves");
 // }
-
 
 // Food* FoodUnitTests::food = nullptr;

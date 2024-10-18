@@ -1,4 +1,4 @@
-// Copyright 2024 Annie, Xu
+// Copyright 2024 COMSW4156-Git-Gud
 
 #include "Outreach.h"
 

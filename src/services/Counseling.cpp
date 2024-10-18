@@ -1,12 +1,17 @@
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include "Counseling.h"
+
 #include <iostream>
-#include <vector>
-#include <utility>
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/types.hpp>
-#include "DatabaseManager.h"
-#include <bsoncxx/json.hpp>
 #include <sstream>
+#include <utility>
+#include <vector>
+
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+
+#include "DatabaseManager.h"
 
 // Constructor: Initialize Counseling with a DatabaseManager and set the collection name
 Counseling::Counseling(DatabaseManager &dbManager)
@@ -44,7 +49,7 @@ std::vector<std::pair<std::string, std::string>> Counseling::createDBContent(
 // Delete a counselor from the database (placeholder implementation)
 std::string Counseling::deleteCounselor(const std::string &counselorId)
 {
-  // TODO: Implement counselor deletion logic
+  // TODO(brendon): Implement counselor deletion logic
   return "Delete";
 }
 
@@ -71,7 +76,7 @@ std::string Counseling::searchCounselorsAll()
 // Update a counselor's information (placeholder implementation)
 std::string Counseling::updateCounselor(const std::string &counselorId, const std::string &field, const std::string &value)
 {
-  // TODO: Implement counselor update logic
+  // TODO(brendon): Implement counselor update logic
   return "Update";
 }
 
