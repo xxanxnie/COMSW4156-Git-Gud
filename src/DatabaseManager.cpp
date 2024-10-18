@@ -5,6 +5,7 @@
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <iostream>
+#include <bsoncxx/json.hpp>
 
 DatabaseManager::DatabaseManager(const std::string& uri)
     : conn(mongocxx::uri{uri}) {}
@@ -27,8 +28,8 @@ void DatabaseManager::findCollection(
     std::vector<bsoncxx::document::value>& result) {
   auto collection = conn["GitGud"][collectionName];
   auto cursor = collection.find(createDocument(keyValues).view());
+
   for (auto&& doc : cursor) {
-    //   std::cout << bsoncxx::to_json(doc) << std::endl;
     result.push_back(bsoncxx::document::value(doc));
   }
 }
