@@ -13,7 +13,8 @@ class Shelter {
       : dbManager(dbManager), collection_name(collection_name) {}
 
   virtual std::string addShelter(std::string ORG, std::string User,
-                         std::string location, int capacity, int curUse);
+                                 std::string location, int capacity,
+                                 int curUse);
   virtual std::string deleteShelter();
   virtual std::string searchShelterAll();
   virtual std::string updateShelter();
