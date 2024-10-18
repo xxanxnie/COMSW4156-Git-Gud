@@ -15,7 +15,7 @@ class Food {
  public:
   Food(DatabaseManager& db);
 
-  void insertFood(
+  void addFood(
       const std::vector<std::pair<std::string, std::string>>& reasource);
 
   std::string getAllFood();
