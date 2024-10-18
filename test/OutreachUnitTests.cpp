@@ -6,32 +6,8 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 
-#include "DatabaseManager.h"
+#include "MockDatabaseManager.h"
 #include "Outreach.h"
-
-/**
- * @brief Mock class for DatabaseManager.
- *
- * This class is used to mock the behavior of the DatabaseManager
- * for testing purposes, allowing for controlled responses in unit tests.
- */
-class MockDatabaseManager : public DatabaseManager {
- public:
-  MockDatabaseManager() : DatabaseManager("mongodb://localhost:27017", true) {}
-
-  MOCK_METHOD(
-      void, findCollection,
-      (const std::string& collectionName,
-       (const std::vector<std::pair<std::string, std::string>>& keyValues),
-       (std::vector<bsoncxx::document::value> & result)),
-      (override));
-
-  MOCK_METHOD(
-      void, insertResource,
-      (const std::string& collectionName,
-       (const std::vector<std::pair<std::string, std::string>>& keyValues)),
-      (override));
-};
 
 /**
  * @brief Unit tests for the OutreachService class.
@@ -42,11 +18,11 @@ class MockDatabaseManager : public DatabaseManager {
 class OutreachServiceUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
-  OutreachService* outreachService;
+  Outreach* outreachService;
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    outreachService = new OutreachService(*mockDbManager, "Outreach");
+    outreachService = new Outreach(*mockDbManager, "Outreach");
   }
 
   void TearDown() override {

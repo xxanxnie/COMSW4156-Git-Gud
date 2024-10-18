@@ -23,6 +23,7 @@ std::string Shelter::addShelter(std::string ORG, std::string User,
   }
   return "Success";
 }
+
 /**
  * Concat the input into data content format
  *
@@ -44,6 +45,7 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
   content.push_back({"curUse", curUse});
   return content;
 }
+
 /**
  * Get the all data content in Shelter collection, and print it
  *
@@ -60,10 +62,12 @@ std::string Shelter::searchShelterAll() {
   }
   return ret;
 }
+
 std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
   std::string id = shelter["_id"].get_oid().value.to_string();
   return id;
 }
+
 std::string Shelter::printShelters(
     std::vector<bsoncxx::document::value> &shelters) const {
   std::string ret;
@@ -77,5 +81,6 @@ std::string Shelter::printShelters(
   }
   return ret;
 }
+
 std::string Shelter::updateShelter() { return "Update"; }
 std::string Shelter::deleteShelter() { return "Delete"; }

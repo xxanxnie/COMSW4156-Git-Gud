@@ -1,39 +1,28 @@
-#include <gtest/gtest.h>
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include <gmock/gmock.h>
-#include "Healthcare.h"
-#include "DatabaseManager.h"
+#include <gtest/gtest.h>
+
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
+
 #include "Food.h"
-
-class MockDatabaseManager : public DatabaseManager {
-public:
-    MockDatabaseManager() : DatabaseManager("mongodb://localhost:27017", true) {}
-
-    MOCK_METHOD(void, findCollection, 
-        (const std::string& collectionName, 
-        (const std::vector<std::pair<std::string, std::string>>& keyValues), 
-        (std::vector<bsoncxx::document::value>& result)), (override));
-
-    MOCK_METHOD(void, insertResource, 
-        (const std::string& collectionName, 
-        (const std::vector<std::pair<std::string, std::string>>& keyValues)), (override));
-};
+#include "MockDatabaseManager.h"
 
 class FoodUnitTests : public ::testing::Test {
  protected:
-    Food* food;
-    MockDatabaseManager* mockDbManager;
+  Food* food;
+  MockDatabaseManager* mockDbManager;
 
-    void SetUp() override {
-        mockDbManager = new MockDatabaseManager();
-        food = new Food(*mockDbManager);
-    }
+  void SetUp() override {
+    mockDbManager = new MockDatabaseManager();
+    food = new Food(*mockDbManager);
+  }
 
-    void TearDown() override {
-        delete food;
-        delete mockDbManager;
-    }
+  void TearDown() override {
+    delete food;
+    delete mockDbManager;
+  }
 };
 
 TEST_F(FoodUnitTests, getAllFood) {
@@ -46,7 +35,8 @@ TEST_F(FoodUnitTests, getAllFood) {
                        << "expirationDate" << "2024-12-31"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
                                       ::testing::Return()));
 
@@ -58,23 +48,18 @@ TEST_F(FoodUnitTests, getAllFood) {
 }
 
 TEST_F(FoodUnitTests, addFood) {
-  // Define the food resource as a vector of key-value pairs
   std::vector<std::pair<std::string, std::string>> foodResource = {
       {"FoodType", "Vegetables"},
       {"Provider", "OrganicFarm"},
       {"location", "Queens"},
       {"quantity", "50"},
-      {"expirationDate", "2024-11-30"}
-  };
+      {"expirationDate", "2024-11-30"}};
 
-  // Set the default behavior for insertResource using ON_CALL
   ON_CALL(*mockDbManager, insertResource("Food", foodResource))
-      .WillByDefault(::testing::Return());  // Simulate successful insertion
+      .WillByDefault(::testing::Return());
 
-  // Call the method to add food
   food->addFood(foodResource);
 
-  // Now check if the food resource was added correctly by simulating a query
   std::vector<bsoncxx::document::value> mockResult;
   mockResult.push_back(bsoncxx::builder::stream::document{}
                        << "FoodType" << "Vegetables"
@@ -84,14 +69,13 @@ TEST_F(FoodUnitTests, addFood) {
                        << "expirationDate" << "2024-11-30"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
                                       ::testing::Return()));
 
-  // Simulate fetching all food items after insertion
   std::string foodItems = food->getAllFood();
 
-  // Assertions to verify the added food item
   EXPECT_NE(foodItems, "[]");
   EXPECT_TRUE(foodItems.find("Vegetables") != std::string::npos);
   EXPECT_TRUE(foodItems.find("OrganicFarm") != std::string::npos);
@@ -99,4 +83,3 @@ TEST_F(FoodUnitTests, addFood) {
   EXPECT_TRUE(foodItems.find("50") != std::string::npos);
   EXPECT_TRUE(foodItems.find("2024-11-30") != std::string::npos);
 }
-

@@ -7,35 +7,7 @@
 #include <bsoncxx/json.hpp>
 
 #include "Counseling.h"
-#include "DatabaseManager.h"
-
-class MockDatabaseManager : public DatabaseManager {
- public:
-  MockDatabaseManager() : DatabaseManager("mongodb://localhost:27017", true) {}
-
-  MOCK_METHOD(
-      void, findCollection,
-      (const std::string &collectionName,
-       (const std::vector<std::pair<std::string, std::string>> &keyValues),
-       (std::vector<bsoncxx::document::value> & result)),
-      (override));
-
-  MOCK_METHOD(
-      void, insertResource,
-      (const std::string &collectionName,
-       (const std::vector<std::pair<std::string, std::string>> &keyValues)),
-      (override));
-
-  // MOCK_METHOD(void, updateResource,
-  //     (const std::string& collectionName,
-  //     (const std::string& id,
-  //     (const std::vector<std::pair<std::string, std::string>>& updates))),
-  //     (override));
-
-  // MOCK_METHOD(void, deleteResource,
-  //     (const std::string& collectionName,
-  //     (const std::string& id)), (override));
-};
+#include "MockDatabaseManager.h"
 
 class CounselingUnitTests : public ::testing::Test {
  protected:

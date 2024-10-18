@@ -12,13 +12,13 @@ class Counseling {
  public:
   Counseling(DatabaseManager& dbManager);
 
-  std::string addCounselor(const std::string& counselorName,
-                           const std::string& specialty);
-  std::string deleteCounselor(const std::string& counselorId);
-  std::string searchCounselorsAll();
-  std::string updateCounselor(const std::string& counselorId,
-                              const std::string& field,
-                              const std::string& value);
+  virtual std::string addCounselor(const std::string& counselorName,
+                                   const std::string& specialty);
+  virtual std::string deleteCounselor(const std::string& counselorId);
+  virtual std::string searchCounselorsAll();
+  virtual std::string updateCounselor(const std::string& counselorId,
+                                      const std::string& field,
+                                      const std::string& value);
 
  private:
   DatabaseManager& dbManager;

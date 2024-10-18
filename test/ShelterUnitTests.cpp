@@ -6,24 +6,9 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 
+#include "MockDatabaseManager.h"
 #include "Shelter.h"
-class MockDatabaseManager : public DatabaseManager {
- public:
-  MockDatabaseManager() : DatabaseManager("mongodb://localhost:27017", true) {}
 
-  MOCK_METHOD(
-      void, findCollection,
-      (const std::string& collectionName,
-       (const std::vector<std::pair<std::string, std::string>>& keyValues),
-       (std::vector<bsoncxx::document::value> & result)),
-      (override));
-
-  MOCK_METHOD(
-      void, insertResource,
-      (const std::string& collectionName,
-       (const std::vector<std::pair<std::string, std::string>>& keyValues)),
-      (override));
-};
 class ShelterUnitTests : public ::testing::Test {
  protected:
   Shelter* shelter;
@@ -59,6 +44,7 @@ TEST_F(ShelterUnitTests, searchShelterAll) {
   EXPECT_TRUE(services.find("HML") != std::string::npos);
   EXPECT_TRUE(services.find("New York") != std::string::npos);
 }
+
 TEST_F(ShelterUnitTests, AddNewShelter) {
   std::vector<std::pair<std::string, std::string>> expectedContent =
       shelter->createDBContent("tmp", "tmp", "tmp", "1", "0");

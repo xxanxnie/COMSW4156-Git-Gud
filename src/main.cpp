@@ -47,7 +47,13 @@ int main(int argc, char* argv[]) {
 
   crow::SimpleApp app;
 
-  RouteController routeController(dbManager);
+  Shelter shelter(dbManager, "Shelter");
+  Counseling counseling(dbManager);
+  Food food(dbManager);
+  Outreach outreach(dbManager, "OutreachService");
+  Healthcare healthcare(dbManager, "HealthcareService");
+
+  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food);
   routeController.initRoutes(app);  
   app.port(8080).multithreaded().run();
 

@@ -16,7 +16,7 @@
  * @param contactInfo Contact information for the outreach program.
  * @return A string indicating the success or failure of the operation.
  */
-std::string OutreachService::addOutreachService(const std::string& targetAudience, 
+std::string Outreach::addOutreachService(const std::string& targetAudience, 
                                    const std::string& programName,
                                    const std::string& description, 
                                    const std::string& programDate,
@@ -48,7 +48,7 @@ std::string OutreachService::addOutreachService(const std::string& targetAudienc
  * @param contactInfo Contact information for the outreach program.
  * @return A vector of key-value pairs representing the outreach program content.
  */
-std::vector<std::pair<std::string, std::string>> OutreachService::createDBContent(
+std::vector<std::pair<std::string, std::string>> Outreach::createDBContent(
     const std::string& targetAudience, const std::string& programName,
     const std::string& description, const std::string& programDate,
     const std::string& location, const std::string& contactInfo) {
@@ -72,7 +72,7 @@ std::vector<std::pair<std::string, std::string>> OutreachService::createDBConten
  * @return A string representation of all outreach services, 
  *         or "[]" if no services are found.
  */
-std::string OutreachService::getAllOutreachServices() {
+std::string Outreach::getAllOutreachServices() {
     std::vector<bsoncxx::document::value> result;
     dbManager.findCollection(collection_name, {}, result);  
     if (result.empty()) {
@@ -90,7 +90,7 @@ std::string OutreachService::getAllOutreachServices() {
  * @param services A vector of documents representing the outreach services.
  * @return A formatted string of outreach services.
  */
-std::string OutreachService::printOutreachServices(
+std::string Outreach::printOutreachServices(
     const std::vector<bsoncxx::document::value>& services) const {
     std::string ret;
     for (const auto& hs : services) {

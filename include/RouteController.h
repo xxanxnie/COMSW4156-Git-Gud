@@ -12,20 +12,33 @@
 #include "../external_libraries/Crow/include/crow.h"
 #include "Counseling.h"
 #include "DatabaseManager.h"
+#include "Food.h"
+#include "Healthcare.h"
+#include "Outreach.h"
 #include "Shelter.h"
 
 class RouteController {
  private:
-  DatabaseManager& dbManager;  // Reference to the database manager
+  DatabaseManager& dbManager;
+  Shelter& shelterManager;
+  Counseling& counselingManager;
+  Healthcare& healthcareManager;
+  Outreach& outreachManager;
+  Food& foodManager;
 
  public:
-  // Constructor
-  RouteController(DatabaseManager& dbManager) : dbManager(dbManager) {}
+  RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
+                  Counseling& counselingManager, Healthcare& healthcareManager,
+                  Outreach& outreachManager, Food& foodManager)
+      : dbManager(dbManager),
+        shelterManager(shelterManager),
+        counselingManager(counselingManager),
+        healthcareManager(healthcareManager),
+        outreachManager(outreachManager),
+        foodManager(foodManager) {}
 
-  // Initialize routes
   void initRoutes(crow::SimpleApp& app);
 
-  // Route handlers
   void index(crow::response& res);
 
   // Shelter-related handlers
