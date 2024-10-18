@@ -1,6 +1,6 @@
-// DatabaseManager.cpp
-#include "DatabaseManager.h"
+// Copyright 2024 COMSW4156-Git-Gud
 
+#include "DatabaseManager.h"
 #include <algorithm>
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
