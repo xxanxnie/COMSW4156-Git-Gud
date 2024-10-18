@@ -9,6 +9,7 @@
 #include "RouteController.h"
 #include "Food.h"
 #include "Healthcare.h"
+#include "Outreach.h"
 #include <map>
 #include <string>
 // Utility function to handle exceptions
@@ -35,68 +36,11 @@ void RouteController::index(crow::response& res) {
   res.end();
 }
 
-// Get resources route
-void RouteController::getResources(const crow::request& req,
-                                   crow::response& res) {
-  try {
-    const char* resourceType = req.url_params.get("type");
-    if (!resourceType) {
-      res.code = 400;
-      res.write("Error: Resource type is required.");
-      res.end();
-      return;
-    }
-
-    auto resources = dbManager.getResources(resourceType);
-    res.code = 200;
-    res.write(bsoncxx::to_json(resources));
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
-
-// Add resource route
-void RouteController::addResource(const crow::request& req,
-                                  crow::response& res) {
-  try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::pair<std::string, std::string>> keyValues;
-    for (auto element : resource.view()) {
-      keyValues.emplace_back(element.key().to_string(),
-                             element.get_string().value.to_string()); 
-    }
-    dbManager.insertResource("Resources", keyValues);
-
-    res.code = 201;  // Created
-    res.write("Resource added successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
-
-// Delete resource route
-void RouteController::deleteResource(const crow::request& req,
-                                     crow::response& res) {
-  try {
-    const char* resourceId = req.url_params.get("id");
-    if (!resourceId) {
-      res.code = 400;
-      res.write("Error: Resource ID is required.");
-      res.end();
-      return;
-    }
-
-    dbManager.deleteResource("Resources", resourceId);
-    res.code = 200;
-    res.write("Resource deleted successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
-
+/**
+ * Get all the shelter information in our database
+ * GET with this key in json format
+ * @return A crow::response object containing an HTTP 200 response, 
+ */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
   try {
@@ -110,6 +54,16 @@ void RouteController::getShelter(const crow::request& req,
     res = handleException(e);
   }
 }
+/**
+ * Add the shelter information to our database
+ * POST with this key in json format
+ * @param ORG     The organization who gave the infomation.
+ * @param User     The target this service provide for.
+ * @param location     The location of the shelter.
+ * @param capacity     The maximum number of users that the shelter can handle.
+ * @param curUse       The current users that using this shelter.
+ * @return A crow::response object containing an HTTP 201 response , 
+ */
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
   try {
@@ -126,42 +80,6 @@ void RouteController::addShelter(const crow::request& req,
                  atoi(content[4].c_str()));
     res.code = 201;  // Created
     res.write("Shelter resource added successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
-
-// Update resource route
-void RouteController::updateResource(const crow::request& req,
-                                     crow::response& res) {
-  try {
-    // Remove or implement validateInputs
-    // if (!validateInputs(req, &res)) {
-    //     return;
-    // }
-
-    auto resource = bsoncxx::from_json(req.body);
-    if (!resource["id"]) {
-      res.code = 400;
-      res.write("Error: Resource ID is required.");
-      res.end();
-      return;
-    }
-
-    auto id = resource["id"].get_utf8().value.to_string();
-    // Convert bsoncxx::document::value to vector of pairs
-    std::vector<std::pair<std::string, std::string>> updates;
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        updates.emplace_back(element.key().to_string(),
-                             element.get_utf8().value.to_string());
-      }
-    }
-    dbManager.updateResource("Resources", id, updates);
-
-    res.code = 200;
-    res.write("Resource updated successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
@@ -321,46 +239,66 @@ void RouteController::getAllFood(const crow::request& req, crow::response& res) 
     }
 }
 
-void RouteController::addOutreach(const crow::request& req, crow::response& res) {
+/**
+ * @brief Adds a new outreach service resource.
+ * 
+ * This method extracts the outreach service details from the incoming 
+ * HTTP request, processes the data, and adds it to the database using 
+ * the OutreachService class. It constructs the response based on 
+ * the outcome of the operation.
+ * 
+ * @param req The HTTP request containing the outreach service data in JSON format.
+ * @param res The HTTP response that will be sent back to the client.
+ * 
+ * @throws std::runtime_error if there is not enough data to add the outreach service.
+ */
+void RouteController::addOutreachService(const crow::request& req, crow::response& res) {
     try {
         auto resource = bsoncxx::from_json(req.body);
-
-        // Check if "_id" exists and is of the correct type
-        if (auto idElement = resource.view()["_id"]; idElement && idElement.type() == bsoncxx::type::k_oid) {
-            std::string outreachId = idElement.get_oid().value.to_string();
-
-            Outreach outreach(
-                std::stoi(outreachId), // Ensure outreachId can be converted to int
-                std::string(resource.view()["targetAudience"].get_string().value),
-                std::string(resource.view()["programName"].get_string().value),
-                std::string(resource.view()["description"].get_string().value),
-                std::string(resource.view()["startDate"].get_string().value),
-                std::string(resource.view()["endDate"].get_string().value),
-                std::string(resource.view()["location"].get_string().value),
-                std::string(resource.view()["contactInfo"].get_string().value),
-                dbManager // Pass dbManager directly
-            );
-
-            // Call the appropriate method to insert outreach
-            std::string result = outreach.addOutreach(
-                outreach.getTargetAudience(), // Ensure to pass the correct parameters
-                outreach.getProgramName(),
-                outreach.getDescription(),
-                outreach.getStartDate(),
-                outreach.getEndDate(),
-                outreach.getLocation(),
-                outreach.getContactInfo()
-            );
-            res.code = 201;  // Created
-            res.write(result);
-            res.end();
-        } else {
-            res.code = 400; // Bad Request
-            res.write("Invalid or missing _id field.");
-            res.end();
+        OutreachService os(dbManager, "OutreachService"); // Initialize the OutreachService
+        std::vector<std::string> content;
+        
+        for (auto element : resource.view()) {
+            if (element.key().to_string() != "id") { // Exclude ID if present
+                content.push_back(element.get_utf8().value.to_string());
+            }
         }
+        
+        if (content.size() < 6) {
+            throw std::runtime_error("Not enough data to add OutreachService.");
+        }
+
+        os.addOutreachService(content[0], content[1], content[2], content[3],
+                               content[4], content[5]);
+
+        res.code = 201; 
+        res.write("OutreachService resource added successfully.");
+        res.end();
     } catch (const std::exception& e) {
-        res = handleException(e);
+        res = handleException(e); // Custom exception handling
+    }
+}
+
+/**
+ * @brief Retrieves all outreach services.
+ * 
+ * This method processes an incoming HTTP request to fetch all outreach 
+ * services from the database. It sends the retrieved services back 
+ * in the HTTP response.
+ * 
+ * @param req The HTTP request for retrieving outreach services.
+ * @param res The HTTP response that will be sent back to the client, 
+ *             containing the outreach services in JSON format.
+ */
+void RouteController::getAllOutreachServices(const crow::request& req, crow::response& res) {
+    try {
+        OutreachService os(dbManager, "OutreachService"); // Initialize the OutreachService
+        std::string response = os.getAllOutreachServices(); // Retrieve all outreach services
+        res.code = 200;
+        res.write(response);
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e); // Custom exception handling
     }
 }
 
@@ -400,35 +338,11 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
   }
 }
 
-
 // Initialize API Routes
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });
 
-  CROW_ROUTE(app, "/resources")
-      .methods(crow::HTTPMethod::GET)(
-          [this](const crow::request& req, crow::response& res) {
-            getResources(req, res);
-            });
-
-  CROW_ROUTE(app, "/resources/add")
-      .methods(crow::HTTPMethod::POST)(
-          [this](const crow::request& req, crow::response& res) {
-            addResource(req, res);
-          });
-
-  CROW_ROUTE(app, "/resources/update")
-      .methods(crow::HTTPMethod::PATCH)(
-          [this](const crow::request& req, crow::response& res) {
-            updateResource(req, res);
-          });
-
-  CROW_ROUTE(app, "/resources/delete")
-      .methods(crow::HTTPMethod::DELETE)(
-          [this](const crow::request& req, crow::response& res) {
-            deleteResource(req, res);
-        });
   CROW_ROUTE(app, "/resources/addFood")
     .methods(crow::HTTPMethod::POST)(
           [this](const crow::request& req, crow::response& res) {
@@ -475,11 +389,16 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
         deleteCounseling(req, res);
         });
 
-  CROW_ROUTE(app, "/resources/outreach")
-      .methods(crow::HTTPMethod::POST)(
-          [this](const crow::request& req, crow::response& res) {
-            addOutreach(req, res);
-          });
+  CROW_ROUTE(app, "/resources/outreach/add")
+      .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+            addOutreachService(req, res);
+        });
+        
+  CROW_ROUTE(app, "/resources/outreach/getAll")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+            getAllOutreachServices(req, res);
+        });
+
   CROW_ROUTE(app, "/resources/healthcare/add")
       .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
             addHealthcareService(req, res);

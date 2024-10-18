@@ -1,60 +1,32 @@
+// Copyright 2024 Annie, Xu
+
 #include "Outreach.h"
 
-// Constructor
-Outreach::Outreach(int id, const std::string& targetAudience, const std::string& programName,
-                   const std::string& description, const std::string& startDate,
-                   const std::string& endDate, const std::string& location,
-                   const std::string& contactInfo, DatabaseManager& db)
-    : id(id), targetAudience(targetAudience), programName(programName),
-      description(description), dates(std::make_pair(startDate, endDate)),
-      location(location), contactInfo(contactInfo), dbManager(db) {}
-
-// Getters
-int Outreach::getID() const {
-    return id;
-}
-
-std::string Outreach::getTargetAudience() const {
-    return targetAudience;
-}
-
-std::string Outreach::getProgramName() const { return programName; }
-
-std::string Outreach::getDescription() const {
-    return description;
-}
-
-std::string Outreach::getStartDate() const {
-    return dates.first;
-}
-
-std::string Outreach::getEndDate() const {
-    return dates.second;
-}
-
-std::string Outreach::getLocation() const {
-    return location;
-}
-
-std::string Outreach::getContactInfo() const {
-    return contactInfo;
-}
-
 /**
- * Add the outreach program information to our database
+ * @brief Add the outreach program information to the database.
+ * 
+ * This method creates a database entry for the outreach program 
+ * with the provided details.
+ * 
+ * @param targetAudience The intended audience for the outreach program.
+ * @param programName The name of the outreach program.
+ * @param description A brief description of the outreach program.
+ * @param programDate The duration of the outreach program.
+ * @param location The location where the outreach program will take place.
+ * @param contactInfo Contact information for the outreach program.
+ * @return A string indicating the success or failure of the operation.
  */
-std::string Outreach::addOutreach(const std::string& targetAudience, 
+std::string OutreachService::addOutreachService(const std::string& targetAudience, 
                                    const std::string& programName,
                                    const std::string& description, 
-                                   const std::string& startDate,
-                                   const std::string& endDate, 
+                                   const std::string& programDate,
                                    const std::string& location,
                                    const std::string& contactInfo) {
-    auto content = createDBContent(targetAudience, programName, description, 
-                                    startDate, endDate, location, 
-                                    contactInfo);
     try {
-        dbManager.insertResource("Outreach", content); // Use dbManager
+        auto content = createDBContent(targetAudience, programName, description, 
+                                        programDate, location, contactInfo);
+        dbManager.insertResource(collection_name, content); // Use dbManager
+
     } catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         return "Error";
@@ -63,73 +35,72 @@ std::string Outreach::addOutreach(const std::string& targetAudience,
 }
 
 /**
- * Create content for the database insertion
+ * @brief Create content for the database insertion.
+ * 
+ * This method formats the provided outreach program details 
+ * into a vector of key-value pairs suitable for database insertion.
+ * 
+ * @param targetAudience The intended audience for the outreach program.
+ * @param programName The name of the outreach program.
+ * @param description A brief description of the outreach program.
+ * @param programDate The duration of the outreach program.
+ * @param location The location of the outreach program.
+ * @param contactInfo Contact information for the outreach program.
+ * @return A vector of key-value pairs representing the outreach program content.
  */
-std::vector<std::pair<std::string, std::string>> Outreach::createDBContent(
+std::vector<std::pair<std::string, std::string>> OutreachService::createDBContent(
     const std::string& targetAudience, const std::string& programName,
-    const std::string& description, const std::string& startDate,
-    const std::string& endDate, const std::string& location,
-    const std::string& contactInfo) {
+    const std::string& description, const std::string& programDate,
+    const std::string& location, const std::string& contactInfo) {
     
     std::vector<std::pair<std::string, std::string>> content;
-    content.push_back({"_id", std::to_string(id)});
     content.push_back({"targetAudience", targetAudience});
     content.push_back({"programName", programName});
     content.push_back({"description", description});
-    content.push_back({"startDate", startDate});
-    content.push_back({"endDate", endDate});
+    content.push_back({"programDate", programDate});
     content.push_back({"location", location});
     content.push_back({"contactInfo", contactInfo});
     return content;
 }
 
 /**
- * Search all outreach programs in the database
+ * @brief Retrieve all outreach services from the database.
+ * 
+ * This method queries the database for all outreach services 
+ * and returns them in a formatted string.
+ * 
+ * @return A string representation of all outreach services, 
+ *         or "[]" if no services are found.
  */
-std::string Outreach::searchOutreachAll() {
-    std::vector<bsoncxx::document::value> result; // Use document::value
-    std::vector<std::pair<std::string, std::string>> keyValues; // Empty key-value pairs
+std::string OutreachService::getAllOutreachServices() {
+    std::vector<bsoncxx::document::value> result;
+    dbManager.findCollection(collection_name, {}, result);  
+    if (result.empty()) {
+        return "[]";
+    }
+    return printOutreachServices(result);
+}
 
-    dbManager.findCollection("Outreach", keyValues, result); // Call with document::value
+/**
+ * @brief Print the outreach services in a formatted string.
+ * 
+ * This method formats the outreach services into a string 
+ * for display or further processing.
+ * 
+ * @param services A vector of documents representing the outreach services.
+ * @return A formatted string of outreach services.
+ */
+std::string OutreachService::printOutreachServices(
+    const std::vector<bsoncxx::document::value>& services) const {
     std::string ret;
-
-    if (!result.empty()) {
-        // Convert document::value to document::view for the print function
-        std::vector<bsoncxx::document::view> views;
-        views.reserve(result.size()); // Reserve space for efficiency
-        for (const auto& docValue : result) {
-            views.push_back(docValue.view()); // Convert to view
+    for (const auto& hs : services) {
+        for (const auto& element : hs.view()) {
+            // Ensure type checking is done correctly
+            if (element.type() == bsoncxx::type::k_utf8) {
+                ret += element.get_utf8().value.to_string() + "\n";  // Fixed extraction
+            }
         }
-
-        ret = printOutreachPrograms(views); // Pass vector of views
-        getOutreachID(result[0].view()); // Pass the view of the first document value
+        ret += "\n";
     }
-
     return ret;
-}
-
-/**
- * Get the ID of a specific outreach program
- */
-std::string Outreach::getOutreachID(const bsoncxx::document::view& outreach) {
-    // Ensure that the _id field exists and is of the correct type
-    if (auto idElement = outreach["_id"]; idElement && idElement.type() == bsoncxx::type::k_oid) {
-        std::string id = idElement.get_oid().value.to_string();
-        std::cout << id << std::endl;
-        return id;
-    } else {
-        std::cerr << "Invalid or missing _id field" << std::endl;
-        return "";
-    }
-}
-
-/**
- * Print details of the outreach programs
- */
-std::string Outreach::printOutreachPrograms(const std::vector<bsoncxx::document::view>& docs) const {
-    std::string output;
-    for (const auto& doc : docs) {
-        output += bsoncxx::to_json(doc) + "\n"; // Convert BSON to JSON string
-    }
-    return output;
 }
