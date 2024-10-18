@@ -37,3 +37,7 @@ std::string Food::getAllFood() {
     return bsoncxx::to_json(arrayBuilder.view());
 }
 
+std::string Food::getType() const { return type; }
+
+std::string Food::getQuantity() const { return quantity; }
+

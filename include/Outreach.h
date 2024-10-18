@@ -4,15 +4,15 @@
 #include <string>
 
 class Outreach {
-public:
-    Outreach(const std::string& programName, const std::string& targetGroup);
-    
-    std::string getProgramName() const;
-    std::string getTargetGroup() const;
+ public:
+  Outreach(const std::string& programName, const std::string& targetGroup);
 
-private:
-    std::string programName;
-    std::string targetGroup;
+  std::string getProgramName() const;
+  std::string getTargetGroup() const;
+
+ private:
+  std::string programName;
+  std::string targetGroup;
 };
 
-#endif 
+#endif
