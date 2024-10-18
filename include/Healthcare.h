@@ -2,17 +2,34 @@
 #define HEALTHCARE_H
 
 #include <string>
+#include <vector>
+#include "DatabaseManager.h"
 
-class Healthcare {
- public:
-  Healthcare(const std::string& provider, const std::string& serviceType);
+class HealthcareService {
+public:
 
-  std::string getProvider() const;
-  std::string getServiceType() const;
+    std::string collection_name;
 
- private:
-  std::string provider;
-  std::string serviceType;
+    HealthcareService(DatabaseManager& dbManager, const std::string& collection_name)
+        : dbManager(dbManager), collection_name(collection_name) {}
+
+    std::string addHealthcareService(const std::string& provider, const std::string& serviceType, 
+                                     const std::string& location, const std::string& operatingHours, 
+                                     const std::string& eligibilityCriteria, const std::string& contactInfo);
+
+    std::string getAllHealthcareServices();
+
+    std::vector<std::pair<std::string, std::string>> createDBContent(const std::string& provider, 
+                                                                     const std::string& serviceType, 
+                                                                     const std::string& location, 
+                                                                     const std::string& operatingHours, 
+                                                                     const std::string& eligibilityCriteria, 
+                                                                     const std::string& contactInfo);
+
+    std::string printHealthcareServices(std::vector<bsoncxx::document::value>& services) const;
+
+private:
+    DatabaseManager& dbManager;
 };
 
 #endif
