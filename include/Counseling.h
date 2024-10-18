@@ -4,15 +4,15 @@
 #include <string>
 
 class Counseling {
-public:
-    Counseling(const std::string& counselorName, const std::string& specialty);
-    
-    std::string getCounselorName() const;
-    std::string getSpecialty() const;
+ public:
+  Counseling(const std::string& counselorName, const std::string& specialty);
 
-private:
-    std::string counselorName;
-    std::string specialty;
+  std::string getCounselorName() const;
+  std::string getSpecialty() const;
+
+ private:
+  std::string counselorName;
+  std::string specialty;
 };
 
-#endif 
+#endif

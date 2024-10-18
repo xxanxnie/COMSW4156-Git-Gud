@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
+
 #include "Food.h"
 
 class FoodUnitTests : public ::testing::Test {
-protected:
-    static Food* food;
+ protected:
+  static Food* food;
 
     // static void SetUpTestSuite() {
     //     food = new Food("Bread", "10 loaves");
@@ -23,5 +24,6 @@ protected:
 // TEST_F(FoodUnitTests, GetQuantity) {
 //     EXPECT_EQ(food->getQuantity(), "10 loaves");
 // }
+
 
 // Food* FoodUnitTests::food = nullptr;
