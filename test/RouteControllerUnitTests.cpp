@@ -13,8 +13,8 @@
 
 class MockShelter : public Shelter {
  public:
-  explicit MockShelter(DatabaseManager& dbManager)
-      : Shelter(dbManager, "ShelterTest") {}
+  explicit MockShelter(DatabaseManager* dbManager)
+      : Shelter(*dbManager, "ShelterTest") {}
 
   MOCK_METHOD(std::string, addShelter,
               (std::string ORG, std::string User, std::string location,
@@ -27,7 +27,8 @@ class MockShelter : public Shelter {
 
 class MockCounseling : public Counseling {
  public:
-  explicit MockCounseling(DatabaseManager& dbManager) : Counseling(dbManager) {}
+  explicit MockCounseling(DatabaseManager* dbManager)
+      : Counseling(*dbManager) {}
 
   MOCK_METHOD(std::string, addCounselor,
               (const std::string& counselorName, const std::string& specialty),
@@ -43,7 +44,7 @@ class MockCounseling : public Counseling {
 
 class MockFood : public Food {
  public:
-  explicit MockFood(DatabaseManager& db) : Food(db) {}
+  explicit MockFood(DatabaseManager* db) : Food(*db) {}
 
   MOCK_METHOD(
       std::string, addFood,
@@ -54,9 +55,9 @@ class MockFood : public Food {
 
 class MockOutreachService : public Outreach {
  public:
-  MockOutreachService(DatabaseManager& dbManager,
+  MockOutreachService(DatabaseManager* dbManager,
                       const std::string& collection_name)
-      : Outreach(dbManager, collection_name) {}
+      : Outreach(*dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addOutreachService,
               (const std::string& targetAudience,
@@ -69,9 +70,9 @@ class MockOutreachService : public Outreach {
 
 class MockHealthcareService : public Healthcare {
  public:
-  MockHealthcareService(DatabaseManager& dbManager,
+  MockHealthcareService(DatabaseManager* dbManager,
                         const std::string& collection_name)
-      : Healthcare(dbManager, collection_name) {}
+      : Healthcare(*dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addHealthcareService,
               (const std::string& provider, const std::string& serviceType,
@@ -82,6 +83,7 @@ class MockHealthcareService : public Healthcare {
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
 };
 
+// Test Fixture with DatabaseManager pointer
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
@@ -94,15 +96,12 @@ class RouteControllerUnitTests : public ::testing::Test {
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    mockShelter = new MockShelter(*mockDbManager);
-    mockCounseling = new MockCounseling(*mockDbManager);
-    mockFood = new MockFood(*mockDbManager);
-    mockOutreach =
-        new MockOutreachService(*mockDbManager, "OutreachServiceTest");
-    mockHealthcare =
-        new MockHealthcareService(*mockDbManager, "HealthcareServiceTest");
-    routeController =
-        new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
+    mockShelter = new MockShelter(mockDbManager);
+    mockCounseling = new MockCounseling(mockDbManager);
+    mockFood = new MockFood(mockDbManager);
+    mockOutreach = new MockOutreachService(mockDbManager, "OutreachServiceTest");
+    mockHealthcare = new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
+    routeController = new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
                             *mockHealthcare, *mockOutreach, *mockFood);
   }
 
