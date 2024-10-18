@@ -6,7 +6,7 @@
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
 #include <string>
-#include <string>
+#include <optional>
 #include <vector>
 
 class DatabaseManager {

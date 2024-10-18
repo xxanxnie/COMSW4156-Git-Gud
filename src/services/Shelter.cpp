@@ -49,7 +49,7 @@ std::string Shelter::searchShelterAll() {
 }
 std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
   std::string id = shelter["_id"].get_oid().value.to_string();
-  std::cout << id << std::endl;
+  // std::cout << id << std::endl;
   return id;
 }
 std::string Shelter::printShelters(
@@ -58,14 +58,14 @@ std::string Shelter::printShelters(
   for (auto shelter : shelters) {
     for (auto element : shelter.view()) {
       if (element.type() != bsoncxx::type::k_oid) {
-        std::cout << element.get_string().value << " ";
+        // std::cout << element.get_string().value << " ";
         ret += element.get_string().value.to_string()+" ";
       }
     }
     ret += "\n";
     // ret += bsoncxx::to_json(shelter) + "\n";
   }
-  std::cout << ret << std::endl;
+  // std::cout << ret << std::endl;
   return ret;
 }
 std::string Shelter::updateShelter() { return "Update"; }
