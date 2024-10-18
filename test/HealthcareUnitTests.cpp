@@ -47,10 +47,10 @@ TEST_F(HealthcareServiceUnitTests, GetAllHealthcareServices) {
                          << "phone" << "123-456-7890"
                          << bsoncxx::builder::stream::finalize);
 
-    EXPECT_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
-        .WillOnce(::testing::DoAll(
+    ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+        .WillByDefault(::testing::DoAll(
             ::testing::SetArgReferee<2>(mockResult), 
-            ::testing::Return()  
+            ::testing::Return()
         ));
 
     std::string services = healthcareService->getAllHealthcareServices();
@@ -71,8 +71,8 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
         {"contactInfo", "123-456-7890"}
     };
 
-    EXPECT_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
-        .WillOnce(::testing::Invoke(
+    ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
+        .WillByDefault(::testing::Invoke(
             [&](const std::string& collectionName, 
                 const std::vector<std::pair<std::string, std::string>>& content) {
                 EXPECT_EQ(collectionName, "HealthcareTest");
