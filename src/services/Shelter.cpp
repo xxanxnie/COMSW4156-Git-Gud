@@ -36,9 +36,11 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
   return content;
 }
 std::string Shelter::searchShelterAll() {
+
   std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
   std::string ret = "[]";
+
   if (result.size() > 0) {
     ret = printShelters(result);
     // getShelterID(result[0]);

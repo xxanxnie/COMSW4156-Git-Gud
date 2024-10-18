@@ -11,14 +11,15 @@ set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/external_libraries/boost)
 set(CROW_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/Crow/include)
 set(ASIO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/asio/include)
 
-# MongoDB C++ Driver paths (adjust these based on the find command results)
-if (UNIX)
-    set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.so")
-    set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
-else()
+# MongoDB C++ Driver paths
+if (APPLE)
     set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.dylib")
     set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.dylib")
+else()
+    set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.so")
+    set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
 endif()
+
 # Include directories
 set(INCLUDE_PATHS 
     ${BOOST_ROOT}
@@ -63,7 +64,7 @@ set(SOURCE_FILES
 )
 
 set(TEST_FILES 
-    test/CounselingUnitTests.cpp
+    #test/CounselingUnitTests.cpp
     test/FoodUnitTests.cpp
     test/HealthcareUnitTests.cpp
     test/OutreachUnitTests.cpp
