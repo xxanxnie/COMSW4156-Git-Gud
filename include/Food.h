@@ -1,18 +1,23 @@
-#ifndef FOOD_H
-#define FOOD_H
+#ifndef FOOD_RESOURCE_H
+#define FOOD_RESOURCE_H
 
+#include <vector>
 #include <string>
+#include <utility> 
+#include "DatabaseManager.h"  
 
 class Food {
- public:
-  Food(const std::string& type, const std::string& quantity);
+private:
+    // std::vector<std::pair<std::string, std::string>> resource;  
+    DatabaseManager& db;  // Reference to the database manager
 
-  std::string getType() const;
-  std::string getQuantity() const;
+public:
+    Food(DatabaseManager& db);
 
- private:
-  std::string type;
-  std::string quantity;
+    void insertFood(const std::vector<std::pair<std::string, std::string>>& reasource);
+
+    std::string getAllFood();
+
 };
 
 #endif

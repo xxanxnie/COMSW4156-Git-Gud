@@ -46,19 +46,19 @@ void DatabaseManager::printCollection(const std::string& collectionName) {
   }
 }
 
-void DatabaseManager::insertResource(
-    const std::string& collectionName,
-    const std::vector<std::pair<std::string, std::string>>& keyValues) {
-  auto collection = conn["GitGud"][collectionName];
-  collection.insert_one(createDocument(keyValues).view());
-}
+void DatabaseManager::insertResource(const std::string& collectionName, const std::vector<std::pair<std::string, std::string>>& keyValues) {
+    auto collection = conn["GitGud"][collectionName];
+    collection.insert_one(createDocument(keyValues).view());
 
 void DatabaseManager::deleteResource(const std::string& collectionName,
                                      const std::string& resourceId) {
   auto collection = conn["GitGud"][collectionName];
   collection.delete_one(createDocument({{"_id", resourceId}}).view());
 }
-
+void DatabaseManager::deleteCollection(const std::string& collectionName) {
+  auto collection = conn["GitGud"][collectionName];
+  collection.drop();
+}
 void DatabaseManager::updateResource(
     const std::string& collectionName, const std::string& resourceId,
     const std::vector<std::pair<std::string, std::string>>& updates) {

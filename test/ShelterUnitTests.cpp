@@ -1,29 +1,36 @@
+// Copyright 2024 Wilson, Liang
 #include <gtest/gtest.h>
+
 #include "Shelter.h"
 
+class ShelterUnitTests : public ::testing::Test {
+ protected:
+  static Shelter* shelter;
+  static DatabaseManager* dbManager;
+  static void SetUpTestSuite() {
+    dbManager = new DatabaseManager("mongodb://localhost:27017");
+    shelter = new Shelter(*dbManager, "ShelterTest");
+  }
+  static void DeleteDB() {
+    dbManager->deleteCollection(shelter->collection_name);
+  }
+  static void TearDownTestSuite() {
+    delete shelter;
+    delete dbManager;
+  }
+};
 
+// Example test case for Shelter
+TEST_F(ShelterUnitTests, InsertShelter) {
+  std::string ret = shelter->addShelter("tmp", "tmp", "tmp", 1, 0);
+  EXPECT_EQ(ret, "Success");
+}
 
-// class ShelterUnitTests : public ::testing::Test {
-// protected:
-//     static Shelter* shelter;
+// Example test case for Shelter location
+TEST_F(ShelterUnitTests, searchShelterAll) {
+  EXPECT_EQ(shelter->searchShelterAll(), "tmp tmp tmp 1 0 \n");
+  DeleteDB();
+}
 
-//     static void SetUpTestSuite() {
-//         shelter = new Shelter("Hope Shelter", "123 Main St");
-//     }
-
-//     static void TearDownTestSuite() {
-//         delete shelter;
-//     }
-// };
-
-// // Example test case for Shelter
-// TEST_F(ShelterUnitTests, GetName) {
-//     EXPECT_EQ(shelter->getName(), "Hope Shelter");
-// }
-
-// // Example test case for Shelter location
-// TEST_F(ShelterUnitTests, GetLocation) {
-//     EXPECT_EQ(shelter->getLocation(), "123 Main St");
-// }
-
-// Shelter* ShelterUnitTests::shelter = nullptr;
+Shelter* ShelterUnitTests::shelter = nullptr;
+DatabaseManager* ShelterUnitTests::dbManager = nullptr;
