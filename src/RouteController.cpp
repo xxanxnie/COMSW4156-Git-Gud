@@ -240,7 +240,7 @@ void RouteController::getAllFood(const crow::request& req, crow::response& res) 
  * 
  * This method extracts the outreach service details from the incoming 
  * HTTP request, processes the data, and adds it to the database using 
- * the OutreachService class. It constructs the response based on 
+ * the Outreach class. It constructs the response based on 
  * the outcome of the operation.
  * 
  * @param req The HTTP request containing the outreach service data in JSON format.
@@ -297,6 +297,17 @@ void RouteController::getAllOutreachServices(const crow::request& req, crow::res
     }
 }
 
+/**
+ * @brief Adds a new healthcare service.
+ *
+ * This function parses the incoming request body, extracts healthcare service details,
+ * and invokes the HealthcareService manager to add the service to the database.
+ * If successful, it sends a 201 HTTP response code along with a success message.
+ * If an exception occurs, the error is handled and returned as a 500 HTTP response.
+ *
+ * @param req The incoming HTTP request containing the healthcare service data in JSON format.
+ * @param res The HTTP response object to be sent back to the client.
+ */
 void RouteController::addHealthcareService(const crow::request& req,
                                  crow::response& res) {
   try {
@@ -318,6 +329,16 @@ void RouteController::addHealthcareService(const crow::request& req,
   }
 }
 
+/**
+ * @brief Retrieves all healthcare services.
+ *
+ * This function invokes the Healthcare manager to fetch all healthcare services from the database.
+ * The response is sent back as a 200 HTTP response with the list of healthcare services in JSON format.
+ * If an exception occurs, the error is handled and returned as a 500 HTTP response.
+ *
+ * @param req The incoming HTTP request.
+ * @param res The HTTP response object to be sent back to the client containing the list of services.
+ */
 void RouteController::getAllHealthcareServices(const crow::request& req,
                                  crow::response& res) {
   try {
