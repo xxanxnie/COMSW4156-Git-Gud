@@ -49,6 +49,9 @@ class RouteController {
   void addFood(const crow::request& req, crow::response& res);
   void getAllFood(const crow::request& req, crow::response& res);
 
+  // Healthcare-related handlers
+  void addHealthcareService(const crow::request& req, crow::response& res);
+  void getAllHealthcareServices(const crow::request& req, crow::response& res);
 };
 
 #endif

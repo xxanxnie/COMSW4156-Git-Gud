@@ -8,6 +8,7 @@
 #include <bsoncxx/json.hpp>
 #include "RouteController.h"
 #include "Food.h"
+#include "Healthcare.h"
 #include <map>
 #include <string>
 // Utility function to handle exceptions
@@ -341,6 +342,43 @@ void RouteController::addOutreach(const crow::request& req, crow::response& res)
     }
 }
 
+void RouteController::addHealthcareService(const crow::request& req,
+                                 crow::response& res) {
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    HealthcareService hs(dbManager, "HealthcareService");
+    std::vector<std::string> content;
+    for (auto element : resource.view()) {
+      if (element.key().to_string() != "id") {
+        content.push_back(element.get_utf8().value.to_string());
+      }
+    }
+    hs.addHealthcareService(content[0], content[1], content[2], content[3],
+                               content[4], content[5]);
+
+    res.code = 201; 
+    res.write("HealthcareService resource added successfully.");
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
+
+void RouteController::getAllHealthcareServices(const crow::request& req,
+                                 crow::response& res) {
+  try {
+    // Parse the request body into a BSON document
+    HealthcareService hs(dbManager, "HealthcareService");
+    std::string response = hs.getAllHealthcareServices();
+    res.code = 200;
+    res.write(response);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
+
+
 // Initialize API Routes
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
@@ -420,4 +458,13 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             addOutreach(req, res);
           });
+  CROW_ROUTE(app, "/resources/healthcare/add")
+      .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+            addHealthcareService(req, res);
+        });
+        
+  CROW_ROUTE(app, "/resources/healthcare/getAll")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+            getAllHealthcareServices(req, res);
+        });
 }

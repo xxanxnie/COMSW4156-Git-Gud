@@ -101,6 +101,8 @@ target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(GitGud PRIVATE 
     gtest 
     gtest_main
+    gmock
+    gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
 )
@@ -115,20 +117,15 @@ target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 target_link_libraries(GitGudTests PRIVATE 
     gtest 
     gtest_main
+    gmock
+    gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
 )
 
 include(GoogleTest)
-gtest_discover_tests(GitGudTests)
-
-
-add_custom_target(
-    run_tests
-    COMMAND $<TARGET_FILE:GitGudTests>
-    DEPENDS GitGudTests
-    COMMENT "Running tests to generate coverage data"
-)
+add_test(NAME GitGudTests COMMAND GitGudTests)
+set_tests_properties(GitGudTests PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/lib:$ENV{LD_LIBRARY_PATH}")
 
 # Add custom target for coverage analysis
 add_custom_target(
