@@ -48,8 +48,7 @@ int main(int argc, char* argv[]) {
   crow::SimpleApp app;
 
   RouteController routeController(dbManager);
-  routeController.initRoutes(
-      app);  
+  routeController.initRoutes(app);  
   app.port(8080).multithreaded().run();
 
   return 0;
