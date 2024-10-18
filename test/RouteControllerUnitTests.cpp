@@ -13,12 +13,9 @@
 
 class MockShelter : public Shelter {
  public:
-  MockShelter(DatabaseManager& dbManager) : Shelter(dbManager, "ShelterTest") {}
-
-  MOCK_METHOD(std::string, addShelter,
-              (std::string ORG, std::string User, std::string location,
-               int capacity, int curUse),
-              (override));
+  explicit MockShelter(DatabaseManager& dbManager) : Shelter(dbManager, "ShelterTest") {}
+  
+  MOCK_METHOD(std::string, addShelter, (std::string ORG, std::string User, std::string location, int capacity, int curUse), (override));
   MOCK_METHOD(std::string, deleteShelter, (), (override));
   MOCK_METHOD(std::string, searchShelterAll, (), (override));
   MOCK_METHOD(std::string, updateShelter, (), (override));
@@ -26,58 +23,37 @@ class MockShelter : public Shelter {
 
 class MockCounseling : public Counseling {
  public:
-  MockCounseling(DatabaseManager& dbManager) : Counseling(dbManager) {}
+  explicit MockCounseling(DatabaseManager& dbManager) : Counseling(dbManager) {}
 
-  MOCK_METHOD(std::string, addCounselor,
-              (const std::string& counselorName, const std::string& specialty),
-              (override));
-  MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId),
-              (override));
+  MOCK_METHOD(std::string, addCounselor, (const std::string& counselorName, const std::string& specialty), (override));
+  MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId), (override));
   MOCK_METHOD(std::string, searchCounselorsAll, (), (override));
-  MOCK_METHOD(std::string, updateCounselor,
-              (const std::string& counselorId, const std::string& field,
-               const std::string& value),
-              (override));
+  MOCK_METHOD(std::string, updateCounselor, (const std::string& counselorId, const std::string& field, const std::string& value), (override));
 };
 
 class MockFood : public Food {
  public:
-  MockFood(DatabaseManager& db) : Food(db) {}
+  explicit MockFood(DatabaseManager& db) : Food(db) {}
 
-  MOCK_METHOD(
-      std::string, addFood,
-      ((const std::vector<std::pair<std::string, std::string>>& resource)),
-      (override));
+  MOCK_METHOD(std::string, addFood, ((const std::vector<std::pair<std::string, std::string>>& resource)), (override));
   MOCK_METHOD(std::string, getAllFood, (), (override));
 };
 
 class MockOutreachService : public Outreach {
  public:
-  MockOutreachService(DatabaseManager& dbManager,
-                      const std::string& collection_name)
+  MockOutreachService(DatabaseManager& dbManager, const std::string& collection_name)
       : Outreach(dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addOutreachService,
-              (const std::string& targetAudience,
-               const std::string& programName, const std::string& description,
-               const std::string& programDate, const std::string& location,
-               const std::string& contactInfo),
-              (override));
+  MOCK_METHOD(std::string, addOutreachService, (const std::string& targetAudience, const std::string& programName, const std::string& description, const std::string& programDate, const std::string& location, const std::string& contactInfo), (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (), (override));
 };
 
 class MockHealthcareService : public Healthcare {
  public:
-  MockHealthcareService(DatabaseManager& dbManager,
-                        const std::string& collection_name)
+  MockHealthcareService(DatabaseManager& dbManager, const std::string& collection_name)
       : Healthcare(dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addHealthcareService,
-              (const std::string& provider, const std::string& serviceType,
-               const std::string& location, const std::string& operatingHours,
-               const std::string& eligibilityCriteria,
-               const std::string& contactInfo),
-              (override));
+  MOCK_METHOD(std::string, addHealthcareService, (const std::string& provider, const std::string& serviceType, const std::string& location, const std::string& operatingHours, const std::string& eligibilityCriteria, const std::string& contactInfo), (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
 };
 
