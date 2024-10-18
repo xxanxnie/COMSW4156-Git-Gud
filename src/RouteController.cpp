@@ -96,7 +96,11 @@ void RouteController::deleteResource(const crow::request& req,
     res = handleException(e);
   }
 }
-
+/**
+ * Get all the shelter information in our database
+ * GET with this key in json format
+ * @return A crow::response object containing an HTTP 200 response, 
+ */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
   try {
@@ -110,6 +114,16 @@ void RouteController::getShelter(const crow::request& req,
     res = handleException(e);
   }
 }
+/**
+ * Add the shelter information to our database
+ * POST with this key in json format
+ * @param ORG     The organization who gave the infomation.
+ * @param User     The target this service provide for.
+ * @param location     The location of the shelter.
+ * @param capacity     The maximum number of users that the shelter can handle.
+ * @param curUse       The current users that using this shelter.
+ * @return A crow::response object containing an HTTP 201 response , 
+ */
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
   try {
