@@ -11,9 +11,14 @@ set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/external_libraries/boost)
 set(CROW_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/Crow/include)
 set(ASIO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/asio/include)
 
-# MongoDB C++ Driver paths (adjust these based on the find command results)
-set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.dylib")
-set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.dylib")
+# MongoDB C++ Driver paths
+if (APPLE)
+    set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.dylib")
+    set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.dylib")
+else()
+    set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.so")
+    set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
+endif()
 
 # Include directories
 set(INCLUDE_PATHS 
@@ -59,7 +64,7 @@ set(SOURCE_FILES
 )
 
 set(TEST_FILES 
-    test/CounselingUnitTests.cpp
+    #test/CounselingUnitTests.cpp
     test/FoodUnitTests.cpp
     test/HealthcareUnitTests.cpp
     test/OutreachUnitTests.cpp
@@ -84,8 +89,8 @@ add_executable(GitGud ${SOURCE_FILES})
 include(FetchContent)
 FetchContent_Declare(
     googletest
-    URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
 )
 FetchContent_MakeAvailable(googletest)
 

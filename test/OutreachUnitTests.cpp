@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "Outreach.h"
 #include "DatabaseManager.h"
 

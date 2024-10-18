@@ -18,9 +18,7 @@ std::string Outreach::getTargetAudience() const {
     return targetAudience;
 }
 
-std::string Outreach::getProgramName() const {
-    return programName;
-}
+std::string Outreach::getProgramName() const { return programName; }
 
 std::string Outreach::getDescription() const {
     return description;
