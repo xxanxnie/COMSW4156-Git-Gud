@@ -7,7 +7,7 @@ Food::Food( DatabaseManager& db)
     :  db(db) {
 }
 
-void Food::insertFood(const std::vector<std::pair<std::string, std::string>>& resource) {
+void Food::addFood(const std::vector<std::pair<std::string, std::string>>& resource) {
     try {
         db.insertResource("Food", resource);
         std::cout << "Food resource inserted successfully." << std::endl;  

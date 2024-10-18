@@ -212,7 +212,7 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
 
         Food food(dbManager);
 
-        food.insertFood(keyValues);
+        food.addFood(keyValues);
 
         res.code = 201; // Created
         res.write("Food resource added successfully.");
