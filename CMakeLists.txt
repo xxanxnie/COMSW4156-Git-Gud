@@ -85,6 +85,10 @@ set(SOURCE_FILES_NO_MAIN
 # Main project executable
 add_executable(GitGud ${SOURCE_FILES})
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(GitGud PRIVATE -Wno-deprecated-declarations)
+endif()
+
 # Google Test setup
 include(FetchContent)
 FetchContent_Declare(
@@ -112,6 +116,10 @@ enable_testing()
 # Test executable
 add_executable(GitGudTests ${TEST_FILES} ${SOURCE_FILES_NO_MAIN})
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(GitGudTests PRIVATE -Wno-deprecated-declarations)
+endif()
+
 target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 
 target_link_libraries(GitGudTests PRIVATE 
@@ -128,9 +136,9 @@ add_test(NAME GitGudTests COMMAND GitGudTests)
 set_tests_properties(GitGudTests PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/local/lib:$ENV{LD_LIBRARY_PATH}")
 
 # Add custom target for coverage analysis
+
 add_custom_target(
     coverage
-    DEPENDS run_tests
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/GitGudTests.dir/src
     COMMAND gcov *.cpp.gcno
     COMMAND lcov --capture --directory . --output-file Coverage.info --ignore-errors inconsistent --filter range

@@ -48,6 +48,17 @@ If you ever need to clean up some files `make clean` is always an option
 
 # Endpoints
 
+# API Endpoints
+
+1. Add Outreach Service
+- **Endpoint:** `POST /resources/outreach/add`
+- **Description:** This endpoint allows clients to add a new outreach service to the system. It expects a POST request containing the necessary details about the outreach service in the request body (e.g., target audience, program name, description, program date, location, and contact informationn). Upon successful addition, the server will respond with a confirmation message.
+
+2. Get All Outreach Services
+- **Endpoint:** `GET /resources/outreach/getAll`
+- **Description:** This endpoint retrieves all outreach services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details such as the target audience, program name, description, program date, location, and contact information.
+
+
 # Branch Coverage
 
 This project uses **GCOV** (coverage tool) and **LCOV** (graphical front-end for GCOV) to generate branch coverage reports for C++ code. After building the project using CMake in the build folder, run `make coverage` which will automatically open the HTML file to view the branch coverage report. If coverage needs to be run again, it may be necessary to clean previous coverage data by using the following commands to delete old `.gcda` and `.gcno` files and rebuild the project:
