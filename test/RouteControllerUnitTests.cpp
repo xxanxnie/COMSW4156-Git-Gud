@@ -83,7 +83,6 @@ class MockHealthcareService : public Healthcare {
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
 };
 
-// Test Fixture with DatabaseManager pointer
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
