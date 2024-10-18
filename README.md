@@ -82,7 +82,7 @@ If you ever need to clean up some files `make clean` is always an option
 
 2. Get All Shelter Services
 - **Endpoint:** `GET /resources/shelter`
-- **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details.
+- **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of shelter services in JSON format. Each service entry includes details.
 * Upon Success: HTTP 200 Status Code is returned string Success
 * Upon Failure: returned string error msg
 # Branch Coverage
