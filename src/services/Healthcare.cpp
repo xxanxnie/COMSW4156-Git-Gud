@@ -100,8 +100,8 @@ std::string Healthcare::printHealthcareServices(
       if (element.type() != bsoncxx::type::k_oid) {
         ret += element.get_string().value.to_string()+ "\n";
       }
-      ret += "\n";
     }
+    ret += "\n";
   }
   return ret;
 }
