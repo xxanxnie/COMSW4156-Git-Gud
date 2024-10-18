@@ -197,7 +197,6 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
         addFood(req, res);
     });
 
-        // New route to get all food resources
     CROW_ROUTE(app, "/resources/getAllFood")
         .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
             getAllFood(req, res);
