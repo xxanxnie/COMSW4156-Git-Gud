@@ -1,64 +1,66 @@
 // C++ System Header
+#include <csignal>
 #include <iostream>
 #include <map>
 #include <string>
-#include <csignal>
 
 // Project Header
 #include "Counseling.h"
+#include "DatabaseManager.h"
 #include "Food.h"
 #include "Healthcare.h"
 #include "Outreach.h"
-#include "Shelter.h"
-#include "DatabaseManager.h"
 #include "RouteController.h"
+#include "Shelter.h"
 
 // Third-party Header
-#include "../external_libraries/Crow/include/crow.h"
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
 
+#include "../external_libraries/Crow/include/crow.h"
+
 /**
- *  Method to handle proper termination protocols 
+ *  Method to handle proper termination protocols
  */
 void signalHandler(int signal) {
-    if (signal == SIGINT || signal == SIGTERM) {
-        std::cout << "Terminating the application..." << std::endl;
-        std::exit(signal);
-    }
+  if (signal == SIGINT || signal == SIGTERM) {
+    std::cout << "Terminating the application..." << std::endl;
+    std::exit(signal);
+  }
 }
 
 /**
- *  Sets up the HTTP server and runs the program 
+ *  Sets up the HTTP server and runs the program
  */
 int main(int argc, char* argv[]) {
-    // Setup signal handling
-    std::signal(SIGINT, signalHandler);
-    std::signal(SIGTERM, signalHandler);
+  // Setup signal handling
+  std::signal(SIGINT, signalHandler);
+  std::signal(SIGTERM, signalHandler);
 
-    // Initialize MongoDB driver
-    mongocxx::instance instance{};
+  // Initialize MongoDB driver
+  mongocxx::instance instance{};
 
-    // Initialize the DatabaseManager
-    DatabaseManager dbManager("mongodb://localhost:27017");
+  // Initialize the DatabaseManager
+  DatabaseManager dbManager("mongodb://localhost:27017");
 
-    // Create collections for social welfare initiatives
-    dbManager.createCollection("Food");
-    dbManager.createCollection("Healthcare");
-    dbManager.createCollection("Outreach");
-    dbManager.createCollection("Shelter");
-    dbManager.createCollection("Counseling");
+  // Create collections for social welfare initiatives
+  dbManager.createCollection("Food");
+  dbManager.createCollection("Healthcare");
+  dbManager.createCollection("Outreach");
+  dbManager.createCollection("Shelter");
+  dbManager.createCollection("Counseling");
 
-    // Initialize the HTTP server
-    crow::SimpleApp app;
+  // Initialize the HTTP server
+  crow::SimpleApp app;
 
-    // Initialize route controller with DatabaseManager
-    RouteController routeController(dbManager);
-    routeController.initRoutes(app);  // Pass the DatabaseManager to the RouteController
+  // Initialize route controller with DatabaseManager
+  RouteController routeController(dbManager);
+  routeController.initRoutes(
+      app);  // Pass the DatabaseManager to the RouteController
 
-    // Start the server
-    app.port(8080).multithreaded().run();
+  // Start the server
+  app.port(8080).multithreaded().run();
 
-    return 0;
+  return 0;
 }
