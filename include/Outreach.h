@@ -56,5 +56,4 @@ private:
     //std::string deleteOutreach();
 };
 
-#endif
-#endif
+#endif // OUTREACH_H

@@ -45,16 +45,6 @@ void RouteController::getResources(const crow::request& req,
       res.end();
       return;
     }
-void RouteController::getResources(const crow::request& req,
-                                   crow::response& res) {
-  try {
-    const char* resourceType = req.url_params.get("type");
-    if (!resourceType) {
-      res.code = 400;
-      res.write("Error: Resource type is required.");
-      res.end();
-      return;
-    }
 
     auto resources = dbManager.getResources(resourceType);
     res.code = 200;
@@ -66,22 +56,6 @@ void RouteController::getResources(const crow::request& req,
 }
 
 // Add resource route
-void RouteController::addResource(const crow::request& req,
-                                  crow::response& res) {
-  try {
-    // Remove or implement validateInputs
-    // if (!validateInputs(req, &res)) {
-    //     return;
-    // }
-
-    auto resource = bsoncxx::from_json(req.body);
-    // Convert bsoncxx::document::value to vector of pairs
-    std::vector<std::pair<std::string, std::string>> keyValues;
-    for (auto element : resource.view()) {
-      keyValues.emplace_back(element.key().to_string(),
-                             element.get_utf8().value.to_string());
-    }
-    dbManager.insertResource("Resources", keyValues);
 void RouteController::addResource(const crow::request& req,
                                   crow::response& res) {
   try {
@@ -99,13 +73,46 @@ void RouteController::addResource(const crow::request& req,
   } catch (const std::exception& e) {
     res = handleException(e);
   }
-    res.code = 201;  
-    res.write("Resource added successfully.");
+}
+
+// Delete resource route
+void RouteController::deleteResource(const crow::request& req,
+                                     crow::response& res) {
+  try {
+    const char* resourceId = req.url_params.get("id");
+    if (!resourceId) {
+      res.code = 400;
+      res.write("Error: Resource ID is required.");
+      res.end();
+      return;
+    }
+
+    dbManager.deleteResource("Resources", resourceId);
+    res.code = 200;
+    res.write("Resource deleted successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
   }
 }
+
+// Get all food resources route
+// void RouteController::getAllFood(const crow::request& req, crow::response& res) {
+//     try {
+//         // Instantiate the Food class and pass the dbManager
+//         Food food(dbManager);
+
+//         // Fetch all food resources from the database
+//         std::string response = food.getAllFood();
+
+//         // Send the response
+//         res.code = 200;
+//         res.write(response);
+//         res.end();
+//     } catch (const std::exception& e) {
+//         res = handleException(e);
+//     }
+// }
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
   try {
@@ -140,6 +147,7 @@ void RouteController::addShelter(const crow::request& req,
     res = handleException(e);
   }
 }
+
 // Update resource route
 void RouteController::updateResource(const crow::request& req,
                                      crow::response& res) {
@@ -157,15 +165,6 @@ void RouteController::updateResource(const crow::request& req,
       return;
     }
 
-    auto id = resource["id"].get_string().value.to_string();
-    std::vector<std::pair<std::string, std::string>> updates;
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        updates.emplace_back(element.key().to_string(),
-                             element.get_string().value.to_string()); 
-      }
-    }
-    dbManager.updateResource("Resources", id, updates);
     auto id = resource["id"].get_utf8().value.to_string();
     // Convert bsoncxx::document::value to vector of pairs
     std::vector<std::pair<std::string, std::string>> updates;
@@ -179,43 +178,6 @@ void RouteController::updateResource(const crow::request& req,
 
     res.code = 200;
     res.write("Resource updated successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-    res.code = 200;
-    res.write("Resource updated successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
-
-// Delete resource route
-void RouteController::deleteResource(const crow::request& req,
-                                     crow::response& res) {
-  try {
-    const char* resourceId = req.url_params.get("id");
-    if (!resourceId) {
-      res.code = 400;
-      res.write("Error: Resource ID is required.");
-      res.end();
-      return;
-    }
-void RouteController::deleteResource(const crow::request& req,
-                                     crow::response& res) {
-  try {
-    const char* resourceId = req.url_params.get("id");
-    if (!resourceId) {
-      res.code = 400;
-      res.write("Error: Resource ID is required.");
-      res.end();
-      return;
-    }
-
-    dbManager.deleteResource("Resources", resourceId);
-    res.code = 200;
-    res.write("Resource deleted successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
@@ -314,50 +276,46 @@ void RouteController::deleteCounseling(const crow::request& req, crow::response&
 }
 
 // Add food route
-void RouteController::addFood(const crow::request& req, crow::response& res) {
-    try {
-        // Parse the request body into a BSON document
-        auto resource = bsoncxx::from_json(req.body);
+// void RouteController::addFood(const crow::request& req, crow::response& res) {
+//     try {
+//         // Parse the request body into a BSON document
+//         auto resource = bsoncxx::from_json(req.body);
 
-        // Convert bsoncxx::document::value to vector of pairs
-        std::vector<std::pair<std::string, std::string>> keyValues;
-        for (auto element : resource.view()) {
-            keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
-        }
+//         // Convert bsoncxx::document::value to vector of pairs
+//         std::vector<std::pair<std::string, std::string>> keyValues;
+//         for (auto element : resource.view()) {
+//             keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
+//         }
 
-        Food food(dbManager);
+//         Food food(dbManager);
 
-        food.insertFood(keyValues);
+//         food.insertFood(keyValues);
 
-        res.code = 201; // Created
-        res.write("Food resource added successfully.");
-        res.end();
-    } catch (const std::exception& e) {
-        res = handleException(e);
-    }
-}
+//         res.code = 201; // Created
+//         res.write("Food resource added successfully.");
+//         res.end();
+//     } catch (const std::exception& e) {
+//         res = handleException(e);
+//     }
+// }
 
 // Get all food resources route
-void RouteController::getAllFood(const crow::request& req, crow::response& res) {
-    try {
-        // Instantiate the Food class and pass the dbManager
-        Food food(dbManager);
+// void RouteController::getAllFood(const crow::request& req, crow::response& res) {
+//     try {
+//         // Instantiate the Food class and pass the dbManager
+//         Food food(dbManager);
 
-        // Fetch all food resources from the database
-        std::string response = food.getAllFood();
+//         // Fetch all food resources from the database
+//         std::string response = food.getAllFood();
 
-        // Send the response
-        res.code = 200;
-        res.write(response);
-        res.end();
-    dbManager.deleteResource("Resources", resourceId);
-    res.code = 200;
-    res.write("Resource deleted successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-  }
-}
+//         // Send the response
+//         res.code = 200;
+//         res.write(response);
+//         res.end();
+//     } catch (const std::exception& e) {
+//         res = handleException(e);
+//     }
+// }
 
 void RouteController::addOutreach(const crow::request& req, crow::response& res) {
     try {
