@@ -23,7 +23,8 @@ class RouteController {
   // Add the initRoutes method declaration
   void initRoutes(crow::SimpleApp& app);
 
-  // Route handlers
+  void addFood(const crow::request& req, crow::response& res);
+  void getAllFood(const crow::request& req, crow::response& res);
   void index(crow::response& res);
   void getResources(const crow::request& req, crow::response& res);
   void addResource(const crow::request& req, crow::response& res);

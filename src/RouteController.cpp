@@ -4,9 +4,11 @@
 #include <bsoncxx/json.hpp>
 #include <exception>
 #include <iostream>
+#include <bsoncxx/json.hpp>
+#include "RouteController.h"
+#include "Food.h"
 #include <map>
 #include <string>
-
 // Utility function to handle exceptions
 crow::response handleException(const std::exception& e) {
   std::cerr << "Error: " << e.what() << std::endl;
@@ -163,6 +165,49 @@ void RouteController::deleteResource(const crow::request& req,
   }
 }
 
+// Add food route
+void RouteController::addFood(const crow::request& req, crow::response& res) {
+    try {
+        // Parse the request body into a BSON document
+        auto resource = bsoncxx::from_json(req.body);
+
+        // Convert bsoncxx::document::value to vector of pairs
+        std::vector<std::pair<std::string, std::string>> keyValues;
+        for (auto element : resource.view()) {
+            keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
+        }
+
+        Food food(dbManager);
+
+        food.insertFood(keyValues);
+
+        res.code = 201; // Created
+        res.write("Food resource added successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+// Get all food resources route
+void RouteController::getAllFood(const crow::request& req, crow::response& res) {
+    try {
+        // Instantiate the Food class and pass the dbManager
+        Food food(dbManager);
+
+        // Fetch all food resources from the database
+        std::string response = food.getAllFood();
+
+        // Send the response
+        res.code = 200;
+        res.write(response);
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+
 // Initialize API Routes
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
@@ -190,7 +235,18 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::DELETE)(
           [this](const crow::request& req, crow::response& res) {
             deleteResource(req, res);
-          });
+
+  CROW_ROUTE(app, "/resources/addFood")
+  .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+      addFood(req, res);
+  });
+
+      // New route to get all food resources
+  CROW_ROUTE(app, "/resources/getAllFood")
+      .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+          getAllFood(req, res);
+  });
+        });
   CROW_ROUTE(app, "/resources/shelter")
       .methods(crow::HTTPMethod::POST)(
           [this](const crow::request& req, crow::response& res) {

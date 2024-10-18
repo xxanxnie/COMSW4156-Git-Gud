@@ -8,6 +8,7 @@
 #include <vector>
 
 class DatabaseManager {
+
  public:
   DatabaseManager(const std::string& uri);
 
