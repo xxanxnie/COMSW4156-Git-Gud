@@ -104,7 +104,9 @@ find . -name "*.gcno" -delete
 
 # Style Checking Analysis
 
-The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files.
+The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files. The below shows the style check output for the current state of the project.
+
+![Style Check](docs/stylecheck.png)
 
 # Setup MongoDb Database
 1. Install docker
