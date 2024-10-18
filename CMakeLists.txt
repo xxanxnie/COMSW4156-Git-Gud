@@ -139,15 +139,15 @@ set_tests_properties(GitGudTests PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=/usr/lo
 
 add_custom_target(
     coverage
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/GitGudTests.dir/src
-    COMMAND gcov *.cpp.gcno
-    COMMAND lcov --capture --directory . --output-file Coverage.info --ignore-errors inconsistent --filter range
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND gcov CMakeFiles/GitGudTests.dir/src/*.gcno
+    COMMAND lcov --capture --directory ${CMAKE_BINARY_DIR} --output-file Coverage.info --ignore-errors inconsistent --filter range
     COMMAND lcov --remove Coverage.info "/usr*" "include/" -o FilteredCoverage.info
     COMMAND genhtml FilteredCoverage.info --output-directory UnitTestCoverageOutput --ignore-errors inconsistent --filter range 
+    COMMAND ${CMAKE_COMMAND} -E echo "Coverage report generated at UnitTestCoverageOutput/index.html"
     COMMAND open UnitTestCoverageOutput/index.html
     COMMENT "Generating code coverage report"
 )
-
 # Find the cpplint program
 find_program(CPPLINT cpplint)
 
