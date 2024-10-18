@@ -3,6 +3,7 @@
 #define MOCK_DATABASE_MANAGER_H
 
 #include <gmock/gmock.h>
+
 #include "DatabaseManager.h"
 
 class MockDatabaseManager : public DatabaseManager {

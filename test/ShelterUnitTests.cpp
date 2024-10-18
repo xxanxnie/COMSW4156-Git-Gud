@@ -6,8 +6,8 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 
-#include "Shelter.h"
 #include "MockDatabaseManager.h"
+#include "Shelter.h"
 
 class ShelterUnitTests : public ::testing::Test {
  protected:

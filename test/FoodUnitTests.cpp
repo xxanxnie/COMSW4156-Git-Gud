@@ -11,18 +11,18 @@
 
 class FoodUnitTests : public ::testing::Test {
  protected:
-    Food* food;
-    MockDatabaseManager* mockDbManager;
+  Food* food;
+  MockDatabaseManager* mockDbManager;
 
-    void SetUp() override {
-        mockDbManager = new MockDatabaseManager();
-        food = new Food(*mockDbManager);
-    }
+  void SetUp() override {
+    mockDbManager = new MockDatabaseManager();
+    food = new Food(*mockDbManager);
+  }
 
-    void TearDown() override {
-        delete food;
-        delete mockDbManager;
-    }
+  void TearDown() override {
+    delete food;
+    delete mockDbManager;
+  }
 };
 
 TEST_F(FoodUnitTests, getAllFood) {
@@ -35,7 +35,8 @@ TEST_F(FoodUnitTests, getAllFood) {
                        << "expirationDate" << "2024-12-31"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
                                       ::testing::Return()));
 
@@ -53,8 +54,7 @@ TEST_F(FoodUnitTests, addFood) {
       {"Provider", "OrganicFarm"},
       {"location", "Queens"},
       {"quantity", "50"},
-      {"expirationDate", "2024-11-30"}
-  };
+      {"expirationDate", "2024-11-30"}};
 
   // Set the default behavior for insertResource using ON_CALL
   ON_CALL(*mockDbManager, insertResource("Food", foodResource))
@@ -73,7 +73,8 @@ TEST_F(FoodUnitTests, addFood) {
                        << "expirationDate" << "2024-11-30"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
                                       ::testing::Return()));
 
@@ -88,4 +89,3 @@ TEST_F(FoodUnitTests, addFood) {
   EXPECT_TRUE(foodItems.find("50") != std::string::npos);
   EXPECT_TRUE(foodItems.find("2024-11-30") != std::string::npos);
 }
-
