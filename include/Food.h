@@ -15,10 +15,10 @@ class Food {
  public:
   Food(DatabaseManager& db);
 
-  void addFood(
+  virtual std::string addFood(
       const std::vector<std::pair<std::string, std::string>>& reasource);
 
-  std::string getAllFood();
+  virtual std::string getAllFood();
 };
 
 #endif

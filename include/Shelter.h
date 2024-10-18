@@ -12,11 +12,11 @@ class Shelter {
   Shelter(DatabaseManager& dbManager, std::string collection_name)
       : dbManager(dbManager), collection_name(collection_name) {}
 
-  std::string addShelter(std::string ORG, std::string User,
+  virtual std::string addShelter(std::string ORG, std::string User,
                          std::string location, int capacity, int curUse);
-  std::string deleteShelter();
-  std::string searchShelterAll();
-  std::string updateShelter();
+  virtual std::string deleteShelter();
+  virtual std::string searchShelterAll();
+  virtual std::string updateShelter();
   std::vector<std::pair<std::string, std::string>> createDBContent(
       std::string ORG, std::string User, std::string location,
       std::string capacity, std::string curUse);

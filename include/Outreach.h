@@ -18,7 +18,7 @@ class OutreachService {
 
   std::string collection_name;
 
-  std::string addOutreachService(const std::string& targetAudience,
+  virtual std::string addOutreachService(const std::string& targetAudience,
                                  const std::string& programName,
                                  const std::string& description,
                                  const std::string& programDate,
@@ -30,7 +30,7 @@ class OutreachService {
       const std::string& description, const std::string& programDate,
       const std::string& location, const std::string& contactInfo);
 
-  std::string getAllOutreachServices();
+  virtual std::string getAllOutreachServices();
   std::string printOutreachServices(
       const std::vector<bsoncxx::document::value>& services) const;
 

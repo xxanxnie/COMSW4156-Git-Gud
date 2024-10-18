@@ -7,13 +7,13 @@ Food::Food( DatabaseManager& db)
     :  db(db) {
 }
 
-void Food::addFood(const std::vector<std::pair<std::string, std::string>>& resource) {
+std::string Food::addFood(const std::vector<std::pair<std::string, std::string>>& resource) {
     try {
         db.insertResource("Food", resource);
-        std::cout << "Food resource inserted successfully." << std::endl;  
+        return "Success";  
     } catch (const std::exception& e) {
         std::cerr << "Error inserting food resource: " << e.what() << std::endl;
-        throw;  
+        return "Error inserting food resource: " + std::string(e.what());
     }
 }
 

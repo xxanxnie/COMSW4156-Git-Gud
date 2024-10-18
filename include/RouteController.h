@@ -13,14 +13,26 @@
 #include "Counseling.h"
 #include "DatabaseManager.h"
 #include "Shelter.h"
+#include "Healthcare.h"
+#include "Outreach.h"
+#include "Food.h"
 
 class RouteController {
  private:
-  DatabaseManager& dbManager;  // Reference to the database manager
+  DatabaseManager& dbManager;  
+  Shelter& shelterManager;
+  Counseling& counselingManager;
+  HealthcareService& healthcareManager;
+  OutreachService& outreachManager;
+  Food& foodManager; 
+  
 
  public:
   // Constructor
-  RouteController(DatabaseManager& dbManager) : dbManager(dbManager) {}
+  RouteController(DatabaseManager& dbManager, Shelter& shelterManager, Counseling& counselingManager,
+                  HealthcareService& healthcareManager, OutreachService& outreachManager, Food& foodManager)
+      : dbManager(dbManager), shelterManager(shelterManager), counselingManager(counselingManager),
+        healthcareManager(healthcareManager), outreachManager(outreachManager), foodManager(foodManager) {}
 
   // Initialize routes
   void initRoutes(crow::SimpleApp& app);

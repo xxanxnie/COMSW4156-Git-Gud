@@ -14,14 +14,14 @@ class HealthcareService {
                     const std::string& collection_name)
       : dbManager(dbManager), collection_name(collection_name) {}
 
-  std::string addHealthcareService(const std::string& provider,
+  virtual std::string addHealthcareService(const std::string& provider,
                                    const std::string& serviceType,
                                    const std::string& location,
                                    const std::string& operatingHours,
                                    const std::string& eligibilityCriteria,
                                    const std::string& contactInfo);
 
-  std::string getAllHealthcareServices();
+  virtual std::string getAllHealthcareServices();
 
   std::vector<std::pair<std::string, std::string>> createDBContent(
       const std::string& provider, const std::string& serviceType,
