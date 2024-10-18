@@ -1,24 +1,13 @@
-#include <gtest/gtest.h>
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include <gmock/gmock.h>
-#include "Healthcare.h"
-#include "DatabaseManager.h"
+#include <gtest/gtest.h>
+
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
+
 #include "Food.h"
-
-class MockDatabaseManager : public DatabaseManager {
-public:
-    MockDatabaseManager() : DatabaseManager("mongodb://localhost:27017", true) {}
-
-    MOCK_METHOD(void, findCollection, 
-        (const std::string& collectionName, 
-        (const std::vector<std::pair<std::string, std::string>>& keyValues), 
-        (std::vector<bsoncxx::document::value>& result)), (override));
-
-    MOCK_METHOD(void, insertResource, 
-        (const std::string& collectionName, 
-        (const std::vector<std::pair<std::string, std::string>>& keyValues)), (override));
-};
+#include "MockDatabaseManager.h"
 
 class FoodUnitTests : public ::testing::Test {
  protected:
