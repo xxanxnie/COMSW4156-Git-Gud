@@ -66,10 +66,10 @@ TEST_F(OutreachServiceUnitTests, GetAllOutreachServices) {
                         << "Contact Info" << "Sarah Johnson, sarah@email.com"
                          << bsoncxx::builder::stream::finalize);
 
-    EXPECT_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
-        .WillOnce(::testing::DoAll(
+    ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+        .WillByDefault(::testing::DoAll(
             ::testing::SetArgReferee<2>(mockResult), 
-            ::testing::Return()  
+            ::testing::Return()
         ));
 
     std::string services = outreachService->getAllOutreachServices();
@@ -96,8 +96,8 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
         {"contactInfo", "Sarah Johnson, sarah@email.com"}
     };
 
-    EXPECT_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
-        .WillOnce(::testing::Invoke(
+    ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
+        .WillByDefault(::testing::Invoke(
             [&](const std::string& collectionName, 
                 const std::vector<std::pair<std::string, std::string>>& content) {
                 EXPECT_EQ(collectionName, "Outreach");
