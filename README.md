@@ -73,25 +73,19 @@ If you ever need to clean up some files `make clean` is always an option
 * Upon Failure: returned string error msg
 
 **Shelter**
-POST /resources/shelter
-* Expected Input json:
-{ 
- "ORG" : "NGO", 
- "User" : "HML", 
- "location" : "New York", 
- "capacity" : "30", 
- "curUse" : "10" 
-}
-* Expected Output: status (String)
-
+1. Add Shelter Service
+- **Endpoint:** `POST /resources/shelter`
+- **Description:** This endpoint allows clients to add a new shelter service to the system. It expects a POST request containing the necessary details about the shelter service in the request body ({ "ORG" : "NGO", "User" : "HML", "location" : "New York", 
+"capacity" : "30","curUse" : "10" }). Upon successful addition, the server will respond with a confirmation message.
 * Upon Success: HTTP 201 Status Code is returned string Success
 * Upon Failure: returned string error msg
 
-GET /resources/shelter
-* Expected Output: all data content (String)
-
-* Upon Success: HTTP 200 Status Code is returned string concat all data content
+2. Get All Shelter Services
+- **Endpoint:** `GET /resources/shelter`
+- **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of shelter services in JSON format. Each service entry includes details.
+* Upon Success: HTTP 200 Status Code is returned string Success
 * Upon Failure: returned string error msg
+
 
 **Food**
 
@@ -126,7 +120,9 @@ find . -name "*.gcno" -delete
 
 # Style Checking Analysis
 
-The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files.
+The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files. The below shows the style check output for the current state of the project.
+
+![Style Check](docs/stylecheck.png)
 
 # Setup MongoDb Database
 1. Install docker
