@@ -44,7 +44,6 @@ void RouteController::index(crow::response& res) {
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
   try {
-    // Parse the request body into a BSON document
     std::string response = shelterManager.searchShelterAll();
     res.code = 200;
     res.write(response);
@@ -66,7 +65,6 @@ void RouteController::getShelter(const crow::request& req,
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
   try {
-    // Parse the request body into a BSON document
     auto resource = bsoncxx::from_json(req.body);
     std::vector<std::string> content;
     for (auto element : resource.view()) {
@@ -76,7 +74,7 @@ void RouteController::addShelter(const crow::request& req,
     }
     shelterManager.addShelter(content[0], content[1], content[2], atoi(content[3].c_str()),
                  atoi(content[4].c_str()));
-    res.code = 201;  // Created
+    res.code = 201;  
     res.write("Shelter resource added successfully.");
     res.end();
   } catch (const std::exception& e) {
@@ -127,10 +125,10 @@ void RouteController::addCounseling(const crow::request& req, crow::response& re
     std::string result = counselingManager.addCounselor(counselorName, specialty);
     
     if (result == "Success") {
-      res.code = 201;  // Created
+      res.code = 201; 
       res.write("Counseling resource added successfully.");
     } else {
-      res.code = 400;  // Bad Request
+      res.code = 400;  
       res.write(result);
     }
     res.end();
@@ -223,10 +221,8 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
 
 void RouteController::getAllFood(const crow::request& req, crow::response& res) {
     try {
-        // Fetch all food resources from the database
         std::string response = foodManager.getAllFood();
 
-        // Send the response
         res.code = 200;
         res.write(response);
         res.end();
@@ -351,7 +347,6 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
   }
 }
 
-// Initialize API Routes
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });

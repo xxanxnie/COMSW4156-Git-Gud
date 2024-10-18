@@ -27,7 +27,6 @@ class RouteController {
   Food& foodManager;
 
  public:
-  // Constructor
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
                   Outreach& outreachManager, Food& foodManager)
@@ -38,10 +37,8 @@ class RouteController {
         outreachManager(outreachManager),
         foodManager(foodManager) {}
 
-  // Initialize routes
   void initRoutes(crow::SimpleApp& app);
 
-  // Route handlers
   void index(crow::response& res);
 
   // Shelter-related handlers

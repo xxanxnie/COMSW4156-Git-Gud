@@ -9,8 +9,7 @@
 
 class Food {
  private:
-  // std::vector<std::pair<std::string, std::string>> resource;
-  DatabaseManager& db;  // Reference to the database manager
+  DatabaseManager& db;
 
  public:
   Food(DatabaseManager& db);

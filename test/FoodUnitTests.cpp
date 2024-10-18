@@ -48,7 +48,6 @@ TEST_F(FoodUnitTests, getAllFood) {
 }
 
 TEST_F(FoodUnitTests, addFood) {
-  // Define the food resource as a vector of key-value pairs
   std::vector<std::pair<std::string, std::string>> foodResource = {
       {"FoodType", "Vegetables"},
       {"Provider", "OrganicFarm"},
@@ -56,14 +55,11 @@ TEST_F(FoodUnitTests, addFood) {
       {"quantity", "50"},
       {"expirationDate", "2024-11-30"}};
 
-  // Set the default behavior for insertResource using ON_CALL
   ON_CALL(*mockDbManager, insertResource("Food", foodResource))
-      .WillByDefault(::testing::Return());  // Simulate successful insertion
+      .WillByDefault(::testing::Return());
 
-  // Call the method to add food
   food->addFood(foodResource);
 
-  // Now check if the food resource was added correctly by simulating a query
   std::vector<bsoncxx::document::value> mockResult;
   mockResult.push_back(bsoncxx::builder::stream::document{}
                        << "FoodType" << "Vegetables"
@@ -78,10 +74,8 @@ TEST_F(FoodUnitTests, addFood) {
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
                                       ::testing::Return()));
 
-  // Simulate fetching all food items after insertion
   std::string foodItems = food->getAllFood();
 
-  // Assertions to verify the added food item
   EXPECT_NE(foodItems, "[]");
   EXPECT_TRUE(foodItems.find("Vegetables") != std::string::npos);
   EXPECT_TRUE(foodItems.find("OrganicFarm") != std::string::npos);

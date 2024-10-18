@@ -14,79 +14,73 @@ DatabaseManager::DatabaseManager(const std::string& uri, bool skipInitialization
     if (!skipInitialization) {
         conn = mongocxx::client(mongocxx::uri{uri});  
     } else {
-        // This is only needed for allowing tests of classes as an independent unit
+        // This is only needed for allowing unit-tests
         conn.reset(); 
     }
 }
+
 bsoncxx::document::value DatabaseManager::createDocument(
-    const std::vector<std::pair<std::string, std::string>> &keyValues)
-{
+    const std::vector<std::pair<std::string, std::string>> &keyValues) {
   bsoncxx::builder::stream::document document{};
-  for (const auto &keyValue : keyValues)
-  {
+  for (const auto &keyValue : keyValues) {
     document << keyValue.first << keyValue.second;
   }
   return document << bsoncxx::builder::stream::finalize;
 }
 
-void DatabaseManager::createCollection(const std::string &collectionName)
-{
-  (*conn)["GitGud"][collectionName]; // Create collection if it doesn't exist
+void DatabaseManager::createCollection(const std::string &collectionName) {
+  (*conn)["GitGud"][collectionName];
 }
+
 void DatabaseManager::findCollection(
     const std::string &collectionName,
     const std::vector<std::pair<std::string, std::string>> &keyValues,
-    std::vector<bsoncxx::document::value> &result)
-{
+    std::vector<bsoncxx::document::value> &result) {
   auto collection = (*conn)["GitGud"][collectionName];
   auto cursor = collection.find(createDocument(keyValues).view());
 
-  for (auto &&doc : cursor)
-  {
+  for (auto &&doc : cursor) {
     result.push_back(bsoncxx::document::value(doc));
   }
 }
-void DatabaseManager::printCollection(const std::string &collectionName)
-{
+
+void DatabaseManager::printCollection(const std::string &collectionName) {
   auto collection = (*conn)["GitGud"][collectionName];
-  if (collection.count_documents({}) == 0)
-  {
+  if (collection.count_documents({}) == 0) {
     std::cout << "Collection " << collectionName << " is empty." << std::endl;
     return;
   }
 
   auto cursor = collection.find({});
-  for (auto &&doc : cursor)
-  {
+  for (auto &&doc : cursor) {
     std::cout << bsoncxx::to_json(doc) << std::endl;
   }
 }
 
-void DatabaseManager::insertResource(const std::string &collectionName, const std::vector<std::pair<std::string, std::string>> &keyValues)
-{
+void DatabaseManager::insertResource(const std::string &collectionName, const std::vector<std::pair<std::string, std::string>> &keyValues) {
   auto collection = (*conn)["GitGud"][collectionName];
   collection.insert_one(createDocument(keyValues).view());
 }
+
 void DatabaseManager::deleteResource(const std::string &collectionName,
-                                     const std::string &resourceId)
-{
+                                     const std::string &resourceId) {
   auto collection = (*conn)["GitGud"][collectionName];
   collection.delete_one(createDocument({{"_id", resourceId}}).view());
 }
-void DatabaseManager::deleteCollection(const std::string &collectionName)
-{
+
+void DatabaseManager::deleteCollection(const std::string &collectionName) {
   auto collection = (*conn)["GitGud"][collectionName];
   collection.drop();
 }
+
 void DatabaseManager::updateResource(
     const std::string &collectionName, const std::string &resourceId,
-    const std::vector<std::pair<std::string, std::string>> &updates)
-{
+    const std::vector<std::pair<std::string, std::string>> &updates) {
   auto collection = (*conn)["GitGud"][collectionName];
   bsoncxx::builder::stream::document updateDoc{};
   updateDoc << "$set" << bsoncxx::builder::stream::open_document;
-  for (const auto &update : updates)
-  {
+
+  for (const auto &update : updates) {
     updateDoc << update.first << update.second;
   }
   updateDoc << bsoncxx::builder::stream::close_document;
@@ -98,21 +92,19 @@ void DatabaseManager::updateResource(
 }
 
 void DatabaseManager::findResource(const std::string &collectionName,
-                                   const std::string &resourceId)
-{
+                                   const std::string &resourceId) {
   auto collection = (*conn)["GitGud"][collectionName];
   auto filter = bsoncxx::builder::stream::document{}
                 << "_id" << resourceId << bsoncxx::builder::stream::finalize;
   auto cursor = collection.find(filter.view());
-  for (auto &&doc : cursor)
-  {
+
+  for (auto &&doc : cursor) {
     std::cout << bsoncxx::to_json(doc) << std::endl;
   }
 }
 
 bsoncxx::document::value DatabaseManager::getResources(
-    const std::string &resourceType)
-{
+    const std::string &resourceType) {
   auto collection = (*conn)["GitGud"]["Resources"];
   auto filter = bsoncxx::builder::stream::document{}
                 << "type" << resourceType << bsoncxx::builder::stream::finalize;
@@ -125,8 +117,7 @@ bsoncxx::document::value DatabaseManager::getResources(
   auto result = document{};
   auto resources_array = array{};
 
-  for (auto &&doc : cursor)
-  {
+  for (auto &&doc : cursor) {
     resources_array << bsoncxx::builder::stream::open_document
                     << bsoncxx::builder::stream::concatenate(doc)
                     << bsoncxx::builder::stream::close_document;
