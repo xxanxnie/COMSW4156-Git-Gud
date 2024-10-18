@@ -73,26 +73,18 @@ If you ever need to clean up some files `make clean` is always an option
 * Upon Failure: returned string error msg
 
 **Shelter**
-POST /resources/shelter
-* Expected Input json:
-{ 
- "ORG" : "NGO", 
- "User" : "HML", 
- "location" : "New York", 
- "capacity" : "30", 
- "curUse" : "10" 
-}
-* Expected Output: status (String)
-
+1. Add Shelter Service
+- **Endpoint:** `POST /resources/shelter`
+- **Description:** This endpoint allows clients to add a new shelter service to the system. It expects a POST request containing the necessary details about the shelter service in the request body ({ "ORG" : "NGO", "User" : "HML", "location" : "New York", 
+"capacity" : "30","curUse" : "10" }). Upon successful addition, the server will respond with a confirmation message.
 * Upon Success: HTTP 201 Status Code is returned string Success
 * Upon Failure: returned string error msg
 
-GET /resources/shelter
-* Expected Output: all data content (String)
-
-* Upon Success: HTTP 200 Status Code is returned string concat all data content
+2. Get All Shelter Services
+- **Endpoint:** `GET /resources/shelter`
+- **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details.
+* Upon Success: HTTP 200 Status Code is returned string Success
 * Upon Failure: returned string error msg
-
 # Branch Coverage
 
 This project uses **GCOV** (coverage tool) and **LCOV** (graphical front-end for GCOV) to generate branch coverage reports for C++ code. After building the project using CMake in the build folder, run `make coverage` which will automatically open the HTML file to view the branch coverage report. If coverage needs to be run again, it may be necessary to clean previous coverage data by using the following commands to delete old `.gcda` and `.gcno` files and rebuild the project:
