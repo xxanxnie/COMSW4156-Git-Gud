@@ -1,11 +1,14 @@
 // Copyright 2024 COMSW4156-Git-Gud
 
 #include "DatabaseManager.h"
+
 #include <algorithm>
+#include <iostream>
+
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-#include <iostream>
 #include <bsoncxx/json.hpp>
+
 
 DatabaseManager::DatabaseManager(const std::string& uri, bool skipInitialization) {
     if (!skipInitialization) {

@@ -1,18 +1,18 @@
-// C++ System Header
-#include "RouteController.h"
-#include "Outreach.h"
+// Copyright 2024 COMSW4156-Git-Gud
 
-#include <bsoncxx/json.hpp>
-#include <exception>
-#include <iostream>
-#include <bsoncxx/json.hpp>
 #include "RouteController.h"
-#include "Food.h"
-#include "Healthcare.h"
-#include "Outreach.h"
+
+#include <iostream>
 #include <map>
 #include <string>
-// Utility function to handle exceptions
+#include <exception>
+
+#include <bsoncxx/json.hpp>
+
+#include "Outreach.h"
+#include "Food.h"
+#include "Healthcare.h"
+
 crow::response handleException(const std::exception& e) {
   std::cerr << "Error: " << e.what() << std::endl;
   return crow::response{500, "An error has occurred: " + std::string(e.what())};

@@ -1,3 +1,5 @@
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include "Healthcare.h"
 #include "DatabaseManager.h"
 #include <iostream>

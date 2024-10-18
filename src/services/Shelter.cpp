@@ -1,4 +1,4 @@
-// Copyright 2024 Wilson, Liang
+// Copyright 2024 COMSW4156-Git-Gud
 #include "Shelter.h"
 
 /**

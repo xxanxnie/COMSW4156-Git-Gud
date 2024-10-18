@@ -5,8 +5,8 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
-#include <string>
 #include <optional>
+#include <string>
 #include <vector>
 
 class DatabaseManager {
@@ -32,7 +32,8 @@ class DatabaseManager {
       const std::vector<std::pair<std::string, std::string>>& updates);
   virtual void findResource(const std::string& collectionName,
                             const std::string& resourceId);
-  virtual bsoncxx::document::value getResources(const std::string& resourceType);
+  virtual bsoncxx::document::value getResources(
+      const std::string& resourceType);
 
  protected:
   std::optional<mongocxx::client> conn;

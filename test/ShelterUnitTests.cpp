@@ -1,4 +1,5 @@
-// Copyright 2024 Wilson, Liang
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
