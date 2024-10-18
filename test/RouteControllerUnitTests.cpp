@@ -98,9 +98,12 @@ class RouteControllerUnitTests : public ::testing::Test {
     mockShelter = new MockShelter(mockDbManager);
     mockCounseling = new MockCounseling(mockDbManager);
     mockFood = new MockFood(mockDbManager);
-    mockOutreach = new MockOutreachService(mockDbManager, "OutreachServiceTest");
-    mockHealthcare = new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
-    routeController = new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
+    mockOutreach =
+        new MockOutreachService(mockDbManager, "OutreachServiceTest");
+    mockHealthcare =
+        new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
+    routeController =
+        new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
                             *mockHealthcare, *mockOutreach, *mockFood);
   }
 
@@ -122,9 +125,9 @@ TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "hml345HML"); 
+  req.add_header("API-Key", "hml345HML");
   crow::response res{};
-  
+
   routeController->getShelter(req, res);
 
   EXPECT_EQ(res.code, 200);
@@ -155,12 +158,12 @@ TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
-  
+
   routeController->getShelter(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -177,7 +180,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
 
   routeController->addShelter(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -187,7 +190,7 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "rfg678RFG"); 
+  req.add_header("API-Key", "rfg678RFG");
   crow::response res{};
   routeController->getCounseling(req, res);
 
@@ -200,7 +203,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
       R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "def456VOL"); 
+  req.add_header("API-Key", "def456VOL");
   crow::response res{};
 
   ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
@@ -218,12 +221,12 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
-  
+
   routeController->getCounseling(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -232,7 +235,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
       R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
 
   ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
@@ -240,7 +243,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 
   routeController->addCounseling(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -250,7 +253,7 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "hml345HML"); 
+  req.add_header("API-Key", "hml345HML");
   crow::response res{};
   routeController->getAllFood(req, res);
 
@@ -261,7 +264,7 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
 TEST_F(RouteControllerUnitTests, AddFoodTest) {
   std::string body = R"({"name": "FoodBank", "location": "NYC"})";
   crow::request req;
-  req.add_header("API-Key", "abc123NGO"); 
+  req.add_header("API-Key", "abc123NGO");
   req.body = body;
   crow::response res{};
 
@@ -283,12 +286,12 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
-  
+
   routeController->getAllFood(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -303,12 +306,12 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
 
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
 
   routeController->addFood(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -318,7 +321,7 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "hml345HML"); 
+  req.add_header("API-Key", "hml345HML");
   crow::response res{};
   routeController->getAllOutreachServices(req, res);
 
@@ -330,7 +333,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
   std::string body =
       R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
   crow::request req;
-  req.add_header("API-Key", "def456VOL"); 
+  req.add_header("API-Key", "def456VOL");
   req.body = body;
   crow::response res{};
 
@@ -350,12 +353,12 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
-  
+
   routeController->getAllOutreachServices(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -364,7 +367,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
       R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
 
   ON_CALL(*mockOutreach, addOutreachService("Youth", "OutreachProgram", "Help",
@@ -373,7 +376,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
 
   routeController->addOutreachService(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -383,7 +386,7 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "rfg678RFG"); 
+  req.add_header("API-Key", "rfg678RFG");
   crow::response res{};
   routeController->getAllHealthcareServices(req, res);
 
@@ -395,7 +398,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   std::string body =
       R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
   crow::request req;
-  req.add_header("API-Key", "ghi789CLN"); 
+  req.add_header("API-Key", "ghi789CLN");
   req.body = body;
   crow::response res{};
 
@@ -417,12 +420,12 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
-  
+
   routeController->getAllHealthcareServices(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
 
@@ -431,7 +434,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
       R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "invalid"); 
+  req.add_header("API-Key", "invalid");
   crow::response res{};
 
   ON_CALL(*mockHealthcare,
@@ -441,6 +444,6 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
 
   routeController->addHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 403); 
+  EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
