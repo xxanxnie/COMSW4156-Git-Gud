@@ -27,10 +27,6 @@ class RouteController {
 
   // Route handlers
   void index(crow::response& res);
-  void getResources(const crow::request& req, crow::response& res);
-  void addResource(const crow::request& req, crow::response& res);
-  void updateResource(const crow::request& req, crow::response& res);
-  void deleteResource(const crow::request& req, crow::response& res);
 
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
