@@ -6,7 +6,7 @@
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/oid.hpp>
 
-std::string HealthcareService::addHealthcareService(const std::string& provider, const std::string& serviceType, 
+std::string Healthcare::addHealthcareService(const std::string& provider, const std::string& serviceType, 
                                                     const std::string& location, const std::string& operatingHours, 
                                                     const std::string& eligibilityCriteria, const std::string& contactInfo) {
     try {
@@ -19,7 +19,7 @@ std::string HealthcareService::addHealthcareService(const std::string& provider,
     return "Success";
 }
 
-std::vector<std::pair<std::string, std::string>> HealthcareService::createDBContent(const std::string& provider, 
+std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(const std::string& provider, 
                                                                                     const std::string& serviceType, 
                                                                                     const std::string& location, 
                                                                                     const std::string& operatingHours, 
@@ -35,7 +35,7 @@ std::vector<std::pair<std::string, std::string>> HealthcareService::createDBCont
     return content;
 }
 
-std::string HealthcareService::getAllHealthcareServices() {
+std::string Healthcare::getAllHealthcareServices() {
     std::vector<bsoncxx::document::value> result;
     dbManager.findCollection(collection_name, {}, result);  
     if (result.empty()) {
@@ -44,7 +44,7 @@ std::string HealthcareService::getAllHealthcareServices() {
     return printHealthcareServices(result);
 }
 
-std::string HealthcareService::printHealthcareServices(
+std::string Healthcare::printHealthcareServices(
     std::vector<bsoncxx::document::value> &services) const {
   std::string ret;
   for (auto hs : services) {

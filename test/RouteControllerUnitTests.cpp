@@ -38,19 +38,19 @@ class MockFood : public Food {
   MOCK_METHOD(std::string, getAllFood, (), (override));
 };
 
-class MockOutreachService : public OutreachService {
+class MockOutreachService : public Outreach {
  public:
   MockOutreachService(DatabaseManager& dbManager, const std::string& collection_name)
-      : OutreachService(dbManager, collection_name) {}
+      : Outreach(dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addOutreachService, (const std::string& targetAudience, const std::string& programName, const std::string& description, const std::string& programDate, const std::string& location, const std::string& contactInfo), (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (), (override));
 };
 
-class MockHealthcareService : public HealthcareService {
+class MockHealthcareService : public Healthcare {
  public:
   MockHealthcareService(DatabaseManager& dbManager, const std::string& collection_name)
-      : HealthcareService(dbManager, collection_name) {}
+      : Healthcare(dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addHealthcareService, (const std::string& provider, const std::string& serviceType, const std::string& location, const std::string& operatingHours, const std::string& eligibilityCriteria, const std::string& contactInfo), (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));

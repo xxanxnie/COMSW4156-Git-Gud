@@ -22,15 +22,15 @@ class RouteController {
   DatabaseManager& dbManager;  
   Shelter& shelterManager;
   Counseling& counselingManager;
-  HealthcareService& healthcareManager;
-  OutreachService& outreachManager;
+  Healthcare& healthcareManager;
+  Outreach& outreachManager;
   Food& foodManager; 
   
 
  public:
   // Constructor
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager, Counseling& counselingManager,
-                  HealthcareService& healthcareManager, OutreachService& outreachManager, Food& foodManager)
+                  Healthcare& healthcareManager, Outreach& outreachManager, Food& foodManager)
       : dbManager(dbManager), shelterManager(shelterManager), counselingManager(counselingManager),
         healthcareManager(healthcareManager), outreachManager(outreachManager), foodManager(foodManager) {}
 

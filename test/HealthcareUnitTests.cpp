@@ -12,11 +12,11 @@
 class HealthcareServiceUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
-  HealthcareService* healthcareService;
+  Healthcare* healthcareService;
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    healthcareService = new HealthcareService(*mockDbManager, "HealthcareTest");
+    healthcareService = new Healthcare(*mockDbManager, "HealthcareTest");
   }
 
   void TearDown() override {

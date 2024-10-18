@@ -6,11 +6,11 @@
 
 #include "DatabaseManager.h"
 
-class HealthcareService {
+class Healthcare {
  public:
   std::string collection_name;
 
-  HealthcareService(DatabaseManager& dbManager,
+  Healthcare(DatabaseManager& dbManager,
                     const std::string& collection_name)
       : dbManager(dbManager), collection_name(collection_name) {}
 

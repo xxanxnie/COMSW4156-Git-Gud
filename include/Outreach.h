@@ -10,9 +10,9 @@
 
 #include "DatabaseManager.h"
 
-class OutreachService {
+class Outreach {
  public:
-  OutreachService(DatabaseManager& dbManager,
+  Outreach(DatabaseManager& dbManager,
                   const std::string& collection_name)
       : dbManager(dbManager), collection_name(collection_name) {}
 

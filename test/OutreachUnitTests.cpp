@@ -18,11 +18,11 @@
 class OutreachServiceUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
-  OutreachService* outreachService;
+  Outreach* outreachService;
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    outreachService = new OutreachService(*mockDbManager, "Outreach");
+    outreachService = new Outreach(*mockDbManager, "Outreach");
   }
 
   void TearDown() override {
