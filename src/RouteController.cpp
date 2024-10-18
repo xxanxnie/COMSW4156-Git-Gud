@@ -20,6 +20,43 @@ crow::response handleException(const std::exception& e) {
   return crow::response{500, "An error has occurred: " + std::string(e.what())};
 }
 
+// Temporary hardcoded API keys and their roles
+std::map<std::string, std::string> validKeys = {
+    // POST/PATCH/DELETE users
+    {"abc123NGO", "NGO"},  // Non-profit Organizations
+    {"def456VOL", "VOL"},  // Volunteers
+    {"ghi789CLN", "CLN"},  // Clinics
+    {"jkl012GOV", "GOV"},  // Government
+
+    // GET users
+    {"hml345HML", "HML"},  // Homeless
+    {"rfg678RFG", "RFG"},  // Refugees
+    {"vet901VET", "VET"},  // Veterans
+    {"sub234SUB", "SUB"}   // Substance Users
+};
+
+bool authenticate(const crow::request& req, const std::string& requiredRole) {
+    auto apiKey = req.get_header_value("API-Key");
+    
+    if (validKeys.find(apiKey) != validKeys.end()) {
+        if (validKeys[apiKey] == requiredRole) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool authenticatePermissionsToGetAll(const crow::request& req) {
+    return authenticate(req, "HML") || authenticate(req, "RFG") ||
+           authenticate(req, "VET") || authenticate(req, "SUB");
+}
+
+bool authenticatePermissionsToPost(const crow::request& req) {
+    return authenticate(req, "NGO") || authenticate(req, "VOL") ||
+           authenticate(req, "CLN") || authenticate(req, "GOV");
+}
+
 /**
  * Redirects to the homepage.
  *
@@ -43,6 +80,13 @@ void RouteController::index(crow::response& res) {
  */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
+  if (!authenticatePermissionsToGetAll(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
   try {
     std::string response = shelterManager.searchShelterAll();
     res.code = 200;
@@ -64,6 +108,13 @@ void RouteController::getShelter(const crow::request& req,
  */
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::vector<std::string> content;
@@ -92,6 +143,13 @@ void RouteController::addShelter(const crow::request& req,
  * @return void. The method modifies the res object directly.
  */
 void RouteController::getCounseling(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToGetAll(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
   try {
     std::string response = counselingManager.searchCounselorsAll();
     res.code = 200;
@@ -117,6 +175,13 @@ void RouteController::getCounseling(const crow::request& req, crow::response& re
  * }
  */
 void RouteController::addCounseling(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string counselorName = resource["counselorName"].get_utf8().value.to_string();
@@ -194,6 +259,13 @@ void RouteController::addCounseling(const crow::request& req, crow::response& re
 // }
 
 void RouteController::addFood(const crow::request& req, crow::response& res) {
+    if (!authenticatePermissionsToPost(req)) {
+      res.code = 403;  
+      res.write("Unauthorized.");
+      res.end();
+      return;
+    }
+
     try {
         // Parse the request body into a BSON document
         auto resource = bsoncxx::from_json(req.body);
@@ -220,6 +292,13 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
 }
 
 void RouteController::getAllFood(const crow::request& req, crow::response& res) {
+    if (!authenticatePermissionsToGetAll(req)) {
+      res.code = 403;  
+      res.write("Unauthorized.");
+      res.end();
+      return;
+    }
+
     try {
         std::string response = foodManager.getAllFood();
 
@@ -245,6 +324,13 @@ void RouteController::getAllFood(const crow::request& req, crow::response& res) 
  * @throws std::runtime_error if there is not enough data to add the outreach service.
  */
 void RouteController::addOutreachService(const crow::request& req, crow::response& res) {
+    if (!authenticatePermissionsToPost(req)) {
+      res.code = 403;  
+      res.write("Unauthorized.");
+      res.end();
+      return;
+    }
+
     try {
         auto resource = bsoncxx::from_json(req.body);
          // Initialize the OutreachService
@@ -283,6 +369,13 @@ void RouteController::addOutreachService(const crow::request& req, crow::respons
  *             containing the outreach services in JSON format.
  */
 void RouteController::getAllOutreachServices(const crow::request& req, crow::response& res) {
+    if (!authenticatePermissionsToGetAll(req)) {
+      res.code = 403;  
+      res.write("Unauthorized.");
+      res.end();
+      return;
+    }
+
     try {
         std::string response = outreachManager.getAllOutreachServices(); // Retrieve all outreach services
         res.code = 200;
@@ -306,6 +399,13 @@ void RouteController::getAllOutreachServices(const crow::request& req, crow::res
  */
 void RouteController::addHealthcareService(const crow::request& req,
                                  crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+  
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::vector<std::string> content;
@@ -337,6 +437,13 @@ void RouteController::addHealthcareService(const crow::request& req,
  */
 void RouteController::getAllHealthcareServices(const crow::request& req,
                                  crow::response& res) {
+  if (!authenticatePermissionsToGetAll(req)) {
+    res.code = 403;  
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
   try {
     std::string response = healthcareManager.getAllHealthcareServices();
     res.code = 200;
