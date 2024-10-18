@@ -45,6 +45,10 @@ class RouteController {
   // Outreach-related handlers
   void addOutreach(const crow::request& req, crow::response& res);
 
+  // Food-related handlers
+  void addFood(const crow::request& req, crow::response& res);
+  void getAllFood(const crow::request& req, crow::response& res);
+
 };
 
 #endif
