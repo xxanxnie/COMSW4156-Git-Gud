@@ -64,7 +64,7 @@ set(SOURCE_FILES
 )
 
 set(TEST_FILES 
-    #test/CounselingUnitTests.cpp
+    test/CounselingUnitTests.cpp
     test/FoodUnitTests.cpp
     test/HealthcareUnitTests.cpp
     test/OutreachUnitTests.cpp
