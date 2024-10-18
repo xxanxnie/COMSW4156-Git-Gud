@@ -45,6 +45,9 @@ class RouteController {
   // Outreach-related handlers
   void addOutreach(const crow::request& req, crow::response& res);
 
+  // Healthcare-related handlers
+  void addHealthcareService(const crow::request& req, crow::response& res);
+  void getAllHealthcareServices(const crow::request& req, crow::response& res);
 };
 
 #endif

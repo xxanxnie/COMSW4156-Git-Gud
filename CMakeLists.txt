@@ -101,6 +101,8 @@ target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 target_link_libraries(GitGud PRIVATE 
     gtest 
     gtest_main
+    gmock
+    gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
 )
@@ -115,6 +117,8 @@ target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 target_link_libraries(GitGudTests PRIVATE 
     gtest 
     gtest_main
+    gmock
+    gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
 )
