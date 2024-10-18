@@ -12,52 +12,42 @@ TEST_DIR="$BASE_PATH/test"
 EXTERNAL_LIBRARIES_DIR="$BASE_PATH/external_libraries"
 COVERAGE_DIR="$BUILD_DIR/coverage"
 
+# Create external_libraries directory if it doesn't exist
+mkdir -p "$EXTERNAL_LIBRARIES_DIR"
+
 # Install external libraries
 echo "Starting the download of external libraries..."
 
 cd "$EXTERNAL_LIBRARIES_DIR" || { echo "Failed to change to external libraries directory"; exit 1; }
 
-# Download Crow Library
-if [ ! -d "Crow" ]; then
-    git clone --recurse-submodules https://github.com/CrowCpp/Crow.git Crow
-else
-    echo "Crow library already exists, skipping download."
-fi
+# Function to download and extract library
+download_and_extract() {
+    local name=$1 url=$2 dir=$3 file="${4:-${name}.tar.gz}"
+    if [ ! -d "$dir" ]; then
+        echo "Downloading $name..."
+        curl -L "$url" -o "$file"
+        tar -xzf "$file"
+        mv "${dir%-*}" "$dir"
+        rm "$file"
+    else
+        echo "$name library already exists, skipping download."
+    fi
+}
 
-# Download Boost Library
-if [ ! -d "boost" ]; then
-    curl -L https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.gz -o boost_1_86_0.tar.gz
-    tar -xzf boost_1_86_0.tar.gz -C .
-    mv boost_1_86_0 boost
-    rm boost_1_86_0.tar.gz
-else
-    echo "Boost library already exists, skipping download."
-fi
+# Download libraries
+[ ! -d "Crow" ] && git clone --recurse-submodules https://github.com/CrowCpp/Crow.git Crow || echo "Crow library already exists, skipping download."
 
-# Download Asio Library
-if [ ! -d "asio" ]; then
-    curl -L https://sourceforge.net/projects/asio/files/asio/1.30.2%20%28Stable%29/asio-1.30.2.tar.gz/download -o asio-1.30.2.tar.gz
-    tar -xzf asio-1.30.2.tar.gz -C .
-    mv asio-1.30.2 asio
-    rm asio-1.30.2.tar.gz
-else
-    echo "Asio library already exists, skipping download."
-fi
+download_and_extract "Boost" "https://archives.boost.io/release/1.86.0/source/boost_1_86_0.tar.gz" "boost" "boost_1_86_0.tar.gz"
+download_and_extract "Asio" "https://sourceforge.net/projects/asio/files/asio/1.30.2%20%28Stable%29/asio-1.30.2.tar.gz/download" "asio" "asio-1.30.2.tar.gz"
 
 # Download and install MongoDB C++ Driver
 if [ ! -d "mongo-cxx-driver" ]; then
     echo "Installing MongoDB C++ Driver..."
-    curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.11.0/mongo-cxx-driver-r3.11.0.tar.gz
-    tar -xzf mongo-cxx-driver-r3.11.0.tar.gz
-    mv mongo-cxx-driver-r3.11.0 mongo-cxx-driver
+    download_and_extract "MongoDB C++ Driver" "https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.11.0/mongo-cxx-driver-r3.11.0.tar.gz" "mongo-cxx-driver" "mongo-cxx-driver-r3.11.0.tar.gz"
     cd mongo-cxx-driver/build
-    cmake ..                                \
-        -DCMAKE_BUILD_TYPE=Release          \
-        -DMONGOCXX_OVERRIDE_DEFAULT_INSTALL_PREFIX=OFF
-    cmake --build .
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DMONGOCXX_OVERRIDE_DEFAULT_INSTALL_PREFIX=OFF
     sudo cmake --build . --target install
     cd ../..
-    rm mongo-cxx-driver-r3.11.0.tar.gz
 else
     echo "MongoDB C++ Driver already exists, skipping installation."
 fi
@@ -96,6 +86,9 @@ cmake ..
 
 # Compile the project
 make -C "$BUILD_DIR" || { echo "Compilation failed"; exit 1; }
+
+sudo apt-get update
+sudo apt-get install libmongoc-1.0-0
 
 # # Run tests
 # "$BUILD_DIR/test_setup" || { echo "Tests failed"; exit 1; }
@@ -144,3 +137,5 @@ do
         echo "$archive not found, skipping removal"
     fi
 done
+
+echo "Setup complete!"
