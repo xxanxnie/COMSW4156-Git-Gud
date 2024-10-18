@@ -430,16 +430,16 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             deleteResource(req, res);
 
-  CROW_ROUTE(app, "/resources/addFood")
-  .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
-      addFood(req, res);
-  });
+  // CROW_ROUTE(app, "/resources/addFood")
+  // .methods(crow::HTTPMethod::POST)([this](const crow::request& req, crow::response& res) {
+  //     addFood(req, res);
+  // });
 
-      // New route to get all food resources
-  CROW_ROUTE(app, "/resources/getAllFood")
-      .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
-          getAllFood(req, res);
-  });
+  //     // New route to get all food resources
+  // CROW_ROUTE(app, "/resources/getAllFood")
+  //     .methods(crow::HTTPMethod::GET)([this](const crow::request& req, crow::response& res) {
+  //         getAllFood(req, res);
+  // });
         });
   CROW_ROUTE(app, "/resources/shelter")
       .methods(crow::HTTPMethod::POST)(
