@@ -74,14 +74,14 @@ cd build
   - **Endpoint:** `POST /resources/outreach/add`
   - **Description:** This endpoint allows clients to add a new outreach service to the system. It expects a POST request containing the necessary details about the outreach service in the request body (e.g., target audience, program name, description, program date, location, and contact informationn). Upon successful addition, the server will respond with a confirmation message.
     * Upon Success: HTTP 201 Status Code is returned string Success
-    * Upon Failure: returned string error msg
+    * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
   2. Get All Outreach Services
   - **Endpoint:** `GET /resources/outreach/getAll`
   - **Description:** This endpoint retrieves all outreach services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details such as the target audience, program name, description, program date, location, and contact information.
     * Upon Success: HTTP 201 Status Code is returned string Success
-    * Upon Failure: returned string error msg
+    * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
 **Shelter**
@@ -90,14 +90,14 @@ cd build
     - **Description:** This endpoint allows clients to add a new shelter service to the system. It expects a POST request containing the necessary details about the shelter service in the request body ({ "ORG" : "NGO", "User" : "HML", "location" : "New York", 
   "capacity" : "30","curUse" : "10" }). Upon successful addition, the server will respond with a confirmation message.
     * Upon Success: HTTP 201 Status Code is returned string Success
-    * Upon Failure: returned string error msg
+    * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
   2. Get All Shelter Services
   - **Endpoint:** `GET /resources/shelter/getAll`
   - **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of shelter services in JSON format. Each service entry includes details.
     * Upon Success: HTTP 200 Status Code is returned string Success
-    * Upon Failure: returned string error msg
+    * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
 **Healthcare**
@@ -136,6 +136,35 @@ cd build
   - **Description:** This endpoint retrieves all counseling services available in the system. It accepts a GET request and returns a list of counseling services in JSON format. Each service entry includes details about the counselor and their specialty.
   - **Response:**
       * Upon Success: HTTP 200 Status Code is returned with a JSON array of counseling services
+      * Upon Failure: An error message is returned
+      * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+**Food**
+  * Expected Input (JSON):
+
+  ```json
+  {
+    "FoodType": "Fruits", 
+    "Provider": "LocalFarm", 
+    "location": "Brooklyn", 
+    "quantity": "100", 
+    "expirationDate": "2024-12-31"
+  }
+  ```
+
+  1. Add Food Resource
+  - **Endpoint:** `POST /resources/food/add`
+  - **Description:** This endpoint allows clients to add a new food resource to the system. It expects a POST request containing the necessary details about the food resource in the request body, such as food type, provider, location, quantity, and expiration date.
+  - **Response:**
+      * Upon Success: HTTP 201 Status Code is returned string Success
+      * Upon Failure: An error message is returned
+      * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+2. Get All Food Resources
+  - **Endpoint:** `GET /resources/food/getAll`
+  - **Description:** This endpoint retrieves all food resources available in the system. It accepts a GET request and returns a list of food resources in a concatenated string format.
+  - **Response:**
+      * Upon Success: HTTP 200 Status Code is returned with a concatenated string of all food data
       * Upon Failure: An error message is returned
       * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 

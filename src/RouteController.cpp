@@ -258,6 +258,18 @@ void RouteController::addCounseling(const crow::request& req, crow::response& re
 //   }
 // }
 
+/**
+  * @brief Adds a food resource to the database.
+  * 
+  * This method processes a POST request to add a food resource. It parses the
+  * request body as a JSON document, extracts the key-value pairs, and uses the
+  * `Food` class to store the resource in the database.
+  * 
+  * @param req The HTTP request containing the food resource in JSON format.
+  * @param res The HTTP response object to send back to the client.
+  * 
+  * @exception std::exception Throws if any error occurs during the database interaction or JSON parsing.
+*/
 void RouteController::addFood(const crow::request& req, crow::response& res) {
     if (!authenticatePermissionsToPost(req)) {
       res.code = 403;  
@@ -267,10 +279,8 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     }
 
     try {
-        // Parse the request body into a BSON document
         auto resource = bsoncxx::from_json(req.body);
 
-        // Convert bsoncxx::document::value to vector of pairs
         std::vector<std::pair<std::string, std::string>> keyValues;
         for (auto element : resource.view()) {
             keyValues.emplace_back(element.key().to_string(), element.get_utf8().value.to_string());
@@ -291,6 +301,18 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
       }
 }
 
+/**
+ * @brief Retrieves all food resources from the database.
+ * 
+ * This method processes a GET request to fetch all food resources stored in the database.
+ * It interacts with the `Food` class to retrieve the resources as a JSON string, 
+ * which is returned to the client in the response body.
+ * 
+ * @param req The HTTP request. It does not require any input parameters in this case.
+ * @param res The HTTP response object used to send the data back to the client.
+ * 
+ * @exception std::exception Throws if any error occurs during database interaction or response handling.
+*/
 void RouteController::getAllFood(const crow::request& req, crow::response& res) {
     if (!authenticatePermissionsToGetAll(req)) {
       res.code = 403;  
