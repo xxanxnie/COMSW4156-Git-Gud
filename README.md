@@ -182,6 +182,7 @@ find . -name "*.gcno" -delete
 ```
 
 **Generating coverage report**
+*Note*: Running the tests prior to this is required to generate `.gcda` and `.gcno` files which contain information about the execution of the program during test runs - used to measuring code coverage.
 
 From the root directory:
 
