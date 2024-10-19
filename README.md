@@ -11,7 +11,7 @@ Our services cater to a diverse range of users, each with unique needs:
 - **Veterans (VET)**: Former military personnel in need of transitional housing and specialized services.
 - **Substance Users (SUB)**: Individuals recovering from addiction who require a safe environment and therapeutic support.
 
-## POST/PATCH/DELETE Users:
+**Users allowed to add / update resources:**
 
 - **Non-profit Organizations (NGO)**: Collaborating entities that help distribute resources and support.
 - **Volunteers (VOL)**: Community members who assist in various service capacities.
@@ -26,100 +26,118 @@ External Libraries:
 - **Boost**: A set of C++ libraries designed to enhance the standard C++ library. (https://www.boost.org/)
 - **Crow**: A C++ micro web framework. (https://crowcpp.org/master/)
 - **Asio**: A cross-platform C++ library for network and low-level I/O programming. (https://think-async.com/Asio/)
+- **mongocxx**: The official C++ driver for MongoDB. (https://www.mongodb.com/docs/languages/cpp/cpp-driver/current/get-started/download-and-install/)
 
-These libraries are already gathered in `external_libraries/install_libraries.sh`. First, give the script executable permissions with `chmod +x install_libraries.sh`, and then run the script to automatically download and install the required libraries using `./install_libraries.sh`.
+**These libraries will be automatically installed when you run the `setup.sh` script.**
 
-brew tap mongodb/brew
-brew install mongo-c-driver
-brew install mongo-cxx-driver
-brew install --cask mongodb-realm-studio
+# Set-up and building the project
+From the root directory:
 
-# Running Tests
+``` bash
+./setup.sh
+```
 
-To build the project, navigate to the build folder and run the following command:
+# Running the app
+From the root directory:
 
-`cmake ..` 
-`make`
-`make cpplint` (for style checking)
+``` bash
+cd build
+./GitGud
+```
 
-If you ever need to clean up some files `make clean` is always an option
+# Running the tests
+From the root directory:
 
-# Running a Cloud Based Instance
+``` bash
+cd build
+./GitGudTests
+```
 
 # Endpoints
 
 **Outreach**
 
-* Expected Input json:
-{ 
- "targetAudience", "HML", 
- "ProgramName", "Emergency Shelter Access", 
- "description", "Provide information and assistance for accessing shelters.", 
- "programDate", "05/01/24 - 12/31/24",
- "location", "Bowery Mission, 227 Bowery, NY",
- "contactInfo", "Sarah Johnson, sarah@email.com"
-}
+  * Expected Input (JSON):
 
-1. Add Outreach Service
-- **Endpoint:** `POST /resources/outreach/add`
-- **Description:** This endpoint allows clients to add a new outreach service to the system. It expects a POST request containing the necessary details about the outreach service in the request body (e.g., target audience, program name, description, program date, location, and contact informationn). Upon successful addition, the server will respond with a confirmation message.
-* Upon Success: HTTP 201 Status Code is returned string Success
-* Upon Failure: returned string error msg
-
-2. Get All Outreach Services
-- **Endpoint:** `GET /resources/outreach/getAll`
-- **Description:** This endpoint retrieves all outreach services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details such as the target audience, program name, description, program date, location, and contact information.
-* Upon Success: HTTP 201 Status Code is returned string Success
-* Upon Failure: returned string error msg
-
-**Shelter**
-1. Add Shelter Service
-- **Endpoint:** `POST /resources/shelter/add`
-- **Description:** This endpoint allows clients to add a new shelter service to the system. It expects a POST request containing the necessary details about the shelter service in the request body ({ "ORG" : "NGO", "User" : "HML", "location" : "New York", 
-"capacity" : "30","curUse" : "10" }). Upon successful addition, the server will respond with a confirmation message.
-* Upon Success: HTTP 201 Status Code is returned string Success
-* Upon Failure: returned string error msg
-
-2. Get All Shelter Services
-- **Endpoint:** `GET /resources/shelter/getAll`
-- **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of shelter services in JSON format. Each service entry includes details.
-* Upon Success: HTTP 200 Status Code is returned string Success
-* Upon Failure: returned string error msg
-
-**Healthcare**
-1. Add Healthcare Service
-- **Endpoint:** `POST /resources/healthcare/add`
-- **Description:** This endpoint allows clients to add a new healthcare service to the system. It expects a POST request containing the necessary details about the healthcare service in the request body (e.g., provider, service type, location, operating hours, eligibility criteria, and contact information). Upon successful addition, the server will respond with a confirmation message.
-* Upon Success: HTTP 201 Status Code is returned with the string "HealthcareService resource added successfully."
-* Upon Failure: An HTTP error status code (e.g., 500) is returned along with an error message detailing the issue.
-
-2. Get All Healthcare Services
-- **Endpoint:** `GET /resources/healthcare/getAll`
-- **Description:** This endpoint retrieves all healthcare services available in the system. It accepts a GET request and returns a list of healthcare services in JSON format. Each service entry includes details such as the provider, service type, location, operating hours, eligibility criteria, and contact information.
-* Upon Success: HTTP 200 Status Code is returned with a list of healthcare services in JSON format.
-* Upon Failure: An HTTP error status code (e.g., 500) is returned along with an error message detailing the issue.
-
-**Counseling**
-1. Add Counseling Service
-- **Endpoint:** `POST /resources/counseling/add`
-- **Description:** This endpoint allows clients to add a new counseling service to the system. It expects a POST request containing the necessary details about the counseling service in the request body. The required fields are "counselorName" and "specialty".
-- **Request Body Example:**
   ```json
   {
-    "counselorName": "Jane Doe",
-    "specialty": "Cognitive Behavioral Therapy"
+    "targetAudience": "HML",
+    "ProgramName": "Emergency Shelter Access",
+    "description": "Provide information and assistance for accessing shelters.",
+    "programDate": "05/01/24 - 12/31/24",
+    "location": "Bowery Mission, 227 Bowery, NY",
+    "contactInfo": "Sarah Johnson, sarah@email.com"
   }
   ```
-- **Response:**
-  * Upon Success: HTTP 201 Status Code is returned with the message "Counseling resource added successfully."
-  * Upon Failure: HTTP 400 Status Code is returned with an error message
+
+  1. Add Outreach Service
+  - **Endpoint:** `POST /resources/outreach/add`
+  - **Description:** This endpoint allows clients to add a new outreach service to the system. It expects a POST request containing the necessary details about the outreach service in the request body (e.g., target audience, program name, description, program date, location, and contact informationn). Upon successful addition, the server will respond with a confirmation message.
+    * Upon Success: HTTP 201 Status Code is returned string Success
+    * Upon Failure: returned string error msg
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+  2. Get All Outreach Services
+  - **Endpoint:** `GET /resources/outreach/getAll`
+  - **Description:** This endpoint retrieves all outreach services available in the system. It accepts a GET request and returns a list of outreach services in JSON format. Each service entry includes details such as the target audience, program name, description, program date, location, and contact information.
+    * Upon Success: HTTP 201 Status Code is returned string Success
+    * Upon Failure: returned string error msg
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+**Shelter**
+  1. Add Shelter Service
+    - **Endpoint:** `POST /resources/shelter/add`
+    - **Description:** This endpoint allows clients to add a new shelter service to the system. It expects a POST request containing the necessary details about the shelter service in the request body ({ "ORG" : "NGO", "User" : "HML", "location" : "New York", 
+  "capacity" : "30","curUse" : "10" }). Upon successful addition, the server will respond with a confirmation message.
+    * Upon Success: HTTP 201 Status Code is returned string Success
+    * Upon Failure: returned string error msg
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+  2. Get All Shelter Services
+  - **Endpoint:** `GET /resources/shelter/getAll`
+  - **Description:** This endpoint retrieves all shelter services available in the system. It accepts a GET request and returns a list of shelter services in JSON format. Each service entry includes details.
+    * Upon Success: HTTP 200 Status Code is returned string Success
+    * Upon Failure: returned string error msg
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+**Healthcare**
+  1. Add Healthcare Service
+  - **Endpoint:** `POST /resources/healthcare/add`
+  - **Description:** This endpoint allows clients to add a new healthcare service to the system. It expects a POST request containing the necessary details about the healthcare service in the request body (e.g., provider, service type, location, operating hours, eligibility criteria, and contact information). Upon successful addition, the server will respond with a confirmation message.
+    * Upon Success: HTTP 201 Status Code is returned with the string "HealthcareService resource added successfully."
+    * Upon Failure: An HTTP error status code (e.g., 500) is returned along with an error message detailing the issue.
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+  2. Get All Healthcare Services
+  - **Endpoint:** `GET /resources/healthcare/getAll`
+  - **Description:** This endpoint retrieves all healthcare services available in the system. It accepts a GET request and returns a list of healthcare services in JSON format. Each service entry includes details such as the provider, service type, location, operating hours, eligibility criteria, and contact information.
+    * Upon Success: HTTP 200 Status Code is returned with a list of healthcare services in JSON format.
+    * Upon Failure: An HTTP error status code (e.g., 500) is returned along with an error message detailing the issue.
+    * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
+**Counseling**
+  1. Add Counseling Service
+  - **Endpoint:** `POST /resources/counseling/add`
+  - **Description:** This endpoint allows clients to add a new counseling service to the system. It expects a POST request containing the necessary details about the counseling service in the request body. The required fields are "counselorName" and "specialty".
+  - **Request Body Example:**
+    ```json
+    {
+      "counselorName": "Jane Doe",
+      "specialty": "Cognitive Behavioral Therapy"
+    }
+    ```
+  - **Response:**
+      * Upon Success: HTTP 201 Status Code is returned with the message "Counseling resource added successfully."
+      * Upon Failure: HTTP 400 Status Code is returned with an error message
+      * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
 2. Get All Counseling Services
-- **Endpoint:** `GET /resources/counseling/getAll`
-- **Description:** This endpoint retrieves all counseling services available in the system. It accepts a GET request and returns a list of counseling services in JSON format. Each service entry includes details about the counselor and their specialty.
-- **Response:**
-  * Upon Success: HTTP 200 Status Code is returned with a JSON array of counseling services
-  * Upon Failure: An error message is returned
+  - **Endpoint:** `GET /resources/counseling/getAll`
+  - **Description:** This endpoint retrieves all counseling services available in the system. It accepts a GET request and returns a list of counseling services in JSON format. Each service entry includes details about the counselor and their specialty.
+  - **Response:**
+      * Upon Success: HTTP 200 Status Code is returned with a JSON array of counseling services
+      * Upon Failure: An error message is returned
+      * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
 
 # Branch Coverage
@@ -131,9 +149,24 @@ find . -name "*.gcda" -delete
 find . -name "*.gcno" -delete
 ```
 
+**Generating coverage report**
+
+From the root directory:
+
+``` bash
+cmake --build build --target coverage
+```
+
 # Style Checking Analysis
 
-The style checking is done using **cpplint** to ensure compliance with the Google C++. Run the style checker using `make cpplint` to check the source and test files. The below shows the style check output for the current state of the project.
+The style checking is done using **cpplint** to ensure compliance with the Google C++.
+
+Run the style checker from root directory using:
+```bash
+make -C build cpplint > docs/cpplint_output.txt
+```
+
+The below shows the style check output for the current state of the project.
 
 ![Style Check](docs/stylecheck.png)
 
@@ -151,11 +184,3 @@ sudo docker compose up
 * With this command images( mongo express and mongodb) will pull from dockerhub and build.
 * Mongodb IP = http://0.0.0.0:27017, mongo-express=http://0.0.0.0:8081.
 * Check more detail in docker-compose.yml file.
-## Setup for mongocxx
-* Download mongocxx follow the [link](https://www.mongodb.com/docs/languages/cpp/cpp-driver/current/get-started/download-and-install/)
-* simple test:
-It will create the new database and some basic method in database, check test_setup.cpp for detail.
-```
-c++ --std=c++17 test_setup.cpp -Wl,-rpath,/usr/local/lib/ $(pkg-config --cflags --libs libmongocxx) -o ./app.out
-./app.out
-```
