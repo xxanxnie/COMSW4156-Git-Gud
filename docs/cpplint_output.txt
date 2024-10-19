@@ -1,4 +1,11 @@
 [100%] Running cpplint for Google C++ Style Guide compliance
+Done processing include/Counseling.h
+Done processing include/DatabaseManager.h
+Done processing include/Food.h
+Done processing include/Healthcare.h
+Done processing include/Outreach.h
+Done processing include/RouteController.h
+Done processing include/Shelter.h
 Done processing src/DatabaseManager.cpp
 Done processing src/RouteController.cpp
 Done processing src/main.cpp
