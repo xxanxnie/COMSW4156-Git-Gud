@@ -53,6 +53,9 @@ cd build
 ./GitGudTests
 ```
 
+# Authentication
+The current implementation uses a basic authentication mechanism with hardcoded API keys to control access to various endpoints based on user roles. Requests are authenticated by validating the API key against predefined roles, such as NGOs, clinics, and volunteers. In future iterations, this system will be enhanced to include dynamic API key generation, role-based access control, and improved security features.
+
 # Endpoints
 
 **Outreach**
