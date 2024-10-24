@@ -502,13 +502,13 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             getShelter(req, res);
           });
 
-  CROW_ROUTE(app, "/resources/counseling/add")
+  CROW_ROUTE(app, "/resources/counseling/getAll")
     .methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) {
         getCounseling(req, res);
       });
 
-  CROW_ROUTE(app, "/resources/counseling/getAll")
+  CROW_ROUTE(app, "/resources/counseling/add")
     .methods(crow::HTTPMethod::POST)(
       [this](const crow::request& req, crow::response& res) {
         addCounseling(req, res);
