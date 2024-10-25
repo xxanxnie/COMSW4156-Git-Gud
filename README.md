@@ -2,6 +2,10 @@
 
 GitGud is a comprehensive API designed to support various social welfare initiatives, focusing on facilitating access to resources for underserved populations. It serves as a centralized hub for information on diverse initiatives, offering essential services such as shelter, food distribution, healthcare access, outreach programs, and counseling. By connecting individuals and families in need with vital resources, GitGud enhances community support systems and empowers users to navigate their circumstances effectively. Through collaboration with non-profit organizations, volunteers, clinics, and government agencies, GitGud fosters an integrated approach to social welfare that promotes equity and compassion.
 
+**URL:** http://34.138.180.143:8080
+
+**Project management:** https://github.com/users/xxanxnie/projects/7/views/1
+
 # User Types
 
 Our services cater to a diverse range of users, each with unique needs:
