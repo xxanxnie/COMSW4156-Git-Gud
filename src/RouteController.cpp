@@ -133,6 +133,47 @@ void RouteController::addShelter(const crow::request& req,
   }
 }
 /**
+ * Add the shelter information to our database
+ * POST with this key in json format
+ * @param ORG     The organization who gave the infomation.
+ * @param User     The target this service provide for.
+ * @param location     The location of the shelter.
+ * @param capacity     The maximum number of users that the shelter can handle.
+ * @param curUse       The current users that using this shelter.
+ * @return A crow::response object containing an HTTP 201 response ,
+ */
+void RouteController::updateShelter(const crow::request& req,
+                                    crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::vector<std::string> content;
+    std::string id = "";
+    for (auto element : resource.view()) {
+      if (element.key().to_string() != "id") {
+        content.push_back(element.get_utf8().value.to_string());
+      }
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      }
+    }
+    shelterManager.updateShelter(id, content[0], content[1], content[2],
+                                 atoi(content[3].c_str()),
+                                 atoi(content[4].c_str()));
+    res.code = 201;
+    res.write("Shelter resource update successfully.");
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
+/**
  * Delete the shelter information in our database
  * Delete with this key in json format
  * @param id     The organization who gave the infomation.
@@ -548,6 +589,11 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::POST)(
           [this](const crow::request& req, crow::response& res) {
             addShelter(req, res);
+          });
+  CROW_ROUTE(app, "/resources/shelter/update")
+      .methods(crow::HTTPMethod::PATCH)(
+          [this](const crow::request& req, crow::response& res) {
+            updateShelter(req, res);
           });
   CROW_ROUTE(app, "/resources/shelter/delete")
       .methods(crow::HTTPMethod::DELETE)(

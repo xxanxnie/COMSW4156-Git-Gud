@@ -22,7 +22,10 @@ class MockShelter : public Shelter {
               (override));
   MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
   MOCK_METHOD(std::string, searchShelterAll, (), (override));
-  MOCK_METHOD(std::string, updateShelter, (), (override));
+  MOCK_METHOD(std::string, updateShelter,
+              (std::string id, std::string ORG, std::string User,
+               std::string location, int capacity, int curUse),
+              (override));
 };
 
 class MockCounseling : public Counseling {

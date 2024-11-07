@@ -83,10 +83,13 @@ std::string Shelter::printShelters(
   return ret;
 }
 
-std::string Shelter::updateShelter() {
+std::string Shelter::updateShelter(std::string id, std::string ORG,
+                                   std::string User, std::string location,
+                                   int capacity, int curUse) {
   try {
-    auto content = createDBContent("tem", "tem", "tem", "tem", "tem");
-    dbManager.updateResource(collection_name, "672c2976bac5c977c8079031",
+    auto content = createDBContent(
+        ORG, User, location, std::to_string(capacity), std::to_string(curUse));
+    dbManager.updateResource(collection_name, id,
                              content);
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
