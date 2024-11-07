@@ -3,20 +3,19 @@
 #include "DatabaseManager.h"
 
 #include <algorithm>
-#include <iostream>
-
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
+#include <iostream>
 
-
-DatabaseManager::DatabaseManager(const std::string& uri, bool skipInitialization) {
-    if (!skipInitialization) {
-        conn = mongocxx::client(mongocxx::uri{uri});  
-    } else {
-        // This is only needed for allowing unit-tests
-        conn.reset(); 
-    }
+DatabaseManager::DatabaseManager(const std::string &uri,
+                                 bool skipInitialization) {
+  if (!skipInitialization) {
+    conn = mongocxx::client(mongocxx::uri{uri});
+  } else {
+    // This is only needed for allowing unit-tests
+    conn.reset();
+  }
 }
 
 bsoncxx::document::value DatabaseManager::createDocument(
@@ -57,15 +56,29 @@ void DatabaseManager::printCollection(const std::string &collectionName) {
   }
 }
 
-void DatabaseManager::insertResource(const std::string &collectionName, const std::vector<std::pair<std::string, std::string>> &keyValues) {
+void DatabaseManager::insertResource(
+    const std::string &collectionName,
+    const std::vector<std::pair<std::string, std::string>> &keyValues) {
   auto collection = (*conn)["GitGud"][collectionName];
   collection.insert_one(createDocument(keyValues).view());
 }
 
-void DatabaseManager::deleteResource(const std::string &collectionName,
+bool DatabaseManager::deleteResource(const std::string &collectionName,
                                      const std::string &resourceId) {
   auto collection = (*conn)["GitGud"][collectionName];
-  collection.delete_one(createDocument({{"_id", resourceId}}).view());
+
+  bsoncxx::builder::stream::document filter_builder;
+  bsoncxx::oid oid(resourceId);
+  filter_builder << "_id" << oid;
+
+  auto result = collection.delete_one(filter_builder.view());
+  if (result && result->deleted_count() > 0) {
+      std::cout << "Document deleted successfully.\n";
+      return 1;
+  } else {
+      std::cout << "No document found with the given _id.\n";
+      return 0;
+  }
 }
 
 void DatabaseManager::deleteCollection(const std::string &collectionName) {

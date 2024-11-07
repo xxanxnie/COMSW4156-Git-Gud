@@ -44,6 +44,7 @@ class RouteController {
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
   void getShelter(const crow::request& req, crow::response& res);
+  void deleteShelter(const crow::request& req, crow::response& res);
 
   // Counseling-related handlers
   void getCounseling(const crow::request& req, crow::response& res);

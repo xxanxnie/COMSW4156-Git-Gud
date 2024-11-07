@@ -15,7 +15,7 @@ class Shelter {
   virtual std::string addShelter(std::string ORG, std::string User,
                                  std::string location, int capacity,
                                  int curUse);
-  virtual std::string deleteShelter();
+  virtual std::string deleteShelter(std::string id);
   virtual std::string searchShelterAll();
   virtual std::string updateShelter();
   std::vector<std::pair<std::string, std::string>> createDBContent(
