@@ -132,7 +132,12 @@ void RouteController::addShelter(const crow::request& req,
     res = handleException(e);
   }
 }
-
+/**
+ * Delete the shelter information in our database
+ * Delete with this key in json format
+ * @param id     The organization who gave the infomation.
+ * @return A crow::response object containing an HTTP 201 response ,
+ */
 void RouteController::deleteShelter(const crow::request& req,
                                     crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {

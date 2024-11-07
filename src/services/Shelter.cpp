@@ -83,7 +83,16 @@ std::string Shelter::printShelters(
   return ret;
 }
 
-std::string Shelter::updateShelter() { return "Update"; }
+std::string Shelter::updateShelter() {
+  try {
+    auto content = createDBContent("tem", "tem", "tem", "tem", "tem");
+    dbManager.updateResource(collection_name, "672c2976bac5c977c8079031",
+                             content);
+  } catch (const std::exception &e) {
+    return "Error: " + std::string(e.what());
+  }
+  return "Update";
+}
 std::string Shelter::deleteShelter(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "SUC";

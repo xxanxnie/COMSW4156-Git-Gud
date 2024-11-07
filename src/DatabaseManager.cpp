@@ -97,9 +97,9 @@ void DatabaseManager::updateResource(
     updateDoc << update.first << update.second;
   }
   updateDoc << bsoncxx::builder::stream::close_document;
-
+  bsoncxx::oid oid(resourceId);
   collection.update_one(bsoncxx::builder::stream::document{}
-                            << "_id" << resourceId
+                            << "_id" << oid
                             << bsoncxx::builder::stream::finalize,
                         updateDoc.view());
 }
