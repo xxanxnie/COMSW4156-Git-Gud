@@ -24,7 +24,7 @@ class DatabaseManager {
   virtual void insertResource(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues);
-  virtual void deleteResource(const std::string& collectionName,
+  virtual bool deleteResource(const std::string& collectionName,
                               const std::string& resourceId);
   virtual void deleteCollection(const std::string& collectionName);
   virtual void updateResource(

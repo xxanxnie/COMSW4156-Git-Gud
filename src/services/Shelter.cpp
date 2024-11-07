@@ -32,7 +32,8 @@ std::string Shelter::addShelter(std::string ORG, std::string User,
  * @param location     The location of the shelter.
  * @param capacity     The maximum number of users that the shelter can handle.
  * @param curUse       The current users that using this shelter.
- * @return std::vector<std::pair<std::string, std::string>> concat the value in to vector of pair
+ * @return std::vector<std::pair<std::string, std::string>> concat the value in
+ * to vector of pair
  */
 std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
     std::string ORG, std::string User, std::string location,
@@ -49,7 +50,7 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
 /**
  * Get the all data content in Shelter collection, and print it
  *
- * @return string, concat the content value 
+ * @return string, concat the content value
  */
 std::string Shelter::searchShelterAll() {
   std::vector<bsoncxx::document::value> result;
@@ -82,5 +83,22 @@ std::string Shelter::printShelters(
   return ret;
 }
 
-std::string Shelter::updateShelter() { return "Update"; }
-std::string Shelter::deleteShelter() { return "Delete"; }
+std::string Shelter::updateShelter(std::string id, std::string ORG,
+                                   std::string User, std::string location,
+                                   int capacity, int curUse) {
+  try {
+    auto content = createDBContent(
+        ORG, User, location, std::to_string(capacity), std::to_string(curUse));
+    dbManager.updateResource(collection_name, id,
+                             content);
+  } catch (const std::exception &e) {
+    return "Error: " + std::string(e.what());
+  }
+  return "Update";
+}
+std::string Shelter::deleteShelter(std::string id) {
+  if (dbManager.deleteResource(collection_name, id)) {
+    return "SUC";
+  }
+  throw std::runtime_error("Document with the specified _id not found.");
+}
