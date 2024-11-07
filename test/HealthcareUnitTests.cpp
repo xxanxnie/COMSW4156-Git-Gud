@@ -50,10 +50,24 @@ TEST_F(HealthcareServiceUnitTests, GetAllHealthcareServices) {
 }
 
 TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
+  std::map<std::string, std::string> updates = {
+      {"provider", "City Hospital"},
+      {"serviceType", "General Checkup"},
+      {"location", "123 Main St"},
+      {"operatingHours", "9 AM - 5 PM"},
+      {"eligibilityCriteria", "Adults"},
+      {"contactInfo", "123-456-7890"}
+  };
+
+  // for comparison in mock call
   std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"provider", "City Hospital"},     {"serviceType", "General Checkup"},
-      {"location", "123 Main St"},       {"operatingHours", "9 AM - 5 PM"},
-      {"eligibilityCriteria", "Adults"}, {"contactInfo", "123-456-7890"}};
+      {"provider", "City Hospital"},
+      {"serviceType", "General Checkup"},
+      {"location", "123 Main St"},
+      {"operatingHours", "9 AM - 5 PM"},
+      {"eligibilityCriteria", "Adults"},
+      {"contactInfo", "123-456-7890"}
+  };
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(::testing::Invoke(
@@ -63,9 +77,7 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
             EXPECT_EQ(content, expectedContent);
           }));
 
-  std::string result = healthcareService->addHealthcareService(
-      "City Hospital", "General Checkup", "123 Main St", "9 AM - 5 PM",
-      "Adults", "123-456-7890");
+  std::string result = healthcareService->addHealthcareService(updates);
 
   EXPECT_EQ(result, "Success");
 }

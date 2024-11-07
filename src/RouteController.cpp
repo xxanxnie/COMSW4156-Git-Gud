@@ -206,7 +206,7 @@ void RouteController::deleteShelter(const crow::request& req,
     res.end();
   }
 }
-// Add these new methods to the RouteController class
+
 /**
  * Retrieves all counseling resources from the database.
  * GET request to fetch all counselors.
@@ -522,14 +522,22 @@ void RouteController::addHealthcareService(const crow::request& req,
 
   try {
     auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
+    std::map<std::string, std::string> content;
+    std::string id = "";
+
     for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        content.push_back(element.get_utf8().value.to_string());
-      }
+      content[element.key().to_string()] = element.get_utf8().value.to_string();
     }
-    healthcareManager.addHealthcareService(content[0], content[1], content[2],
-                                           content[3], content[4], content[5]);
+
+    std::string validationMessage = healthcareManager.validateHealthcareServiceInput(content);
+    if (!validationMessage.empty()) {
+      res.code = 400;
+      res.write(validationMessage);
+      res.end();
+      return;
+    }
+    
+    healthcareManager.addHealthcareService(content);
 
     res.code = 201;
     res.write("HealthcareService resource added successfully.");
@@ -567,6 +575,73 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+  }
+}
+
+void RouteController::updateHealthcareService(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::map<std::string, std::string> content;
+    std::string id = "";
+
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      } else {
+        content[element.key().to_string()] = element.get_utf8().value.to_string();
+      }
+    }
+
+    std::string validationMessage = healthcareManager.validateHealthcareServiceInput(content);
+    if (!validationMessage.empty()) {
+      res.code = 400;
+      res.write(validationMessage);
+      res.end();
+      return;
+    }
+
+    std::string result = healthcareManager.updateHealthcare(id, content);
+    res.code = 201;
+    res.write(result);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
+
+void RouteController::deleteHealthcareService(const crow::request& req,
+                                    crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::string id = "";
+
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      }
+    }
+
+    std::string msg = healthcareManager.deleteHealthcare(id);
+    res.code = 201;
+    res.write(msg);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    res.end();
   }
 }
 
@@ -652,5 +727,17 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::GET)(
           [this](const crow::request& req, crow::response& res) {
             getAllHealthcareServices(req, res);
+          });
+
+  CROW_ROUTE(app, "/resources/healthcare/update")
+      .methods(crow::HTTPMethod::PATCH)(
+          [this](const crow::request& req, crow::response& res) {
+            updateHealthcareService(req, res);
+          });
+
+  CROW_ROUTE(app, "/resources/healthcare/delete")
+      .methods(crow::HTTPMethod::DELETE)(
+          [this](const crow::request& req, crow::response& res) {
+            deleteHealthcareService(req, res);
           });
 }

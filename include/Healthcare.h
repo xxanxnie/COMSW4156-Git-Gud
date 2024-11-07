@@ -13,17 +13,20 @@ class Healthcare {
   Healthcare(DatabaseManager& dbManager, const std::string& collection_name)
       : dbManager(dbManager), collection_name(collection_name) {}
 
-  virtual std::string addHealthcareService(
-      const std::string& provider, const std::string& serviceType,
-      const std::string& location, const std::string& operatingHours,
-      const std::string& eligibilityCriteria, const std::string& contactInfo);
+  virtual std::string addHealthcareService(const std::map<std::string, std::string>& updates);
 
   virtual std::string getAllHealthcareServices();
 
+  virtual std::string deleteHealthcare(std::string id);
+  virtual std::string updateHealthcare(
+      const std::string& id, const std::map<std::string, std::string>& updates
+  );
+
+  virtual std::string validateHealthcareServiceInput(
+    const std::map<std::string, std::string>& content);
+
   std::vector<std::pair<std::string, std::string>> createDBContent(
-      const std::string& provider, const std::string& serviceType,
-      const std::string& location, const std::string& operatingHours,
-      const std::string& eligibilityCriteria, const std::string& contactInfo);
+      const std::map<std::string, std::string>& updates);
 
   std::string printHealthcareServices(
       std::vector<bsoncxx::document::value>& services) const;

@@ -78,11 +78,8 @@ class MockHealthcareService : public Healthcare {
       : Healthcare(*dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addHealthcareService,
-              (const std::string& provider, const std::string& serviceType,
-               const std::string& location, const std::string& operatingHours,
-               const std::string& eligibilityCriteria,
-               const std::string& contactInfo),
-              (override));
+            ((const std::map<std::string, std::string>& updates)),
+            (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
 };
 
@@ -405,11 +402,17 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockHealthcare,
-          addHealthcareService("HealthcareProvider", "General Care", "NYC",
-                               "9-5", "None", "123-456"))
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "HealthcareProvider"},
+      {"serviceType", "General Care"},
+      {"location", "NYC"},
+      {"operatingHours", "9-5"},
+      {"eligibilityCriteria", "None"},
+      {"contactInfo", "123-456"}
+  };
+
+  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
       .WillByDefault(::testing::Return("Success"));
-  ;
 
   routeController->addHealthcareService(req, res);
 
@@ -440,9 +443,16 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockHealthcare,
-          addHealthcareService("HealthcareProvider", "General Care", "NYC",
-                               "9-5", "None", "123-456"))
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "HealthcareProvider"},
+      {"serviceType", "General Care"},
+      {"location", "NYC"},
+      {"operatingHours", "9-5"},
+      {"eligibilityCriteria", "None"},
+      {"contactInfo", "123-456"}
+  };
+
+  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
