@@ -45,16 +45,19 @@ TEST_F(ShelterUnitTests, searchShelterAll) {
   EXPECT_TRUE(services.find("New York") != std::string::npos);
 }
 
-TEST_F(ShelterUnitTests, AddNewShelter) {
+TEST_F(ShelterUnitTests, UpdateShelter) {
   std::vector<std::pair<std::string, std::string>> expectedContent =
       shelter->createDBContent("tmp", "tmp", "tmp", "1", "0");
-  ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          updateResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(
-          [&](const std::string& collectionName,
+          [&](const std::string& collectionName, const std::string& resourceId,
               const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(resourceId, id_temp);
             EXPECT_EQ(collectionName, "ShelterTest");
             EXPECT_EQ(content, expectedContent);
           });
-  std::string ret = shelter->addShelter("tmp", "tmp", "tmp", 1, 0);
-  EXPECT_EQ(ret, "Success");
+  std::string ret = shelter->updateShelter(id_temp, "tmp", "tmp", "tmp", 1, 0);
+  EXPECT_EQ(ret, "Update");
 }
