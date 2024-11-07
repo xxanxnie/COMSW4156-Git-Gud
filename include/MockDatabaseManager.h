@@ -29,9 +29,9 @@ class MockDatabaseManager : public DatabaseManager {
        (const std::vector<std::pair<std::string, std::string>> &updates)),
       (override));
 
-  // MOCK_METHOD(void, deleteResource,
-  //     (const std::string& collectionName,
-  //     (const std::string& id)), (override));
+  MOCK_METHOD(bool, deleteResource,
+      (const std::string& collectionName,
+      (const std::string& id)), (override));
 };
 
 #endif  // MOCK_DATABASE_MANAGER_H

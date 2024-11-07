@@ -61,3 +61,17 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
   std::string ret = shelter->updateShelter(id_temp, "tmp", "tmp", "tmp", 1, 0);
   EXPECT_EQ(ret, "Update");
 }
+
+TEST_F(ShelterUnitTests, DeleteShelter) {
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_))
+      .WillByDefault([&](const std::string& collectionName,
+                         const std::string& resourceId) {
+        EXPECT_EQ(resourceId, id_temp);
+        EXPECT_EQ(collectionName, "ShelterTest");
+        return 1;
+      });
+  std::string ret = shelter->deleteShelter(id_temp);
+  EXPECT_EQ(ret, "SUC");
+}
