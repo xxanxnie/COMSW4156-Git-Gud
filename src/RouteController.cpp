@@ -122,9 +122,14 @@ void RouteController::addShelter(const crow::request& req,
         content.push_back(element.get_utf8().value.to_string());
       }
     }
-    shelterManager.addShelter(content[0], content[1], content[2],
-                              atoi(content[3].c_str()),
-                              atoi(content[4].c_str()));
+    int capacity = atoi(content[3].c_str());
+    int current = atoi(content[4].c_str());
+    if (capacity <= 0 || current > capacity) {
+      throw std::invalid_argument("The request with invalid argument.");
+    }
+
+    shelterManager.addShelter(content[0], content[1], content[2], capacity,
+                              current);
     res.code = 201;
     res.write("Shelter resource added successfully.");
     res.end();
@@ -163,14 +168,19 @@ void RouteController::updateShelter(const crow::request& req,
         id = element.get_utf8().value.to_string();
       }
     }
+    int capacity = atoi(content[3].c_str());
+    int current = atoi(content[4].c_str());
+    if (capacity <= 0 || current > capacity) {
+      throw std::invalid_argument("The request with invalid argument.");
+    }
     shelterManager.updateShelter(id, content[0], content[1], content[2],
-                                 atoi(content[3].c_str()),
-                                 atoi(content[4].c_str()));
+                                 capacity, current);
     res.code = 201;
     res.write("Shelter resource update successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 /**
