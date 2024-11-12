@@ -417,6 +417,38 @@ void RouteController::getAllFood(const crow::request& req,
 }
 
 /**
+ * @brief Retrieves all outreach services.
+ *
+ * This method processes an incoming HTTP request to fetch all outreach
+ * services from the database. It sends the retrieved services back
+ * in the HTTP response.
+ *
+ * @param req The HTTP request for retrieving outreach services.
+ * @param res The HTTP response that will be sent back to the client,
+ *             containing the outreach services in JSON format.
+ */
+void RouteController::getAllOutreachServices(const crow::request& req,
+                                             crow::response& res) {
+  if (!authenticatePermissionsToGetAll(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    std::string response =
+        outreachManager
+            .getAllOutreachServices();  // Retrieve all outreach services
+    res.code = 200;
+    res.write(response);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);  // Custom exception handling
+  }
+}
+
+/**
  * @brief Adds a new outreach service resource.
  *
  * This method extracts the outreach service details from the incoming
@@ -466,20 +498,8 @@ void RouteController::addOutreachService(const crow::request& req,
   }
 }
 
-/**
- * @brief Retrieves all outreach services.
- *
- * This method processes an incoming HTTP request to fetch all outreach
- * services from the database. It sends the retrieved services back
- * in the HTTP response.
- *
- * @param req The HTTP request for retrieving outreach services.
- * @param res The HTTP response that will be sent back to the client,
- *             containing the outreach services in JSON format.
- */
-void RouteController::getAllOutreachServices(const crow::request& req,
-                                             crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
+void RouteController::updateOutreach(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
     res.end();
@@ -487,14 +507,85 @@ void RouteController::getAllOutreachServices(const crow::request& req,
   }
 
   try {
-    std::string response =
-        outreachManager
-            .getAllOutreachServices();  // Retrieve all outreach services
-    res.code = 200;
-    res.write(response);
+    // Parse the incoming request JSON
+    auto resource = bsoncxx::from_json(req.body);
+    
+    std::string id;
+    std::string targetAudience;
+    std::string programName;
+    std::string description;
+    std::string programDate;
+    std::string location;
+    std::string contactInfo;
+
+    // Extract the data from the JSON body
+    for (auto element : resource.view()) {
+      std::string key = element.key().to_string();
+      if (key == "id") {
+        id = element.get_utf8().value.to_string();
+      } else if (key == "targetAudience") {
+        targetAudience = element.get_utf8().value.to_string();
+      } else if (key == "programName") {
+        programName = element.get_utf8().value.to_string();
+      } else if (key == "description") {
+        description = element.get_utf8().value.to_string();
+      } else if (key == "programDate") {
+        programDate = element.get_utf8().value.to_string();
+      } else if (key == "location") {
+        location = element.get_utf8().value.to_string();
+      } else if (key == "contactInfo") {
+        contactInfo = element.get_utf8().value.to_string();
+      }
+    }
+
+    // Ensure the ID is provided for the update
+    if (id.empty()) {
+      res.code = 400;
+      res.write("Missing outreach service ID.");
+      res.end();
+      return;
+    }
+
+    // Call the OutreachService manager to update the outreach service
+    outreachManager.updateOutreach(id, targetAudience, programName, 
+                                          description, programDate, location, contactInfo);
+
+    // Send success response
+    res.code = 200;  // OK
+    res.write("OutreachService resource updated successfully.");
+    res.end();
+
+  } catch (const std::exception& e) {
+    res = handleException(e);  // Custom exception handler
+  }
+}
+
+
+void RouteController::deleteOutreach(const crow::request& req,
+                                    crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::vector<std::string> content;
+    std::string id = "";
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      }
+    }
+    outreachManager.deleteOutreach(id);
+    res.code = 201;
+    res.write("Outreach resource deleted successfully.");
     res.end();
   } catch (const std::exception& e) {
-    res = handleException(e);  // Custom exception handling
+    res = handleException(e);
+    res.end();
   }
 }
 
@@ -636,6 +727,17 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             addOutreachService(req, res);
           });
 
+  CROW_ROUTE(app, "/resources/outreach/update")
+      .methods(crow::HTTPMethod::PATCH)(
+          [this](const crow::request& req, crow::response& res) {
+            updateOutreach(req, res);
+          });
+  CROW_ROUTE(app, "/resources/outreach/delete")
+      .methods(crow::HTTPMethod::DELETE)(
+          [this](const crow::request& req, crow::response& res) {
+            deleteOutreach(req, res);
+          });
+
   CROW_ROUTE(app, "/resources/outreach/getAll")
       .methods(crow::HTTPMethod::GET)(
           [this](const crow::request& req, crow::response& res) {
@@ -654,3 +756,4 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             getAllHealthcareServices(req, res);
           });
 }
+

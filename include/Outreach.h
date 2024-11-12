@@ -30,9 +30,16 @@ class Outreach {
       const std::string& location, const std::string& contactInfo);
 
   virtual std::string getAllOutreachServices();
-  std::string printOutreachServices(
-      const std::vector<bsoncxx::document::value>& services) const;
+  virtual std::string deleteOutreach(std::string id);
+  virtual std::string updateOutreach(const std::string& id, 
+                                   const std::string& targetAudience, 
+                                   const std::string& programName,
+                                   const std::string& description,
+                                   const std::string& programDate,
+                                   const std::string& location,
+                                   const std::string& contactInfo);
 
+  std::string printOutreachServices(const std::vector<bsoncxx::document::value>& services) const;
  private:
   DatabaseManager& dbManager;
 };

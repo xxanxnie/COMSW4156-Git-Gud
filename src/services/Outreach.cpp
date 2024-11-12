@@ -104,3 +104,54 @@ std::string Outreach::printOutreachServices(
     }
     return ret;
 }
+
+std::string Outreach::deleteOutreach(std::string id) {
+  if (dbManager.deleteResource(collection_name, id)) {
+    return "SUC";
+  }
+  throw std::runtime_error("Document with the specified _id not found.");
+}
+
+std::string Outreach::updateOutreach(
+    const std::string& id, 
+    const std::string& targetAudience, 
+    const std::string& programName,
+    const std::string& description,
+    const std::string& programDate,
+    const std::string& location,
+    const std::string& contactInfo) {
+
+  try {
+    // Create a vector of key-value pairs for the updates
+    std::vector<std::pair<std::string, std::string>> updates;
+
+    // Only add non-empty fields to the update list
+    if (!targetAudience.empty()) {
+      updates.push_back({"targetAudience", targetAudience});
+    }
+    if (!programName.empty()) {
+      updates.push_back({"programName", programName});
+    }
+    if (!description.empty()) {
+      updates.push_back({"description", description});
+    }
+    if (!programDate.empty()) {
+      updates.push_back({"programDate", programDate});
+    }
+    if (!location.empty()) {
+      updates.push_back({"location", location});
+    }
+    if (!contactInfo.empty()) {
+      updates.push_back({"contactInfo", contactInfo});
+    }
+
+    // Call the updateResource method in DatabaseManager to apply the updates
+    dbManager.updateResource("outreachServices", id, updates);
+  } catch (const std::exception& e) {
+    // Return error message if there is an exception
+    return "Error: " + std::string(e.what());
+  }
+
+  // Return success message
+  return "Outreach Service updated successfully.";
+}
