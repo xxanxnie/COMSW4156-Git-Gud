@@ -107,7 +107,7 @@ std::string Outreach::printOutreachServices(
 
 std::string Outreach::deleteOutreach(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
-    return "SUC";
+    return "Outreach Service deleted successfully.";
   }
   throw std::runtime_error("Document with the specified _id not found.");
 }

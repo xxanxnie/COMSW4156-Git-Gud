@@ -474,7 +474,6 @@ void RouteController::addOutreachService(const crow::request& req,
 
   try {
     auto resource = bsoncxx::from_json(req.body);
-    // Initialize the OutreachService
     std::vector<std::string> content;
 
     for (auto element : resource.view()) {
@@ -507,7 +506,7 @@ void RouteController::updateOutreach(const crow::request& req, crow::response& r
   }
 
   try {
-    // Parse the incoming request JSON
+    // parse the incoming request JSON
     auto resource = bsoncxx::from_json(req.body);
     
     std::string id;
@@ -518,7 +517,7 @@ void RouteController::updateOutreach(const crow::request& req, crow::response& r
     std::string location;
     std::string contactInfo;
 
-    // Extract the data from the JSON body
+    // extract the data from the JSON body
     for (auto element : resource.view()) {
       std::string key = element.key().to_string();
       if (key == "id") {
@@ -538,20 +537,18 @@ void RouteController::updateOutreach(const crow::request& req, crow::response& r
       }
     }
 
-    // Ensure the ID is provided for the update
-    if (id.empty()) {
+    if (id.empty()) {       // need id to update 
       res.code = 400;
       res.write("Missing outreach service ID.");
       res.end();
       return;
     }
 
-    // Call the OutreachService manager to update the outreach service
     outreachManager.updateOutreach(id, targetAudience, programName, 
                                           description, programDate, location, contactInfo);
 
-    // Send success response
-    res.code = 200;  // OK
+    // success response message
+    res.code = 200; 
     res.write("OutreachService resource updated successfully.");
     res.end();
 

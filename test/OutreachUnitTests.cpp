@@ -96,3 +96,34 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
 
   EXPECT_EQ(result, "Success");
 }
+
+TEST_F(OutreachServiceUnitTests, UpdateOutreach) {
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      outreachService->createDBContent("tmp", "tmp", "tmp", "tmp", "tmp", "tmp");
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          updateResource(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string& collectionName, const std::string& resourceId,
+              const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(resourceId, id_temp);
+            EXPECT_EQ(collectionName, "OutreachTest");
+            EXPECT_EQ(content, expectedContent);
+          });
+  std::string ret = outreachService->updateOutreach(id_temp, "tmp", "tmp", "tmp", "tmp", "tmp", "tmp");
+  EXPECT_EQ(ret, "Outreach Service updated successfully.");
+}
+
+TEST_F(OutreachServiceUnitTests, DeleteOutreach) {
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_))
+      .WillByDefault([&](const std::string& collectionName,
+                         const std::string& resourceId) {
+        EXPECT_EQ(resourceId, id_temp);
+        EXPECT_EQ(collectionName, "OutreachTest");
+        return 1;
+      });
+  std::string ret = outreachService->deleteOutreach(id_temp);
+  EXPECT_EQ(ret, "Outreach Service deleted successfully.");
+}
