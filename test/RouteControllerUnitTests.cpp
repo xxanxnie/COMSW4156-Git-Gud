@@ -81,6 +81,14 @@ class MockHealthcareService : public Healthcare {
             ((const std::map<std::string, std::string>& updates)),
             (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
+
+  MOCK_METHOD(std::string, updateHealthcare,
+              (const std::string&, (const std::map<std::string, std::string>&)),
+              (override));
+
+  MOCK_METHOD(std::string, deleteHealthcare,
+              ((std::string)),
+              (override));
 };
 
 class RouteControllerUnitTests : public ::testing::Test {
@@ -467,3 +475,73 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
+
+TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  crow::request req;
+  req.add_header("API-Key", "ghi789CLN");
+  req.body = body;
+  crow::response res{};
+
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "City Hospital"},
+      {"serviceType", "Emergency"},
+      {"location", "456 Elm St"},
+      {"operatingHours", "24/7"},
+      {"contactInfo", "987-654-3210"}
+  };
+  std::string id = "507f191e810c19729de860ea";
+
+  ON_CALL(*mockHealthcare, updateHealthcare(id, expectedContent))
+      .WillByDefault(::testing::Return("Healthcare record updated successfully."));
+
+  routeController->updateHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Healthcare record updated successfully.");
+}
+
+TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  crow::request req;
+  req.add_header("API-Key", "invalid");
+  req.body = body;
+  crow::response res{};
+
+  routeController->updateHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 403);
+  EXPECT_EQ(res.body, "Unauthorized.");
+}
+
+TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea"})";
+  crow::request req;
+  req.add_header("API-Key", "ghi789CLN");
+  req.body = body;
+  crow::response res{};
+
+  std::string id = "507f191e810c19729de860ea";
+
+  ON_CALL(*mockHealthcare, deleteHealthcare(id))
+      .WillByDefault(::testing::Return("Healthcare record deleted successfully."));
+
+  routeController->deleteHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Healthcare record deleted successfully.");
+}
+
+TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestUnauthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea"})";
+  crow::request req;
+  req.add_header("API-Key", "invalid");
+  req.body = body;
+  crow::response res{};
+
+  routeController->deleteHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 403);
+  EXPECT_EQ(res.body, "Unauthorized.");
+}
+
