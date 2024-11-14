@@ -66,6 +66,8 @@ class RouteController {
   // Healthcare-related handlers
   void addHealthcareService(const crow::request& req, crow::response& res);
   void getAllHealthcareServices(const crow::request& req, crow::response& res);
+  void updateHealthcareService(const crow::request& req, crow::response& res);
+  void deleteHealthcareService(const crow::request& req, crow::response& res);
 };
 
 #endif
