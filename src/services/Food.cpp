@@ -37,6 +37,28 @@ std::string Food::addFood(const std::vector<std::pair<std::string, std::string>>
 }
 
 /**
+ * @brief Deletes a food resource from the database.
+ * 
+ * This method takes the ID of the food resource and removes it from the database.
+ * 
+ * @param id The ID of the food resource to be deleted.
+ * 
+ * @return std::string Returns "Success" if the food resource is deleted successfully, 
+ * or an error message if the deletion fails.
+ * 
+ * @exception std::exception Throws if an error occurs during the database deletion.
+ */
+std::string Food::deleteFood(const std::string& id) {
+    try {
+        db.deleteResource("Food", id);
+        return "Success";  
+    } catch (const std::exception& e) {
+        std::cerr << "Error deleting food resource: " << e.what() << std::endl;
+        return "Error deleting food resource: " + std::string(e.what());
+    }
+}
+
+/**
  * @brief Retrieves all food resources from the database.
  * 
  * This method queries the database for all food resources and returns them 
@@ -61,4 +83,29 @@ std::string Food::getAllFood() {
     }
 
     return bsoncxx::to_json(arrayBuilder.view());
+}
+
+/**
+ * @brief Updates a food resource in the database.
+ * 
+ * This method takes the ID of the food resource and new key-value pairs
+ * to update the resource in the database.
+ * 
+ * @param id The ID of the food resource to be updated.
+ * @param resource A vector of key-value pairs with the updated values.
+ * 
+ * @return std::string Returns "Success" if the food resource is updated successfully, 
+ * or an error message if the update fails.
+ * 
+ * @exception std::exception Throws if an error occurs during the database update.
+ */
+std::string Food::updateFood(const std::string& id, 
+    const std::vector<std::pair<std::string, std::string>>& resource) {
+    try {
+        db.updateResource("Food", id, resource);
+        return "Success";
+    } catch (const std::exception& e) {
+        std::cerr << "Error updating food resource: " << e.what() << std::endl;
+        return "Error updating food resource: " + std::string(e.what());
+    }
 }

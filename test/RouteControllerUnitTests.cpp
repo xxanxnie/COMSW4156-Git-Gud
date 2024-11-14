@@ -251,13 +251,16 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
-  std::string mockResponse = R"([{"name": "FoodBank", "location": "NYC"}])";
+  crow::request req;
+  crow::response res;
+  
+  // Set valid API key for GET operations
+  req.add_header("API-Key", "hml345HML");
+
+  std::string mockResponse = "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
   ON_CALL(*mockFood, getAllFood())
       .WillByDefault(::testing::Return(mockResponse));
 
-  crow::request req{};
-  req.add_header("API-Key", "hml345HML");
-  crow::response res{};
   routeController->getAllFood(req, res);
 
   EXPECT_EQ(res.code, 200);
@@ -265,16 +268,20 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddFoodTest) {
-  std::string body = R"({"name": "FoodBank", "location": "NYC"})";
   crow::request req;
+  crow::response res;
+  
+  // Set valid API key for POST operations
   req.add_header("API-Key", "abc123NGO");
-  req.body = body;
-  crow::response res{};
+  
+  // Add all required fields
+  req.body = "{\"FoodType\": \"Vegetables\", "
+             "\"Provider\": \"Local Farm\", "
+             "\"location\": \"NYC\", "
+             "\"quantity\": \"100\", "
+             "\"expirationDate\": \"2024-12-31\"}";
 
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"name", "FoodBank"}, {"location", "NYC"}};
-
-  ON_CALL(*mockFood, addFood(expectedContent))
+  ON_CALL(*mockFood, addFood(::testing::_))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addFood(req, res);
