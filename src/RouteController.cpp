@@ -445,15 +445,12 @@ void RouteController::getAllFood(const crow::request& req,
   }
 
   try {
+    // Get the response directly from the food manager
     std::string response = foodManager.getAllFood();
-
-    // Format the return result
-    std::string formattedResponse = "{\n  \"foodResources\": [\n";
-    formattedResponse += response;
-    formattedResponse += "\n  ]\n}";
-
+    
+    // Return the raw response without additional formatting
     res.code = 200;
-    res.write(formattedResponse);
+    res.write(response);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
@@ -596,7 +593,9 @@ void RouteController::updateFood(const crow::request& req, crow::response& res) 
             res.end();
             return;
         }
-
+        
+        std::string id = resource["id"].get_utf8().value.to_string();
+        
         std::string result = foodManager.updateFood(id, updates);
         if (result == "Success") {
             res.code = 200;
