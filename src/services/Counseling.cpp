@@ -58,8 +58,10 @@ std::vector<std::pair<std::string, std::string>> Counseling::createDBContent(
  * @todo Implement counselor deletion logic.
  */
 std::string Counseling::deleteCounselor(const std::string &counselorId) {
-  // TODO(brendon): Implement counselor deletion logic
-  return "Delete";
+  if (dbManager.deleteResource(collection_name, counselorId)) {
+    return "Success";
+  }
+  throw std::runtime_error("Document with the specified _id not found.");
 }
 
 /**
@@ -81,14 +83,19 @@ std::string Counseling::searchCounselorsAll() {
 /**
  * @brief Updates a counselor's information in the database.
  * @param counselorId The ID of the counselor to update.
- * @param field The field to update.
- * @param value The new value for the field.
+ * @param counselorName The new name of the counselor.
+ * @param specialty The new specialty of the counselor.
  * @return A string indicating the result of the operation.
  * @todo Implement counselor update logic.
  */
-std::string Counseling::updateCounselor(const std::string &counselorId, const std::string &field, const std::string &value) {
-  // TODO(brendon): Implement counselor update logic
-  return "Update";
+std::string Counseling::updateCounselor(const std::string &counselorId, const std::string &counselorName, const std::string &specialty) {
+  try {
+    auto content = createDBContent(counselorName, specialty);
+    dbManager.updateResource(collection_name, counselorId, content);
+  } catch (const std::exception &e) {
+    return "Error: " + std::string(e.what());
+  }
+  return "Success";
 }
 
 /**

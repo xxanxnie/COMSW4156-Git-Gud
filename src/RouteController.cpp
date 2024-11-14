@@ -279,63 +279,92 @@ void RouteController::addCounseling(const crow::request& req,
   }
 }
 
-// void RouteController::updateCounseling(const crow::request& req,
-// crow::response& res) {
-//   try {
-//     auto resource = bsoncxx::from_json(req.body);
-//     if (!resource["id"]) {
-//       res.code = 400;
-//       res.write("Error: Counselor ID is required.");
-//       res.end();
-//       return;
-//     }
+/**
+ * Update the counseling information in our database
+ * PATCH with this key in json format
+ * @param id              The unique identifier of the counselor.
+ * @param counselorName   The name of the counselor.
+ * @param specialty       The specialty or expertise of the counselor.
+ * @return A crow::response object containing an HTTP 200 response,
+ */
+void RouteController::updateCounseling(const crow::request& req,
+                                     crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
 
-//     std::string id = resource["id"].get_utf8().value.to_string();
-//     std::string field = resource["field"].get_utf8().value.to_string();
-//     std::string value = resource["value"].get_utf8().value.to_string();
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::string id = "";
+    std::string counselorName = "";
+    std::string specialty = "";
 
-//     Counseling c(dbManager);
-//     std::string result = c.updateCounselor(id, field, value);
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      } else if (element.key().to_string() == "counselorName") {
+        counselorName = element.get_utf8().value.to_string();
+      } else if (element.key().to_string() == "specialty") {
+        specialty = element.get_utf8().value.to_string();
+      }
+    }
 
-//     if (result == "Update") {
-//       res.code = 200;
-//       res.write("Counseling resource updated successfully.");
-//     } else {
-//       res.code = 400;
-//       res.write(result);
-//     }
-//     res.end();
-//   } catch (const std::exception& e) {
-//     res = handleException(e);
-//   }
-// }
+    std::string result = counselingManager.updateCounselor(id, counselorName, specialty);
 
-// void RouteController::deleteCounseling(const crow::request& req,
-// crow::response& res) {
-//   try {
-//     const char* counselorId = req.url_params.get("id");
-//     if (!counselorId) {
-//       res.code = 400;
-//       res.write("Error: Counselor ID is required.");
-//       res.end();
-//       return;
-//     }
+    if (result == "Success") {
+      res.code = 200;
+      res.write("Counseling resource updated successfully.");
+    } else {
+      res.code = 400;
+      res.write(result);
+    }
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
 
-//     Counseling c(dbManager);
-//     std::string result = c.deleteCounselor(counselorId);
+/**
+ * Delete the counseling information in our database
+ * DELETE with this key in json format
+ * @param id     The unique identifier of the counselor.
+ * @return A crow::response object containing an HTTP 200 response,
+ */
+void RouteController::deleteCounseling(const crow::request& req,
+                                     crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
 
-//     if (result == "Delete") {
-//       res.code = 200;
-//       res.write("Counseling resource deleted successfully.");
-//     } else {
-//       res.code = 400;
-//       res.write(result);
-//     }
-//     res.end();
-//   } catch (const std::exception& e) {
-//     res = handleException(e);
-//   }
-// }
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::string id = "";
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      }
+    }
+
+    std::string result = counselingManager.deleteCounselor(id);
+
+    if (result == "Success") {
+      res.code = 200;
+      res.write("Counseling resource deleted successfully.");
+    } else {
+      res.code = 400;
+      res.write(result);
+    }
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
+}
 
 /**
  * @brief Adds a food resource to the database.
@@ -825,17 +854,17 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             addCounseling(req, res);
           });
 
-  // CROW_ROUTE(app, "/resources/counseling")
-  //   .methods(crow::HTTPMethod::PATCH)(
-  //     [this](const crow::request& req, crow::response& res) {
-  //       updateCounseling(req, res);
-  //     });
+  CROW_ROUTE(app, "/resources/counseling/update")
+    .methods(crow::HTTPMethod::PATCH)(
+      [this](const crow::request& req, crow::response& res) {
+        updateCounseling(req, res);
+      });
 
-  // CROW_ROUTE(app, "/resources/counseling")
-  //   .methods(crow::HTTPMethod::DELETE)(
-  //     [this](const crow::request& req, crow::response& res) {
-  //       deleteCounseling(req, res);
-  //       });
+  CROW_ROUTE(app, "/resources/counseling/delete")
+    .methods(crow::HTTPMethod::DELETE)(
+      [this](const crow::request& req, crow::response& res) {
+        deleteCounseling(req, res);
+      });
 
   CROW_ROUTE(app, "/resources/outreach/add")
       .methods(crow::HTTPMethod::POST)(

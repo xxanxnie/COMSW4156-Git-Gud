@@ -50,8 +50,8 @@ class RouteController {
   // Counseling-related handlers
   void getCounseling(const crow::request& req, crow::response& res);
   void addCounseling(const crow::request& req, crow::response& res);
-  // void updateCounseling(const crow::request& req, crow::response& res);
-  // void deleteCounseling(const crow::request& req, crow::response& res);
+  void updateCounseling(const crow::request& req, crow::response& res);
+  void deleteCounseling(const crow::request& req, crow::response& res);
 
   // Outreach-related handlers
   void addOutreachService(const crow::request& req, crow::response& res);
