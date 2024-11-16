@@ -15,12 +15,13 @@ set(ASIO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_libraries/asio/include)
 if (APPLE)
     set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.dylib")
     set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.dylib")
-    set(BCRYPT_INCLUDE_DIR "/usr/local/include")
-    set(BCRYPT_LIBRARY "/usr/local/lib/libbcrypt.a")
 else()
     set(MONGOCXX_LIB_PATH "/usr/local/lib/libmongocxx.so")
     set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
 endif()
+
+set(BCRYPT_INCLUDE_DIR "/usr/local/include")
+set(BCRYPT_LIBRARY "/usr/local/lib/libbcrypt.a")
 
 # Include directories
 set(INCLUDE_PATHS 
