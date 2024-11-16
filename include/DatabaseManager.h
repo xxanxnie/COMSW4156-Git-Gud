@@ -35,6 +35,11 @@ class DatabaseManager {
   virtual bsoncxx::document::value getResources(
       const std::string& resourceType);
 
+  static DatabaseManager& getInstance() {
+    static DatabaseManager instance("mongodb://localhost:27017");
+    return instance;
+  }
+
  protected:
   std::optional<mongocxx::client> conn;
 
