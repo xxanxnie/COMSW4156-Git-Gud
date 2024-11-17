@@ -27,19 +27,16 @@ public:
 // User model
 struct User {
     std::string id;
-    std::string username;
     std::string email;
     std::string passwordHash;
     std::string role;
     std::string createdAt;
 
-    // Constructor for creating a new user
-    User(const std::string& username, 
-         const std::string& email, 
+    // Updated constructor
+    User(const std::string& email, 
          const std::string& passwordHash,
          const std::string& role = "user")
-        : username(username)
-        , email(email)
+        : email(email)
         , passwordHash(passwordHash)
         , role(role) {}
     
@@ -75,9 +72,8 @@ public:
     ~AuthService() = default;
 
     // User registration and login
-    std::string registerUser(const std::string& username, 
-                            const std::string& email, 
-                            const std::string& password);
+    std::string registerUser(const std::string& email, 
+                           const std::string& password);
     
     std::string loginUser(const std::string& email, 
                          const std::string& password);
@@ -97,7 +93,7 @@ public:
     
 private:
     DatabaseManager& dbManager;
-    const std::string collection_name = "users";
+    const std::string collection_name = "Users";
     const int JWT_EXPIRATION_HOURS = 24;
     const std::string JWT_SECRET = "your-secret-key";  // In production, load from env variables
 
@@ -112,11 +108,9 @@ private:
     // User validation
     bool isValidEmail(const std::string& email);
     bool isValidPassword(const std::string& password);
-    bool isValidUsername(const std::string& username);
 
     // Database operations
     std::vector<std::pair<std::string, std::string>> createUserDocument(
-        const std::string& username,
         const std::string& email,
         const std::string& passwordHash,
         const std::string& role = "user"

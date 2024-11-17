@@ -12,8 +12,7 @@ AuthService::AuthService(DatabaseManager& dbManager) : dbManager(dbManager) {}
 AuthService::AuthService() : dbManager(DatabaseManager::getInstance()) {}
 
 // Registration
-std::string AuthService::registerUser(const std::string& username, 
-                                    const std::string& email, 
+std::string AuthService::registerUser(const std::string& email, 
                                     const std::string& password) {
     // Validate input
     if (!isValidEmail(email)) {
@@ -21,9 +20,6 @@ std::string AuthService::registerUser(const std::string& username,
     }
     if (!isValidPassword(password)) {
         throw AuthException("Password does not meet requirements");
-    }
-    if (!isValidUsername(username)) {
-        throw AuthException("Invalid username format");
     }
 
     // Check if user already exists
@@ -33,7 +29,7 @@ std::string AuthService::registerUser(const std::string& username,
 
     // Hash password and create user
     std::string hashedPassword = hashPassword(password);
-    auto userDoc = createUserDocument(username, email, hashedPassword);
+    auto userDoc = createUserDocument(email, hashedPassword);
     
     try {
         dbManager.insertResource(collection_name, userDoc);
@@ -48,7 +44,7 @@ std::string AuthService::registerUser(const std::string& username,
         }
         
         auto userView = result[0].view();
-        User newUser(username, email, hashedPassword);
+        User newUser(email, hashedPassword);
         newUser.id = userView["_id"].get_oid().value.to_string();
         return generateJWT(newUser);
     } catch (const std::exception& e) {
@@ -141,7 +137,6 @@ std::optional<User> AuthService::findUserByEmail(const std::string& email) {
     User user;
     user.id = userDoc["_id"].get_oid().value.to_string();
     user.email = userDoc["email"].get_utf8().value.to_string();
-    user.username = userDoc["username"].get_utf8().value.to_string();
     user.passwordHash = userDoc["passwordHash"].get_utf8().value.to_string();
     user.role = userDoc["role"].get_utf8().value.to_string();
     user.createdAt = userDoc["createdAt"].get_utf8().value.to_string();
@@ -161,12 +156,6 @@ bool AuthService::isValidPassword(const std::string& password) {
     return std::regex_match(password, pattern);
 }
 
-bool AuthService::isValidUsername(const std::string& username) {
-    // 3-20 characters, alphanumeric and underscore
-    const std::regex pattern(R"(^[a-zA-Z0-9_]{3,20}$)");
-    return std::regex_match(username, pattern);
-}
-
 // Utility Methods
 int64_t AuthService::getCurrentTimestamp() {
     return std::chrono::duration_cast<std::chrono::seconds>(
@@ -179,13 +168,11 @@ int64_t AuthService::getExpirationTimestamp() {
 }
 
 std::vector<std::pair<std::string, std::string>> AuthService::createUserDocument(
-    const std::string& username,
     const std::string& email,
     const std::string& passwordHash,
     const std::string& role
 ) {
     std::vector<std::pair<std::string, std::string>> content;
-    content.push_back({"username", username});
     content.push_back({"email", email});
     content.push_back({"passwordHash", passwordHash});
     content.push_back({"role", role});

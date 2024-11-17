@@ -44,6 +44,7 @@ int main(int argc, char* argv[]) {
   dbManager.createCollection("Outreach");
   dbManager.createCollection("Shelter");
   dbManager.createCollection("Counseling");
+  dbManager.createCollection("Users");
 
   crow::SimpleApp app;
 

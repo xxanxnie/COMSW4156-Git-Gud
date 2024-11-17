@@ -16,6 +16,7 @@
 #include "Healthcare.h"
 #include "Outreach.h"
 #include "Shelter.h"
+#include "Auth.h"
 
 class RouteController {
  private:
@@ -68,6 +69,9 @@ class RouteController {
   void getAllHealthcareServices(const crow::request& req, crow::response& res);
   void updateHealthcareService(const crow::request& req, crow::response& res);
   void deleteHealthcareService(const crow::request& req, crow::response& res);
+
+  void registerUser(const crow::request& req, crow::response& res);
+  void loginUser(const crow::request& req, crow::response& res);
 };
 
 #endif

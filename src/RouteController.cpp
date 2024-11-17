@@ -868,6 +868,74 @@ void RouteController::deleteHealthcareService(const crow::request& req,
   }
 }
 
+void RouteController::registerUser(const crow::request& req, crow::response& res) {
+    try {
+        auto resource = bsoncxx::from_json(req.body);
+        
+        // Validate required fields
+        if (!resource["email"] || !resource["password"]) {
+            res.code = 400;
+            res.write("Missing required fields: email and password");
+            res.end();
+            return;
+        }
+
+        std::string email = resource["email"].get_utf8().value.to_string();
+        std::string password = resource["password"].get_utf8().value.to_string();
+
+        AuthService& authService = AuthService::getInstance();
+        std::string token = authService.registerUser(email, password);
+
+        res.code = 201;
+        res.write(token);
+        res.end();
+    } catch (const UserAlreadyExistsException& e) {
+        res.code = 409;
+        res.write(e.what());
+        res.end();
+    } catch (const AuthException& e) {
+        res.code = 400;
+        res.write(e.what());
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+void RouteController::loginUser(const crow::request& req, crow::response& res) {
+    try {
+        auto resource = bsoncxx::from_json(req.body);
+        
+        // Validate required fields
+        if (!resource["email"] || !resource["password"]) {
+            res.code = 400;
+            res.write("Missing required fields: email and password");
+            res.end();
+            return;
+        }
+
+        std::string email = resource["email"].get_utf8().value.to_string();
+        std::string password = resource["password"].get_utf8().value.to_string();
+
+        AuthService& authService = AuthService::getInstance();
+        std::string token = authService.loginUser(email, password);
+
+        res.code = 200;
+        res.write(token);
+        res.end();
+    } catch (const InvalidCredentialsException& e) {
+        res.code = 401;
+        res.write(e.what());
+        res.end();
+    } catch (const AuthException& e) {
+        res.code = 400;
+        res.write(e.what());
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });
@@ -976,4 +1044,16 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             deleteHealthcareService(req, res);
           });
+
+  CROW_ROUTE(app, "/auth/register")
+      .methods(crow::HTTPMethod::POST)
+      ([this](const crow::request& req, crow::response& res) {
+          registerUser(req, res);
+      });
+
+  CROW_ROUTE(app, "/auth/login")
+      .methods(crow::HTTPMethod::POST)
+      ([this](const crow::request& req, crow::response& res) {
+          loginUser(req, res);
+      });
 }
