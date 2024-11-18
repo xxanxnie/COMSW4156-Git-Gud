@@ -128,17 +128,22 @@ void RouteController::addShelter(const crow::request& req,
       throw std::invalid_argument("The request with invalid argument.");
     }
 
-    shelterManager.addShelter(content[0], content[1], content[2], capacity,
-                              current);
-    res.code = 201;
-    res.write("Shelter resource added successfully.");
+    std::string result = shelterManager.addShelter(
+        content[0], content[1], content[2], capacity, current);
+    if (result.find("Error") != std::string::npos) {
+      res.code = 400;
+      res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Shelter resource added successfully.");
+    }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
   }
 }
 /**
- * Add the shelter information to our database
+ * Update the shelter information to our database
  * POST with this key in json format
  * @param ORG     The organization who gave the infomation.
  * @param User     The target this service provide for.
@@ -276,12 +281,12 @@ void RouteController::addCounseling(const crow::request& req,
     std::string result =
         counselingManager.addCounselor(counselorName, specialty);
 
-    if (result == "Success") {
-      res.code = 201;
-      res.write("Counseling resource added successfully.");
-    } else {
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Counseling resource added successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
@@ -298,7 +303,7 @@ void RouteController::addCounseling(const crow::request& req,
  * @return A crow::response object containing an HTTP 200 response,
  */
 void RouteController::updateCounseling(const crow::request& req,
-                                     crow::response& res) {
+                                       crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -322,7 +327,8 @@ void RouteController::updateCounseling(const crow::request& req,
       }
     }
 
-    std::string result = counselingManager.updateCounselor(id, counselorName, specialty);
+    std::string result =
+        counselingManager.updateCounselor(id, counselorName, specialty);
 
     if (result == "Success") {
       res.code = 200;
@@ -344,7 +350,7 @@ void RouteController::updateCounseling(const crow::request& req,
  * @return A crow::response object containing an HTTP 200 response,
  */
 void RouteController::deleteCounseling(const crow::request& req,
-                                     crow::response& res) {
+                                       crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -407,12 +413,11 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     }
 
     auto resource = bsoncxx::from_json(req.body);
-    
+
     // Required fields validation
     const std::vector<std::string> requiredFields = {
-      "FoodType", "Provider", "location", "quantity", "expirationDate"
-    };
-    
+        "FoodType", "Provider", "location", "quantity", "expirationDate"};
+
     for (const auto& field : requiredFields) {
       if (!resource[field]) {
         res.code = 400;
@@ -420,7 +425,7 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
         res.end();
         return;
       }
-      
+
       // Check for empty values
       if (resource[field].get_utf8().value.empty()) {
         res.code = 400;
@@ -444,15 +449,15 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     std::vector<std::pair<std::string, std::string>> keyValues;
     for (auto element : resource.view()) {
       keyValues.emplace_back(element.key().to_string(),
-                           element.get_utf8().value.to_string());
+                             element.get_utf8().value.to_string());
     }
     std::string result = foodManager.addFood(keyValues);
-    if (result == "Success") {
-      res.code = 201;
-      res.write("Food resource added successfully.");
-    } else {
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Food resource added successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
@@ -486,7 +491,7 @@ void RouteController::getAllFood(const crow::request& req,
   try {
     // Get the response directly from the food manager
     std::string response = foodManager.getAllFood();
-    
+
     // Return the raw response without additional formatting
     res.code = 200;
     res.write(response);
@@ -499,15 +504,18 @@ void RouteController::getAllFood(const crow::request& req,
 /**
  * @brief Deletes a food resource from the database.
  *
- * This method processes a DELETE request to remove a food resource identified by its ID.
- * It interacts with the `Food` class to delete the resource from the database.
+ * This method processes a DELETE request to remove a food resource identified
+ * by its ID. It interacts with the `Food` class to delete the resource from the
+ * database.
  *
  * @param req The HTTP request containing the food resource ID in JSON format.
  * @param res The HTTP response object to send back to the client.
  *
- * @exception std::exception Throws if any error occurs during the database interaction or JSON parsing.
+ * @exception std::exception Throws if any error occurs during the database
+ * interaction or JSON parsing.
  */
-void RouteController::deleteFood(const crow::request& req, crow::response& res) {
+void RouteController::deleteFood(const crow::request& req,
+                                 crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -525,8 +533,8 @@ void RouteController::deleteFood(const crow::request& req, crow::response& res) 
     }
 
     auto resource = bsoncxx::from_json(req.body);
-    
-    // Validate ID 
+
+    // Validate ID
     if (!resource["id"]) {
       res.code = 400;
       res.write("Invalid input: 'id' field is required");
@@ -559,94 +567,95 @@ void RouteController::deleteFood(const crow::request& req, crow::response& res) 
 /**
  * @brief Updates a food resource in the database.
  *
- * This method processes a PATCH request to update a food resource. It validates the
- * required fields in the request body and updates only the provided fields.
+ * This method processes a PATCH request to update a food resource. It validates
+ * the required fields in the request body and updates only the provided fields.
  * Required fields in JSON format:
  * - id: The ID of the food resource to update
  * - At least one of: FoodType, Provider, location, quantity, expirationDate
  *
- * @param req The HTTP request containing the food resource ID and fields to update.
+ * @param req The HTTP request containing the food resource ID and fields to
+ * update.
  * @param res The HTTP response object to send back to the client.
  */
-void RouteController::updateFood(const crow::request& req, crow::response& res) {
-    if (!authenticatePermissionsToPost(req)) {
-        res.code = 403;
-        res.write("Unauthorized.");
-        res.end();
-        return;
+void RouteController::updateFood(const crow::request& req,
+                                 crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    // Input validation
+    if (req.body.empty()) {
+      res.code = 400;
+      res.write("Invalid input: Request body cannot be empty.");
+      res.end();
+      return;
     }
 
-    try {
-        // Input validation
-        if (req.body.empty()) {
-            res.code = 400;
-            res.write("Invalid input: Request body cannot be empty.");
-            res.end();
-            return;
-        }
+    auto resource = bsoncxx::from_json(req.body);
 
-        auto resource = bsoncxx::from_json(req.body);
-        
-        // Validate ID 
-        if (!resource["id"]) {
-            res.code = 400;
-            res.write("Invalid input: 'id' field is required");
-            res.end();
-            return;
-        }
-
-       
-
-        // Validate update fields
-        const std::vector<std::string> validFields = {
-            "FoodType", "Provider", "location", "quantity", "expirationDate"
-        };
-        std::vector<std::pair<std::string, std::string>> updates;
-        bool hasValidField = false;
-
-        for (const auto& field : validFields) {
-            if (resource[field]) {
-                // Validate quantity if it's being updated
-                if (field == "quantity") {
-                    try {
-                        std::stoi(resource[field].get_utf8().value.to_string());
-                    } catch (const std::exception&) {
-                        res.code = 400;
-                        res.write("Invalid input: Quantity must be a valid number");
-                        res.end();
-                        return;
-                    }
-                }
-                
-                std::string value = resource[field].get_utf8().value.to_string();
-                if (!value.empty()) {
-                    updates.emplace_back(field, value);
-                    hasValidField = true;
-                }
-            }
-        }
-
-        if (!hasValidField) {
-            res.code = 400;
-            res.write("Invalid input: At least one valid field must be provided for update");
-            res.end();
-            return;
-        }
-        
-        std::string id = resource["id"].get_utf8().value.to_string();
-        
-        std::string result = foodManager.updateFood(id, updates);
-        if (result == "Success") {
-            res.code = 200;
-            res.write("Food resource updated successfully.");
-        } else {
-            res.code = 400;
-            res.write(result);
-        }
-        res.end();
-    } catch (const std::exception& e) {
-        res = handleException(e);
+    // Validate ID
+    if (!resource["id"]) {
+      res.code = 400;
+      res.write("Invalid input: 'id' field is required");
+      res.end();
+      return;
     }
+
+    // Validate update fields
+    const std::vector<std::string> validFields = {
+        "FoodType", "Provider", "location", "quantity", "expirationDate"};
+    std::vector<std::pair<std::string, std::string>> updates;
+    bool hasValidField = false;
+
+    for (const auto& field : validFields) {
+      if (resource[field]) {
+        // Validate quantity if it's being updated
+        if (field == "quantity") {
+          try {
+            std::stoi(resource[field].get_utf8().value.to_string());
+          } catch (const std::exception&) {
+            res.code = 400;
+            res.write("Invalid input: Quantity must be a valid number");
+            res.end();
+            return;
+          }
+        }
+
+        std::string value = resource[field].get_utf8().value.to_string();
+        if (!value.empty()) {
+          updates.emplace_back(field, value);
+          hasValidField = true;
+        }
+      }
+    }
+
+    if (!hasValidField) {
+      res.code = 400;
+      res.write(
+          "Invalid input: At least one valid field must be provided for "
+          "update");
+      res.end();
+      return;
+    }
+
+    std::string id = resource["id"].get_utf8().value.to_string();
+
+    std::string result = foodManager.updateFood(id, updates);
+    if (result == "Success") {
+      res.code = 200;
+      res.write("Food resource updated successfully.");
+    } else {
+      res.code = 400;
+      res.write(result);
+    }
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+  }
 }
 
 /**
@@ -688,11 +697,16 @@ void RouteController::addOutreachService(const crow::request& req,
       throw std::runtime_error("Not enough data to add OutreachService.");
     }
 
-    outreachManager.addOutreachService(content[0], content[1], content[2],
-                                       content[3], content[4], content[5]);
+    std::string result = outreachManager.addOutreachService(
+        content[0], content[1], content[2], content[3], content[4], content[5]);
 
-    res.code = 201;
-    res.write("OutreachService resource added successfully.");
+    if (result.find("Error") != std::string::npos) {
+      res.code = 400;
+      res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Outreach resource added successfully.");
+    }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);  // Custom exception handling
@@ -762,18 +776,24 @@ void RouteController::addHealthcareService(const crow::request& req,
       content[element.key().to_string()] = element.get_utf8().value.to_string();
     }
 
-    std::string validationMessage = healthcareManager.validateHealthcareServiceInput(content);
+    std::string validationMessage =
+        healthcareManager.validateHealthcareServiceInput(content);
     if (!validationMessage.empty()) {
       res.code = 400;
       res.write(validationMessage);
       res.end();
       return;
     }
-    
-    healthcareManager.addHealthcareService(content);
 
-    res.code = 201;
-    res.write("HealthcareService resource added successfully.");
+    std::string result = healthcareManager.addHealthcareService(content);
+
+    if (result.find("Error") != std::string::npos) {
+      res.code = 400;
+      res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Healthcare resource added successfully.");
+    }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
@@ -811,7 +831,8 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
   }
 }
 
-void RouteController::updateHealthcareService(const crow::request& req, crow::response& res) {
+void RouteController::updateHealthcareService(const crow::request& req,
+                                              crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -828,11 +849,13 @@ void RouteController::updateHealthcareService(const crow::request& req, crow::re
       if (element.key().to_string() == "id") {
         id = element.get_utf8().value.to_string();
       } else {
-        content[element.key().to_string()] = element.get_utf8().value.to_string();
+        content[element.key().to_string()] =
+            element.get_utf8().value.to_string();
       }
     }
 
-    std::string validationMessage = healthcareManager.validateHealthcareServiceInput(content);
+    std::string validationMessage =
+        healthcareManager.validateHealthcareServiceInput(content);
     if (!validationMessage.empty()) {
       res.code = 400;
       res.write(validationMessage);
@@ -850,7 +873,7 @@ void RouteController::updateHealthcareService(const crow::request& req, crow::re
 }
 
 void RouteController::deleteHealthcareService(const crow::request& req,
-                                    crow::response& res) {
+                                              crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -940,16 +963,16 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           });
 
   CROW_ROUTE(app, "/resources/counseling/update")
-    .methods(crow::HTTPMethod::PATCH)(
-      [this](const crow::request& req, crow::response& res) {
-        updateCounseling(req, res);
-      });
+      .methods(crow::HTTPMethod::PATCH)(
+          [this](const crow::request& req, crow::response& res) {
+            updateCounseling(req, res);
+          });
 
   CROW_ROUTE(app, "/resources/counseling/delete")
-    .methods(crow::HTTPMethod::DELETE)(
-      [this](const crow::request& req, crow::response& res) {
-        deleteCounseling(req, res);
-      });
+      .methods(crow::HTTPMethod::DELETE)(
+          [this](const crow::request& req, crow::response& res) {
+            deleteCounseling(req, res);
+          });
 
   CROW_ROUTE(app, "/resources/outreach/add")
       .methods(crow::HTTPMethod::POST)(
