@@ -78,12 +78,17 @@ class MockHealthcareService : public Healthcare {
       : Healthcare(*dbManager, collection_name) {}
 
   MOCK_METHOD(std::string, addHealthcareService,
-              (const std::string& provider, const std::string& serviceType,
-               const std::string& location, const std::string& operatingHours,
-               const std::string& eligibilityCriteria,
-               const std::string& contactInfo),
-              (override));
+            ((const std::map<std::string, std::string>& updates)),
+            (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
+
+  MOCK_METHOD(std::string, updateHealthcare,
+              (const std::string&, (const std::map<std::string, std::string>&)),
+              (override));
+
+  MOCK_METHOD(std::string, deleteHealthcare,
+              ((std::string)),
+              (override));
 };
 
 class RouteControllerUnitTests : public ::testing::Test {
@@ -251,13 +256,16 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
-  std::string mockResponse = R"([{"name": "FoodBank", "location": "NYC"}])";
+  crow::request req;
+  crow::response res;
+  
+  // Set valid API key for GET operations
+  req.add_header("API-Key", "hml345HML");
+
+  std::string mockResponse = "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
   ON_CALL(*mockFood, getAllFood())
       .WillByDefault(::testing::Return(mockResponse));
 
-  crow::request req{};
-  req.add_header("API-Key", "hml345HML");
-  crow::response res{};
   routeController->getAllFood(req, res);
 
   EXPECT_EQ(res.code, 200);
@@ -265,16 +273,20 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddFoodTest) {
-  std::string body = R"({"name": "FoodBank", "location": "NYC"})";
   crow::request req;
+  crow::response res;
+  
+  // Set valid API key for POST operations
   req.add_header("API-Key", "abc123NGO");
-  req.body = body;
-  crow::response res{};
+  
+  // Add all required fields
+  req.body = "{\"FoodType\": \"Vegetables\", "
+             "\"Provider\": \"Local Farm\", "
+             "\"location\": \"NYC\", "
+             "\"quantity\": \"100\", "
+             "\"expirationDate\": \"2024-12-31\"}";
 
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"name", "FoodBank"}, {"location", "NYC"}};
-
-  ON_CALL(*mockFood, addFood(expectedContent))
+  ON_CALL(*mockFood, addFood(::testing::_))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addFood(req, res);
@@ -405,11 +417,17 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockHealthcare,
-          addHealthcareService("HealthcareProvider", "General Care", "NYC",
-                               "9-5", "None", "123-456"))
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "HealthcareProvider"},
+      {"serviceType", "General Care"},
+      {"location", "NYC"},
+      {"operatingHours", "9-5"},
+      {"eligibilityCriteria", "None"},
+      {"contactInfo", "123-456"}
+  };
+
+  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
       .WillByDefault(::testing::Return("Success"));
-  ;
 
   routeController->addHealthcareService(req, res);
 
@@ -440,9 +458,16 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockHealthcare,
-          addHealthcareService("HealthcareProvider", "General Care", "NYC",
-                               "9-5", "None", "123-456"))
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "HealthcareProvider"},
+      {"serviceType", "General Care"},
+      {"location", "NYC"},
+      {"operatingHours", "9-5"},
+      {"eligibilityCriteria", "None"},
+      {"contactInfo", "123-456"}
+  };
+
+  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
@@ -450,3 +475,73 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
+
+TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  crow::request req;
+  req.add_header("API-Key", "ghi789CLN");
+  req.body = body;
+  crow::response res{};
+
+  std::map<std::string, std::string> expectedContent = {
+      {"provider", "City Hospital"},
+      {"serviceType", "Emergency"},
+      {"location", "456 Elm St"},
+      {"operatingHours", "24/7"},
+      {"contactInfo", "987-654-3210"}
+  };
+  std::string id = "507f191e810c19729de860ea";
+
+  ON_CALL(*mockHealthcare, updateHealthcare(id, expectedContent))
+      .WillByDefault(::testing::Return("Healthcare record updated successfully."));
+
+  routeController->updateHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Healthcare record updated successfully.");
+}
+
+TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  crow::request req;
+  req.add_header("API-Key", "invalid");
+  req.body = body;
+  crow::response res{};
+
+  routeController->updateHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 403);
+  EXPECT_EQ(res.body, "Unauthorized.");
+}
+
+TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea"})";
+  crow::request req;
+  req.add_header("API-Key", "ghi789CLN");
+  req.body = body;
+  crow::response res{};
+
+  std::string id = "507f191e810c19729de860ea";
+
+  ON_CALL(*mockHealthcare, deleteHealthcare(id))
+      .WillByDefault(::testing::Return("Healthcare record deleted successfully."));
+
+  routeController->deleteHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Healthcare record deleted successfully.");
+}
+
+TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestUnauthorized) {
+  std::string body = R"({"id": "507f191e810c19729de860ea"})";
+  crow::request req;
+  req.add_header("API-Key", "invalid");
+  req.body = body;
+  crow::response res{};
+
+  routeController->deleteHealthcareService(req, res);
+
+  EXPECT_EQ(res.code, 403);
+  EXPECT_EQ(res.body, "Unauthorized.");
+}
+
