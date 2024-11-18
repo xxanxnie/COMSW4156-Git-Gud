@@ -1,11 +1,13 @@
 // Copyright 2024 COMSW4156-Git-Gud
 
 #include "Healthcare.h"
-#include "DatabaseManager.h"
-#include <iostream>
-#include <unordered_set>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/oid.hpp>
+#include <iostream>
+#include <unordered_set>
+
+#include "DatabaseManager.h"
 
 /**
  * @brief Adds a new healthcare service to the database.
@@ -22,15 +24,16 @@
  * @return A string indicating whether the operation was successful ("Success")
  *         or an error message in case of failure.
  */
-std::string Healthcare::addHealthcareService(const std::map<std::string, std::string>& updates) {
-    try {
-        auto content = createDBContent(updates);
-        dbManager.insertResource(collection_name, content);
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << '\n';
-        return "Error: " + std::string(e.what());
-    }
-    return "Success";
+std::string Healthcare::addHealthcareService(
+    const std::map<std::string, std::string>& updates) {
+  try {
+    auto content = createDBContent(updates);
+    dbManager.insertResource(collection_name, content);
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+    return "Error: " + std::string(e.what());
+  }
+  return "Success";
 }
 
 /**
@@ -47,17 +50,25 @@ std::string Healthcare::addHealthcareService(const std::map<std::string, std::st
  * @param contactInfo The contact information for the healthcare service.
  * @return A vector of key-value pairs representing the healthcare service.
  */
-std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(const std::map<std::string, std::string>& updates) {
-    std::vector<std::pair<std::string, std::string>> content;
+std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(
+    const std::map<std::string, std::string>& updates) {
+  std::vector<std::pair<std::string, std::string>> content;
 
-    if (updates.count("provider")) content.push_back({"provider", updates.at("provider")});
-    if (updates.count("serviceType")) content.push_back({"serviceType", updates.at("serviceType")});
-    if (updates.count("location")) content.push_back({"location", updates.at("location")});
-    if (updates.count("operatingHours")) content.push_back({"operatingHours", updates.at("operatingHours")});
-    if (updates.count("eligibilityCriteria")) content.push_back({"eligibilityCriteria", updates.at("eligibilityCriteria")});
-    if (updates.count("contactInfo")) content.push_back({"contactInfo", updates.at("contactInfo")});
+  if (updates.count("provider"))
+    content.push_back({"provider", updates.at("provider")});
+  if (updates.count("serviceType"))
+    content.push_back({"serviceType", updates.at("serviceType")});
+  if (updates.count("location"))
+    content.push_back({"location", updates.at("location")});
+  if (updates.count("operatingHours"))
+    content.push_back({"operatingHours", updates.at("operatingHours")});
+  if (updates.count("eligibilityCriteria"))
+    content.push_back(
+        {"eligibilityCriteria", updates.at("eligibilityCriteria")});
+  if (updates.count("contactInfo"))
+    content.push_back({"contactInfo", updates.at("contactInfo")});
 
-    return content;
+  return content;
 }
 
 /**
@@ -70,20 +81,22 @@ std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(con
  *         Returns an empty array ("[]") if no services are found.
  */
 std::string Healthcare::getAllHealthcareServices() {
-    std::vector<bsoncxx::document::value> result;
-    dbManager.findCollection(collection_name, {}, result);  
-    if (result.empty()) {
-        return "[]";
-    }
-    return printHealthcareServices(result);
+  std::vector<bsoncxx::document::value> result;
+  dbManager.findCollection(collection_name, {}, result);
+  if (result.empty()) {
+    return "[]";
+  }
+  return printHealthcareServices(result);
 }
 
-std::string Healthcare::updateHealthcare(const std::string& id, const std::map<std::string, std::string>& updates) {
+std::string Healthcare::updateHealthcare(
+    const std::string& id, const std::map<std::string, std::string>& updates) {
   try {
     auto content = createDBContent(updates);
     dbManager.updateResource(collection_name, id, content);
-  } catch (const std::exception &e) {
-    return "Update failed: " + std::string(e.what()) + ". Please check the input and try again.";
+  } catch (const std::exception& e) {
+    return "Update failed: " + std::string(e.what()) +
+           ". Please check the input and try again.";
   }
 
   return "Healthcare record updated successfully.";
@@ -94,7 +107,8 @@ std::string Healthcare::deleteHealthcare(std::string id) {
     return "Healthcare record deleted successfully.";
   }
 
-  throw std::runtime_error("Deletion failed: No healthcare record found matching the provided ID.");
+  throw std::runtime_error(
+      "Deletion failed: No healthcare record found matching the provided ID.");
 }
 
 /**
@@ -105,15 +119,16 @@ std::string Healthcare::deleteHealthcare(std::string id) {
  * document's ObjectId.
  *
  * @param services A vector of BSON documents representing healthcare services.
- * @return A string containing the formatted information of all healthcare services.
+ * @return A string containing the formatted information of all healthcare
+ * services.
  */
 std::string Healthcare::printHealthcareServices(
-    std::vector<bsoncxx::document::value> &services) const {
+    std::vector<bsoncxx::document::value>& services) const {
   std::string ret;
   for (auto hs : services) {
     for (auto element : hs.view()) {
       if (element.type() != bsoncxx::type::k_oid) {
-        ret += element.get_string().value.to_string()+ "\n";
+        ret += element.get_string().value.to_string() + "\n";
       }
     }
     ret += "\n";
@@ -121,23 +136,28 @@ std::string Healthcare::printHealthcareServices(
   return ret;
 }
 
-std::string Healthcare::validateHealthcareServiceInput(const std::map<std::string, std::string>& content) {
-    std::string missingFields;
+std::string Healthcare::validateHealthcareServiceInput(
+    const std::map<std::string, std::string>& content) {
+  std::string missingFields;
 
-    std::unordered_set<std::string> requiredFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo"};
-    std::unordered_set<std::string> allowedFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo", "eligibilityCriteria"};
+  std::unordered_set<std::string> requiredFields = {
+      "provider", "serviceType", "location", "operatingHours", "contactInfo"};
+  std::unordered_set<std::string> allowedFields = {
+      "provider",       "serviceType", "location",
+      "operatingHours", "contactInfo", "eligibilityCriteria"};
 
-    for (const auto& field : requiredFields) {
-        if (content.find(field) == content.end()) {
-            missingFields += "Missing " + field + ". ";
-        }
+  for (const auto& field : requiredFields) {
+    if (content.find(field) == content.end()) {
+      missingFields += "Missing " + field + ". ";
     }
+  }
 
-    for (const auto& [key, value] : content) {
-        if (allowedFields.find(key) == allowedFields.end()) {
-            missingFields += "Unexpected field: " + key + ". ";
-        }
+  for (const auto& [key, value] : content) {
+    if (allowedFields.find(key) == allowedFields.end()) {
+      missingFields += "Unexpected field: " + key + ". ";
     }
+  }
 
-    return missingFields.empty() ? "" : "Input validation failed: " + missingFields;
+  return missingFields.empty() ? ""
+                               : "Input validation failed: " + missingFields;
 }

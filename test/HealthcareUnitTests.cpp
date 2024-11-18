@@ -75,6 +75,7 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "HealthcareTest");
             EXPECT_EQ(content, expectedContent);
+            return "";
           }));
 
   std::string result = healthcareService->addHealthcareService(updates);

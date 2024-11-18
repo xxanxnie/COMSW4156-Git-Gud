@@ -55,6 +55,7 @@ TEST_F(CounselingUnitTests, AddCounselor) {
               const std::vector<std::pair<std::string, std::string>> &content) {
             EXPECT_EQ(collectionName, "Counseling");
             EXPECT_EQ(content, expectedContent);
+            return "";
           }));
 
   std::string result = counseling->addCounselor("Jane Smith", "Family Therapy");

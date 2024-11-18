@@ -86,6 +86,7 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "Outreach");
             EXPECT_EQ(content, expectedContent);
+            return "";
           }));
 
   std::string result = outreachService->addOutreachService(

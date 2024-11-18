@@ -56,12 +56,13 @@ TEST_F(FoodUnitTests, addFood) {
       {"expirationDate", "2024-11-30"}};
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
-      .WillByDefault([&](const std::string& collectionName,
-                        const std::vector<std::pair<std::string, std::string>>& content) -> bool {
-        EXPECT_EQ(collectionName, "Food");
-        EXPECT_EQ(content, foodResource);
-        return true;
-      });
+      .WillByDefault(
+          [&](const std::string& collectionName,
+              const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(collectionName, "Food");
+            EXPECT_EQ(content, foodResource);
+            return "";
+          });
 
   food->addFood(foodResource);
 
@@ -94,7 +95,7 @@ TEST_F(FoodUnitTests, deleteFood) {
 
   ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
-                        const std::string& resourceId) -> bool {
+                         const std::string& resourceId) -> bool {
         EXPECT_EQ(resourceId, mockId);
         EXPECT_EQ(collectionName, "Food");
         return true;
@@ -105,9 +106,10 @@ TEST_F(FoodUnitTests, deleteFood) {
 
   // Verify deletion by checking empty results
   std::vector<bsoncxx::document::value> mockResult;
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
-                                    ::testing::Return()));
+                                      ::testing::Return()));
 
   std::string foodItems = food->getAllFood();
   EXPECT_EQ(foodItems, "[]");
@@ -118,13 +120,14 @@ TEST_F(FoodUnitTests, updateFood) {
   std::vector<std::pair<std::string, std::string>> updateResource = {
       {"FoodType", "UpdatedVegetables"},
       {"quantity", "75"},
-      {"expirationDate", "2024-12-01"}
-  };
+      {"expirationDate", "2024-12-01"}};
 
-  ON_CALL(*mockDbManager, updateResource(::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          updateResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault(
           [&](const std::string& collectionName, const std::string& resourceId,
-              const std::vector<std::pair<std::string, std::string>>& content) -> bool {
+              const std::vector<std::pair<std::string, std::string>>& content)
+              -> bool {
             EXPECT_EQ(resourceId, mockId);
             EXPECT_EQ(collectionName, "Food");
             EXPECT_EQ(content, updateResource);

@@ -2,14 +2,13 @@
 
 #include "Counseling.h"
 
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
 #include <iostream>
 #include <sstream>
 #include <utility>
 #include <vector>
-
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
 
 #include "DatabaseManager.h"
 
@@ -26,7 +25,8 @@ Counseling::Counseling(DatabaseManager &dbManager)
  * @param specialty The specialty of the counselor.
  * @return A string indicating success or an error message.
  */
-std::string Counseling::addCounselor(const std::string &counselorName, const std::string &specialty) {
+std::string Counseling::addCounselor(const std::string &counselorName,
+                                     const std::string &specialty) {
   auto content = createDBContent(counselorName, specialty);
   try {
     dbManager.insertResource(collection_name, content);
@@ -88,7 +88,9 @@ std::string Counseling::searchCounselorsAll() {
  * @return A string indicating the result of the operation.
  * @todo Implement counselor update logic.
  */
-std::string Counseling::updateCounselor(const std::string &counselorId, const std::string &counselorName, const std::string &specialty) {
+std::string Counseling::updateCounselor(const std::string &counselorId,
+                                        const std::string &counselorName,
+                                        const std::string &specialty) {
   try {
     auto content = createDBContent(counselorName, specialty);
     dbManager.updateResource(collection_name, counselorId, content);
@@ -103,7 +105,8 @@ std::string Counseling::updateCounselor(const std::string &counselorId, const st
  * @param counselor The BSON document containing the counselor's information.
  * @return The ID of the counselor as a string.
  */
-std::string Counseling::getCounselorID(const bsoncxx::document::view &counselor) {
+std::string Counseling::getCounselorID(
+    const bsoncxx::document::view &counselor) {
   std::string id = counselor["_id"].get_oid().value.to_string();
   std::cout << id << std::endl;
   return id;
@@ -114,13 +117,15 @@ std::string Counseling::getCounselorID(const bsoncxx::document::view &counselor)
  * @param counselors A vector of BSON documents representing counselors.
  * @return A JSON string containing all counselors' information.
  */
-std::string Counseling::printCounselors(std::vector<bsoncxx::document::value> &counselors) const {
+std::string Counseling::printCounselors(
+    std::vector<bsoncxx::document::value> &counselors) const {
   std::string ret = "[";
   for (const auto &counselor : counselors) {
     try {
       ret += bsoncxx::to_json(counselor.view()) + ",";
     } catch (const std::exception &e) {
-      std::cerr << "Error processing counselor document: " << e.what() << std::endl;
+      std::cerr << "Error processing counselor document: " << e.what()
+                << std::endl;
       ret += "{\"error\":\"Unable to process this counselor data\"},";
     }
   }
