@@ -705,7 +705,7 @@ void RouteController::addOutreachService(const crow::request& req,
       res.write(result);
     } else {
       res.code = 201;
-      res.write("Outreach resource added successfully.");
+      res.write("OutreachService resource added successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
@@ -792,7 +792,7 @@ void RouteController::addHealthcareService(const crow::request& req,
       res.write(result);
     } else {
       res.code = 201;
-      res.write("Healthcare resource added successfully.");
+      res.write("HealthcareService resource added successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
