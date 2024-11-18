@@ -23,18 +23,19 @@ Counseling::Counseling(DatabaseManager &dbManager)
  * @brief Adds a new counselor to the database.
  * @param counselorName The name of the counselor.
  * @param specialty The specialty of the counselor.
- * @return A string indicating success or an error message.
+ * @return A string indicating ID or an error message.
  */
 std::string Counseling::addCounselor(const std::string &counselorName,
                                      const std::string &specialty) {
   auto content = createDBContent(counselorName, specialty);
+  std::string ID = "";
   try {
-    dbManager.insertResource(collection_name, content);
+    ID = dbManager.insertResource(collection_name, content);
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
     return "Error: " + std::string(e.what());
   }
-  return "Success";
+  return ID;
 }
 
 /**

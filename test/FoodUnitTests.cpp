@@ -61,10 +61,10 @@ TEST_F(FoodUnitTests, addFood) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "Food");
             EXPECT_EQ(content, foodResource);
-            return "";
+            return "1234";
           });
 
-  food->addFood(foodResource);
+  auto ID = food->addFood(foodResource);
 
   std::vector<bsoncxx::document::value> mockResult;
   mockResult.push_back(bsoncxx::builder::stream::document{}

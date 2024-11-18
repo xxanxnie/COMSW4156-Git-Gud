@@ -21,7 +21,7 @@ Food::Food(DatabaseManager& db) : db(db) {}
  * @param resource A vector of key-value pairs representing the food resource to
  * be added.
  *
- * @return std::string Returns "Success" if the food resource is added
+ * @return std::string Returns item ID if the food resource is added
  * successfully, or an error message if the insertion fails.
  *
  * @exception std::exception Throws if an error occurs during the database
@@ -30,8 +30,8 @@ Food::Food(DatabaseManager& db) : db(db) {}
 std::string Food::addFood(
     const std::vector<std::pair<std::string, std::string>>& resource) {
   try {
-    db.insertResource("Food", resource);
-    return "Success";
+    std::string ID = db.insertResource("Food", resource);
+    return ID;
   } catch (const std::exception& e) {
     std::cerr << "Error inserting food resource: " << e.what() << std::endl;
     return "Error inserting food resource: " + std::string(e.what());

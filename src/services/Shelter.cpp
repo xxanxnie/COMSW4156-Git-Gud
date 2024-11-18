@@ -9,7 +9,7 @@
  * @param location     The location of the shelter.
  * @param capacity     The maximum number of users that the shelter can handle.
  * @param curUse       The current users that using this shelter.
- * @return String Success or Error message
+ * @return item ID in database or Error message
  */
 std::string Shelter::addShelter(std::string ORG, std::string User,
                                 std::string location, int capacity,
@@ -17,11 +17,11 @@ std::string Shelter::addShelter(std::string ORG, std::string User,
   try {
     auto content = createDBContent(
         ORG, User, location, std::to_string(capacity), std::to_string(curUse));
-    dbManager.insertResource(collection_name, content);
+    std::string ID = dbManager.insertResource(collection_name, content);
+    return ID;
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
   }
-  return "Success";
 }
 
 /**
@@ -89,8 +89,7 @@ std::string Shelter::updateShelter(std::string id, std::string ORG,
   try {
     auto content = createDBContent(
         ORG, User, location, std::to_string(capacity), std::to_string(curUse));
-    dbManager.updateResource(collection_name, id,
-                             content);
+    dbManager.updateResource(collection_name, id, content);
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
   }

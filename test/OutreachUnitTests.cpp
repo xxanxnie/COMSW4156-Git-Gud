@@ -86,7 +86,7 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "Outreach");
             EXPECT_EQ(content, expectedContent);
-            return "";
+            return "12345";
           }));
 
   std::string result = outreachService->addOutreachService(
@@ -95,5 +95,5 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
       "05/01/24 - 12/31/24", "Bowery Mission, 227 Bowery, NY",
       "Sarah Johnson, sarah@email.com");
 
-  EXPECT_EQ(result, "Success");
+  EXPECT_EQ(result, "12345");
 }

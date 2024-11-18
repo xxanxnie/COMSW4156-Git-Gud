@@ -22,6 +22,20 @@ class ShelterUnitTests : public ::testing::Test {
     delete mockDbManager;
   }
 };
+TEST_F(ShelterUnitTests, AddNewShelter) {
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      shelter->createDBContent("tmp", "tmp", "tmp", "1", "0");
+  ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string& collectionName,
+              const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(collectionName, "ShelterTest");
+            EXPECT_EQ(content, expectedContent);
+            return "12345";
+          });
+  std::string ret = shelter->addShelter("tmp", "tmp", "tmp", 1, 0);
+  EXPECT_EQ(ret, "12345");
+}
 
 TEST_F(ShelterUnitTests, searchShelterAll) {
   std::vector<bsoncxx::document::value> mockResult;

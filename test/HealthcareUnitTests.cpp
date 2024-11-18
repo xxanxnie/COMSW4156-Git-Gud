@@ -75,12 +75,12 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "HealthcareTest");
             EXPECT_EQ(content, expectedContent);
-            return "";
+            return "12345";
           }));
 
   std::string result = healthcareService->addHealthcareService(updates);
 
-  EXPECT_EQ(result, "Success");
+  EXPECT_EQ(result, "12345");
 }
 
 TEST_F(HealthcareServiceUnitTests, DeleteHealthcare) {

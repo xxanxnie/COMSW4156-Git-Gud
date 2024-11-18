@@ -21,19 +21,19 @@
  * @param operatingHours The operating hours for the healthcare service.
  * @param eligibilityCriteria The criteria required for eligibility.
  * @param contactInfo The contact information for the healthcare service.
- * @return A string indicating whether the operation was successful ("Success")
+ * @return A string indicating whether the operation was successful (item ID)
  *         or an error message in case of failure.
  */
 std::string Healthcare::addHealthcareService(
     const std::map<std::string, std::string>& updates) {
   try {
     auto content = createDBContent(updates);
-    dbManager.insertResource(collection_name, content);
+    std::string ID = dbManager.insertResource(collection_name, content);
+    return ID;
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return "Error: " + std::string(e.what());
   }
-  return "Success";
 }
 
 /**
