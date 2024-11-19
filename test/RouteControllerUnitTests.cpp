@@ -139,15 +139,23 @@ TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
   std::string body =
-      R"({"ORG": "NGO", "User": "HML", "location": "NYC", "capacity": "100", "curUse": "20"})";
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "abc123NGO");
   crow::response res{};
 
   ON_CALL(*mockShelter,
-          addShelter("{\"rwe\":\"tmp\",\"wre\": \"tmp\", "
-                     "\"wer\":\"tmp\",\"wer\": \"1\", \"rer\":\" 0 \"}"))
+          addShelter(
+              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+              "\"66664566565\",\"HoursOfOperation\": "
+              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);
@@ -174,15 +182,23 @@ TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
   std::string body =
-      R"({"ORG": "NGO", "User": "HML", "location": "NYC", "capacity": "100", "curUse": "20"})";
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
   ON_CALL(*mockShelter,
-          addShelter("{\"rwe\":\"tmp\",\"wre\": \"tmp\", "
-                     "\"wer\":\"tmp\",\"wer\": \"1\", \"rer\":\" 0 \"}"))
+          addShelter(
+              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+              "\"66664566565\",\"HoursOfOperation\": "
+              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);

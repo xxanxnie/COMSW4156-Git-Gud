@@ -7,16 +7,41 @@ Address
 Description
 ContactInfo
 HoursOfOperation
+ORG
+TargetUser
 Capacity
 CurrentUse
 */
 Shelter::Shelter(DatabaseManager &dbManager, std::string collection_name)
     : dbManager(dbManager), collection_name(collection_name) {
-  std::vector<std::string> cols({"Name", "City", "Address", "Description",
-                             "ContactInfo", "HoursOfOperation", "Capacity",
-                             "CurrentUse"});
+  cols = std::vector<std::string>({"Name", "City", "Address", "Description",
+                                   "ContactInfo", "HoursOfOperation", "ORG",
+                                   "TargetUser", "Capacity", "CurrentUse"});
+  cleanCache();
+}
+void Shelter::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
+  }
+}
+void Shelter::checkInputFormat(std::string content) {
+  auto resource = bsoncxx::from_json(content);
+  for (auto element : resource.view()) {
+    if (format.find(element.key().to_string()) != format.end()) {
+      format[element.key().to_string()] = element.get_utf8().value.to_string();
+    } else {
+      throw std::invalid_argument("The request with unrelative argument.");
+    }
+  }
+  int capacity = atoi(format["Capacity"].c_str());
+  int current = atoi(format["CurrentUse"].c_str());
+  if (capacity <= 0 || current > capacity) {
+    throw std::invalid_argument("The request with invalid argument.");
+  }
+  for (auto property : format) {
+    if (property.second == "") {
+      throw std::invalid_argument("The request missing some properties.");
+    }
   }
 }
 /**
@@ -31,21 +56,9 @@ Shelter::Shelter(DatabaseManager &dbManager, std::string collection_name)
  */
 std::string Shelter::addShelter(std::string request_body) {
   try {
-    auto resource = bsoncxx::from_json(request_body);
-    std::vector<std::string> content;
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        content.push_back(element.get_utf8().value.to_string());
-      }
-    }
-    int capacity = atoi(content[3].c_str());
-    int current = atoi(content[4].c_str());
-    if (capacity <= 0 || current > capacity) {
-      throw std::invalid_argument("The request with invalid argument.");
-    }
-
-    auto content_new = createDBContent(
-        content[0], content[1], content[2], content[3], content[4]);
+    cleanCache();
+    checkInputFormat(request_body);
+    auto content_new = createDBContent();
     std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
   } catch (const std::exception &e) {
@@ -64,15 +77,11 @@ std::string Shelter::addShelter(std::string request_body) {
  * @return std::vector<std::pair<std::string, std::string>> concat the value in
  * to vector of pair
  */
-std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
-    std::string ORG, std::string User, std::string location,
-    std::string capacity, std::string curUse) {
+std::vector<std::pair<std::string, std::string>> Shelter::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
-  content.push_back({"ORG", ORG});
-  content.push_back({"User", User});
-  content.push_back({"location", location});
-  content.push_back({"capacity", capacity});
-  content.push_back({"curUse", curUse});
+  for (auto property : format) {
+    content.push_back(property);
+  }
   return content;
 }
 
@@ -84,13 +93,17 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent(
 std::string Shelter::searchShelterAll() {
   std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
-  std::string ret = "[]";
 
   if (result.size() > 0) {
-    ret = printShelters(result);
+    bsoncxx::builder::basic::array arrayBuilder;
+    for (const auto &doc : result) {
+      arrayBuilder.append(doc.view());
+    }
+    std::cout << printShelters(result);
     // getShelterID(result[0]);
+    return bsoncxx::to_json(arrayBuilder.view());
   }
-  return ret;
+  return "[]";
 }
 
 std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
@@ -116,8 +129,7 @@ std::string Shelter::updateShelter(std::string id, std::string ORG,
                                    std::string User, std::string location,
                                    int capacity, int curUse) {
   try {
-    auto content = createDBContent(
-        ORG, User, location, std::to_string(capacity), std::to_string(curUse));
+    auto content = createDBContent();
     dbManager.updateResource(collection_name, id, content);
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
