@@ -16,6 +16,7 @@
 #include "Healthcare.h"
 #include "Outreach.h"
 #include "Shelter.h"
+#include "SubscriptionManager.h"
 
 class RouteController {
  private:
@@ -25,21 +26,24 @@ class RouteController {
   Healthcare& healthcareManager;
   Outreach& outreachManager;
   Food& foodManager;
+  SubscriptionManager subscriptionManager;
 
  public:
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
-                  Outreach& outreachManager, Food& foodManager)
+                  Outreach& outreachManager, Food& foodManager, SubscriptionManager& subscriptionManager)
       : dbManager(dbManager),
         shelterManager(shelterManager),
         counselingManager(counselingManager),
         healthcareManager(healthcareManager),
         outreachManager(outreachManager),
-        foodManager(foodManager) {}
+        foodManager(foodManager),
+        subscriptionManager(subscriptionManager) {}
 
   void initRoutes(crow::SimpleApp& app);
 
   void index(crow::response& res);
+  void subscribeToResources(const crow::request& req, crow::response& res);
 
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);

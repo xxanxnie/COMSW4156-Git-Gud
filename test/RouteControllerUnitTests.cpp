@@ -91,6 +91,18 @@ class MockHealthcareService : public Healthcare {
               (override));
 };
 
+class MockSubscriptionManager : public SubscriptionManager {
+ public:
+  explicit MockSubscriptionManager(DatabaseManager* dbManager)
+      : SubscriptionManager(*dbManager) {}
+
+  MOCK_METHOD(std::string, addSubscriber, 
+              ((const std::map<std::string, std::string>& subscriberDetails)), (override));
+  MOCK_METHOD(std::string, deleteSubscriber, (const std::string& id), (override));
+  MOCK_METHOD((std::map<std::string, std::string>), getSubscribers, (const std::string&, (const std::string&)), (override));
+  MOCK_METHOD(void, notifySubscribers, ((const std::string&), (const std::string& )), (override));
+};
+
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
@@ -99,6 +111,7 @@ class RouteControllerUnitTests : public ::testing::Test {
   MockFood* mockFood;
   MockOutreachService* mockOutreach;
   MockHealthcareService* mockHealthcare;
+  MockSubscriptionManager* mockSubscriptionManager;
   RouteController* routeController;
 
   void SetUp() override {
@@ -110,9 +123,10 @@ class RouteControllerUnitTests : public ::testing::Test {
         new MockOutreachService(mockDbManager, "OutreachServiceTest");
     mockHealthcare =
         new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
+    mockSubscriptionManager = new MockSubscriptionManager(mockDbManager);
     routeController =
         new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
-                            *mockHealthcare, *mockOutreach, *mockFood);
+                            *mockHealthcare, *mockOutreach, *mockFood, *mockSubscriptionManager);
   }
 
   void TearDown() override {
@@ -411,7 +425,7 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   std::string body =
-      R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
+      R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "123 St", "city": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
   crow::request req;
   req.add_header("API-Key", "ghi789CLN");
   req.body = body;
@@ -420,7 +434,8 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   std::map<std::string, std::string> expectedContent = {
       {"provider", "HealthcareProvider"},
       {"serviceType", "General Care"},
-      {"location", "NYC"},
+      {"location", "123 St"},
+      {"city", "NYC"},
       {"operatingHours", "9-5"},
       {"eligibilityCriteria", "None"},
       {"contactInfo", "123-456"}
@@ -477,7 +492,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
-  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "city": "NYC", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
   crow::request req;
   req.add_header("API-Key", "ghi789CLN");
   req.body = body;
@@ -487,6 +502,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       {"provider", "City Hospital"},
       {"serviceType", "Emergency"},
       {"location", "456 Elm St"},
+      {"city", "NYC"},
       {"operatingHours", "24/7"},
       {"contactInfo", "987-654-3210"}
   };

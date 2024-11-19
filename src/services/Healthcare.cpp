@@ -124,8 +124,8 @@ std::string Healthcare::printHealthcareServices(
 std::string Healthcare::validateHealthcareServiceInput(const std::map<std::string, std::string>& content) {
     std::string missingFields;
 
-    std::unordered_set<std::string> requiredFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo"};
-    std::unordered_set<std::string> allowedFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo", "eligibilityCriteria"};
+    std::unordered_set<std::string> requiredFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo", "city"};
+    std::unordered_set<std::string> allowedFields = {"provider", "serviceType", "location", "operatingHours", "contactInfo", "eligibilityCriteria", "city"};
 
     for (const auto& field : requiredFields) {
         if (content.find(field) == content.end()) {
