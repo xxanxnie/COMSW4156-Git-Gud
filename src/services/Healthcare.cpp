@@ -8,7 +8,15 @@
 #include <unordered_set>
 
 #include "DatabaseManager.h"
-
+/*
+Name:	provider
+Address	
+Category	
+Description: serviceType	
+ContactInfo
+eligibilityCriteria
+Hours of Operation
+*/
 /**
  * @brief Adds a new healthcare service to the database.
  *

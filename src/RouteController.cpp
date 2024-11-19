@@ -115,21 +115,7 @@ void RouteController::addShelter(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        content.push_back(element.get_utf8().value.to_string());
-      }
-    }
-    int capacity = atoi(content[3].c_str());
-    int current = atoi(content[4].c_str());
-    if (capacity <= 0 || current > capacity) {
-      throw std::invalid_argument("The request with invalid argument.");
-    }
-
-    std::string result = shelterManager.addShelter(
-        content[0], content[1], content[2], capacity, current);
+    std::string result = shelterManager.addShelter(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);

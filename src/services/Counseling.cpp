@@ -11,7 +11,14 @@
 #include <vector>
 
 #include "DatabaseManager.h"
-
+/*
+Name
+counselorName
+Address	
+Description: specialty
+ContactInfo 
+Hours of Operation
+*/
 /**
  * @brief Constructs a Counseling object.
  * @param dbManager Reference to the DatabaseManager object.

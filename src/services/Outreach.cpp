@@ -1,7 +1,14 @@
 // Copyright 2024 COMSW4156-Git-Gud
 
 #include "Outreach.h"
-
+/*
+Name: programName	
+Address	
+Description	
+TargetAudience
+ContactInfo
+Hours of Operation
+*/
 /**
  * @brief Add the outreach program information to the database.
  *

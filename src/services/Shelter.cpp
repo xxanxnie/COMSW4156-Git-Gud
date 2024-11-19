@@ -1,6 +1,24 @@
 // Copyright 2024 COMSW4156-Git-Gud
 #include "Shelter.h"
-
+/* property in database
+Name
+City
+Address
+Description
+ContactInfo
+HoursOfOperation
+Capacity
+CurrentUse
+*/
+Shelter::Shelter(DatabaseManager &dbManager, std::string collection_name)
+    : dbManager(dbManager), collection_name(collection_name) {
+  std::vector<std::string> cols({"Name", "City", "Address", "Description",
+                             "ContactInfo", "HoursOfOperation", "Capacity",
+                             "CurrentUse"});
+  for (auto name : cols) {
+    format[name] = "";
+  }
+}
 /**
  * Add the shelter information to our database
  *
@@ -11,13 +29,24 @@
  * @param curUse       The current users that using this shelter.
  * @return item ID in database or Error message
  */
-std::string Shelter::addShelter(std::string ORG, std::string User,
-                                std::string location, int capacity,
-                                int curUse) {
+std::string Shelter::addShelter(std::string request_body) {
   try {
-    auto content = createDBContent(
-        ORG, User, location, std::to_string(capacity), std::to_string(curUse));
-    std::string ID = dbManager.insertResource(collection_name, content);
+    auto resource = bsoncxx::from_json(request_body);
+    std::vector<std::string> content;
+    for (auto element : resource.view()) {
+      if (element.key().to_string() != "id") {
+        content.push_back(element.get_utf8().value.to_string());
+      }
+    }
+    int capacity = atoi(content[3].c_str());
+    int current = atoi(content[4].c_str());
+    if (capacity <= 0 || current > capacity) {
+      throw std::invalid_argument("The request with invalid argument.");
+    }
+
+    auto content_new = createDBContent(
+        content[0], content[1], content[2], content[3], content[4]);
+    std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());

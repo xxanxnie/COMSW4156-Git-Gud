@@ -33,7 +33,8 @@ TEST_F(ShelterUnitTests, AddNewShelter) {
             EXPECT_EQ(content, expectedContent);
             return "12345";
           });
-  std::string ret = shelter->addShelter("tmp", "tmp", "tmp", 1, 0);
+  std::string ret = shelter->addShelter(
+      "{\"rwe\":\"tmp\",\"wre\": \"tmp\", \"wer\":\"tmp\",\"wer\": \"1\", \"rer\":\"0\"}");
   EXPECT_EQ(ret, "12345");
 }
 
@@ -78,8 +79,7 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
 
 TEST_F(ShelterUnitTests, DeleteShelter) {
   std::string id_temp = "123456789";
-  ON_CALL(*mockDbManager,
-          deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
                          const std::string& resourceId) {
         EXPECT_EQ(resourceId, id_temp);

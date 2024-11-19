@@ -4,6 +4,15 @@
 
 #include <iostream>
 
+/*
+Name: Provider	
+Address	
+Description: FoodType	
+ContactInfo 
+Hours of Operation
+Quantity
+ExpirationDate
+*/
 Food::Food(DatabaseManager& db) : db(db) {}
 
 /**
