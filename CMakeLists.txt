@@ -56,6 +56,7 @@ set(SOURCE_FILES
     src/main.cpp 
     src/RouteController.cpp
     src/DatabaseManager.cpp
+    src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
@@ -75,6 +76,7 @@ set(TEST_FILES
 set(SOURCE_FILES_NO_MAIN
     src/RouteController.cpp
     src/DatabaseManager.cpp
+    src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
