@@ -12,13 +12,11 @@ class Shelter {
  public:
   Shelter(DatabaseManager& dbManager, std::string collection_name);
   void cleanCache();
-  void checkInputFormat(std::string content);
+  std::string checkInputFormat(std::string content);
   virtual std::string addShelter(std::string request_body);
   virtual std::string deleteShelter(std::string id);
   virtual std::string searchShelterAll();
-  virtual std::string updateShelter(std::string id, std::string ORG,
-                                    std::string User, std::string location,
-                                    int capacity, int curUse);
+  virtual std::string updateShelter(std::string request_body);
   std::vector<std::pair<std::string, std::string>> createDBContent();
   std::string printShelters(
       std::vector<bsoncxx::document::value>& shelters) const;

@@ -121,7 +121,7 @@ void RouteController::addShelter(const crow::request& req,
       res.write(result);
     } else {
       res.code = 201;
-      res.write("Shelter resource added successfully.");
+      res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
@@ -148,26 +148,14 @@ void RouteController::updateShelter(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
-    std::string id = "";
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {
-        content.push_back(element.get_utf8().value.to_string());
-      }
-      if (element.key().to_string() == "id") {
-        id = element.get_utf8().value.to_string();
-      }
+    std::string result = shelterManager.updateShelter(req.body);
+    if (result.find("Error") != std::string::npos) {
+      res.code = 400;
+      res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Shelter resource update successfully.");
     }
-    int capacity = atoi(content[3].c_str());
-    int current = atoi(content[4].c_str());
-    if (capacity <= 0 || current > capacity) {
-      throw std::invalid_argument("The request with invalid argument.");
-    }
-    shelterManager.updateShelter(id, content[0], content[1], content[2],
-                                 capacity, current);
-    res.code = 201;
-    res.write("Shelter resource update successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);

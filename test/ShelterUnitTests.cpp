@@ -71,6 +71,14 @@ TEST_F(ShelterUnitTests, searchShelterAll) {
 }
 
 TEST_F(ShelterUnitTests, UpdateShelter) {
+  shelter->checkInputFormat(R"({
+        "id":"123456789" ,
+        "CurrentUse" : "10", "Capacity" : "100", 
+        "TargetUser" : "HML", "ORG" : "NGO", 
+        "HoursOfOperation" : "2024-01-11", 
+        "ContactInfo" : "66664566565", "Description" : "NULL", 
+        "Address" : "temp", "City" : "New York", "Name" : "temp"
+        })");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       shelter->createDBContent();
   std::string id_temp = "123456789";
@@ -83,7 +91,15 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
             EXPECT_EQ(collectionName, "ShelterTest");
             EXPECT_EQ(content, expectedContent);
           });
-  std::string ret = shelter->updateShelter(id_temp, "tmp", "tmp", "tmp", 1, 0);
+  std::string ret = shelter->updateShelter(
+      R"({
+        "id":"123456789" ,
+        "CurrentUse" : "10", "Capacity" : "100", 
+        "TargetUser" : "HML", "ORG" : "NGO", 
+        "HoursOfOperation" : "2024-01-11", 
+        "ContactInfo" : "66664566565", "Description" : "NULL", 
+        "Address" : "temp", "City" : "New York", "Name" : "temp"
+        })");
   EXPECT_EQ(ret, "Update");
 }
 

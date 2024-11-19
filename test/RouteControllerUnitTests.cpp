@@ -20,8 +20,7 @@ class MockShelter : public Shelter {
   MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
   MOCK_METHOD(std::string, searchShelterAll, (), (override));
   MOCK_METHOD(std::string, updateShelter,
-              (std::string id, std::string ORG, std::string User,
-               std::string location, int capacity, int curUse),
+              (std::string request_body),
               (override));
 };
 
@@ -161,7 +160,6 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
   routeController->addShelter(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Shelter resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {

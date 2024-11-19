@@ -62,7 +62,7 @@ std::string DatabaseManager::insertResource(
   auto collection = (*conn)["GitGud"][collectionName];
   auto item = collection.insert_one(createDocument(keyValues).view());
   std::cout << item->inserted_id().get_oid().value.to_string() << std::endl;
-  return  item->inserted_id().get_oid().value.to_string();
+  return item->inserted_id().get_oid().value.to_string();
 }
 
 bool DatabaseManager::deleteResource(const std::string &collectionName,
@@ -100,10 +100,16 @@ void DatabaseManager::updateResource(
   }
   updateDoc << bsoncxx::builder::stream::close_document;
   bsoncxx::oid oid(resourceId);
-  collection.update_one(bsoncxx::builder::stream::document{}
-                            << "_id" << oid
-                            << bsoncxx::builder::stream::finalize,
-                        updateDoc.view());
+  auto check = collection.find_one(bsoncxx::builder::stream::document{}
+                                   << "_id" << oid
+                                   << bsoncxx::builder::stream::finalize);
+  if (!check) {
+    throw std::invalid_argument("The request with wrong id.");
+  }
+  auto result = collection.update_one(bsoncxx::builder::stream::document{}
+                                          << "_id" << oid
+                                          << bsoncxx::builder::stream::finalize,
+                                      updateDoc.view());
 }
 
 void DatabaseManager::findResource(const std::string &collectionName,

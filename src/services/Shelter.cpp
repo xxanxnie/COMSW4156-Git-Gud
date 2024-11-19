@@ -24,12 +24,17 @@ void Shelter::cleanCache() {
     format[name] = "";
   }
 }
-void Shelter::checkInputFormat(std::string content) {
+std::string Shelter::checkInputFormat(std::string content) {
   auto resource = bsoncxx::from_json(content);
+  std::string id;
   for (auto element : resource.view()) {
     if (format.find(element.key().to_string()) != format.end()) {
       format[element.key().to_string()] = element.get_utf8().value.to_string();
     } else {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+        continue;
+      }
       throw std::invalid_argument("The request with unrelative argument.");
     }
   }
@@ -43,6 +48,7 @@ void Shelter::checkInputFormat(std::string content) {
       throw std::invalid_argument("The request missing some properties.");
     }
   }
+  return id;
 }
 /**
  * Add the shelter information to our database
@@ -125,12 +131,12 @@ std::string Shelter::printShelters(
   return ret;
 }
 
-std::string Shelter::updateShelter(std::string id, std::string ORG,
-                                   std::string User, std::string location,
-                                   int capacity, int curUse) {
+std::string Shelter::updateShelter(std::string request_body) {
   try {
-    auto content = createDBContent();
-    dbManager.updateResource(collection_name, id, content);
+    cleanCache();
+    std::string id = checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
   }
