@@ -77,6 +77,7 @@ set(SOURCE_FILES_NO_MAIN
     src/RouteController.cpp
     src/DatabaseManager.cpp
     src/SubscriptionManager.cpp
+    src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
@@ -111,6 +112,13 @@ target_link_libraries(GitGud PRIVATE
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    PocoFoundation
+    PocoNet
+    PocoNetSSL
+    PocoCrypto
+    PocoUtil
+    ssl
+    crypto
 )
 
 enable_testing()
@@ -131,6 +139,13 @@ target_link_libraries(GitGudTests PRIVATE
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    PocoFoundation
+    PocoNet
+    PocoNetSSL
+    PocoCrypto
+    PocoUtil
+    ssl
+    crypto
 )
 
 include(GoogleTest)
