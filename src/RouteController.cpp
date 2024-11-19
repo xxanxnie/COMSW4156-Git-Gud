@@ -652,10 +652,19 @@ void RouteController::addHealthcareService(const crow::request& req,
   }
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
+    
+    auto resource = bsoncxx::from_json(req.body);
+    std::string city = "";
+
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "city") city = element.get_utf8().value.to_string();
+    }
+
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
     } else {
+      subscriptionManager.notifySubscribers("healthcare", city);  
       res.code = 201;
       res.write(result);
     }
@@ -742,6 +751,42 @@ void RouteController::deleteHealthcareService(const crow::request& req,
     }
 
     std::string msg = healthcareManager.deleteHealthcare(id);
+    res.code = 201;
+    res.write(msg);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    res.end();
+  }
+}
+
+void RouteController::subscribeToResources(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToGetAll(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::map<std::string, std::string> content;
+
+    for (auto element : resource.view()) {
+      content[element.key().to_string()] = element.get_utf8().value.to_string();
+    }
+
+    if (content.find("resources") == content.end() || 
+        content.find("city") == content.end() || 
+        content.find("contact") == content.end()) {
+      res.code = 400;
+      res.write("Error: Missing required fields (id, resources, city, or contact).");
+      res.end();
+      return;
+    }
+
+    std::string msg = subscriptionManager.addSubscriber(content);
+
     res.code = 201;
     res.write(msg);
     res.end();
@@ -869,5 +914,11 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::DELETE)(
           [this](const crow::request& req, crow::response& res) {
             deleteHealthcareService(req, res);
+          });
+
+  CROW_ROUTE(app, "/resources/subscribe")
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
+            subscribeToResources(req, res);
           });
 }

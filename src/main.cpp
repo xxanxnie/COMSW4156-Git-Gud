@@ -12,6 +12,7 @@
 #include "Outreach.h"
 #include "RouteController.h"
 #include "Shelter.h"
+#include "SubscriptionManager.h"
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
@@ -44,6 +45,7 @@ int main(int argc, char* argv[]) {
   dbManager.createCollection("Outreach");
   dbManager.createCollection("Shelter");
   dbManager.createCollection("Counseling");
+  dbManager.createCollection("Subscribers");
 
   crow::SimpleApp app;
 
@@ -52,8 +54,9 @@ int main(int argc, char* argv[]) {
   Food food(dbManager);
   Outreach outreach(dbManager, "OutreachService");
   Healthcare healthcare(dbManager, "HealthcareService");
+  SubscriptionManager subscriptionManager(dbManager);
 
-  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food);
+  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food, subscriptionManager);
   routeController.initRoutes(app);  
   app.port(8080).multithreaded().run();
 
