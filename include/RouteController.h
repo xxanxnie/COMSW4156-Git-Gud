@@ -56,6 +56,8 @@ class RouteController {
   // Outreach-related handlers
   void addOutreachService(const crow::request& req, crow::response& res);
   void getAllOutreachServices(const crow::request& req, crow::response& res);
+  void updateOutreach(const crow::request& req, crow::response& res);
+  void deleteOutreach(const crow::request& req, crow::response& res);
 
   // Food-related handlers
   void addFood(const crow::request& req, crow::response& res);
