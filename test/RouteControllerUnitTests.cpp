@@ -28,15 +28,12 @@ class MockCounseling : public Counseling {
   explicit MockCounseling(DatabaseManager* dbManager)
       : Counseling(*dbManager) {}
 
-  MOCK_METHOD(std::string, addCounselor,
-              (const std::string& counselorName, const std::string& specialty),
+  MOCK_METHOD(std::string, addCounselor, (std::string request_body),
               (override));
   MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId),
               (override));
   MOCK_METHOD(std::string, searchCounselorsAll, (), (override));
-  MOCK_METHOD(std::string, updateCounselor,
-              (const std::string& counselorId, const std::string& field,
-               const std::string& value),
+  MOCK_METHOD(std::string, updateCounselor, (std::string request_body),
               (override));
 };
 
@@ -216,20 +213,26 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
-  std::string body =
-      R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
+  std::string body = R"({
+        "Name" : "OrganicFarm",
+        "City" : "New York",
+        "Address": "temp",
+        "Description" : "Vegetables",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "def456VOL");
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
-      .WillByDefault(::testing::Return("Success"));
+  ON_CALL(*mockCounseling, addCounselor(body))
+      .WillByDefault(::testing::Return("Suc"));
 
   routeController->addCounseling(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Counseling resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
@@ -248,14 +251,21 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
-  std::string body =
-      R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
+  std::string body = R"({
+        "Name" : "New York Psychological Association",
+        "City" : "New York",
+        "Address": "211 E 43rd St, New York, NY 10017",
+        "Description" : "Provides mental health counseling and therapy services.",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
+  ON_CALL(*mockCounseling, addCounselor(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addCounseling(req, res);
@@ -338,8 +348,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockFood, addFood(input))
-      .WillByDefault(::testing::Return("12345"));
+  ON_CALL(*mockFood, addFood(input)).WillByDefault(::testing::Return("12345"));
 
   routeController->addFood(req, res);
 

@@ -46,8 +46,18 @@ TEST_F(CounselingUnitTests, SearchCounselorsAll) {
 }
 
 TEST_F(CounselingUnitTests, AddCounselor) {
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"counselorName", "Jane Smith"}, {"specialty", "Family Therapy"}};
+  std::string input = R"({
+        "Name" : "OrganicFarm",
+        "City" : "New York",
+        "Address": "temp",
+        "Description" : "Vegetables",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
+  counseling->checkInputFormat(input);
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      counseling->createDBContent();
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(::testing::Invoke(
@@ -58,7 +68,7 @@ TEST_F(CounselingUnitTests, AddCounselor) {
             return "12345";
           }));
 
-  std::string result = counseling->addCounselor("Jane Smith", "Family Therapy");
+  std::string result = counseling->addCounselor(input);
 
   EXPECT_EQ(result, "12345");
 }

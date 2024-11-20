@@ -14,9 +14,10 @@
 /*
 Name
 counselorName
-Address	
+City
+Address
 Description: specialty
-ContactInfo 
+ContactInfo
 Hours of Operation
 */
 /**
@@ -24,25 +25,59 @@ Hours of Operation
  * @param dbManager Reference to the DatabaseManager object.
  */
 Counseling::Counseling(DatabaseManager &dbManager)
-    : dbManager(dbManager), collection_name("Counseling") {}
-
+    : dbManager(dbManager), collection_name("Counseling") {
+  cols = std::vector<std::string>({"Name", "counselorName", "City", "Address",
+                                   "Description", "ContactInfo",
+                                   "HoursOfOperation"});
+  cleanCache();
+}
+void Counseling::cleanCache() {
+  for (auto name : cols) {
+    format[name] = "";
+  }
+}
+std::string Counseling::checkInputFormat(std::string content) {
+  auto resource = bsoncxx::from_json(content);
+  std::string id;
+  for (auto element : resource.view()) {
+    if (format.find(element.key().to_string()) != format.end()) {
+      format[element.key().to_string()] = element.get_utf8().value.to_string();
+    } else {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+        continue;
+      }
+      cleanCache();
+      throw std::invalid_argument(
+          "Counseling: The request with unrelative argument.");
+    }
+  }
+  for (auto property : format) {
+    if (property.second == "") {
+      cleanCache();
+      throw std::invalid_argument(
+          "Counseling: The request missing some properties.");
+    }
+  }
+  return id;
+}
 /**
  * @brief Adds a new counselor to the database.
  * @param counselorName The name of the counselor.
  * @param specialty The specialty of the counselor.
  * @return A string indicating ID or an error message.
  */
-std::string Counseling::addCounselor(const std::string &counselorName,
-                                     const std::string &specialty) {
-  auto content = createDBContent(counselorName, specialty);
-  std::string ID = "";
+std::string Counseling::addCounselor(std::string request_body) {
   try {
-    ID = dbManager.insertResource(collection_name, content);
+    cleanCache();
+    checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    std::string ID = dbManager.insertResource(collection_name, content_new);
+    return ID;
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
     return "Error: " + std::string(e.what());
   }
-  return ID;
 }
 
 /**
@@ -51,11 +86,11 @@ std::string Counseling::addCounselor(const std::string &counselorName,
  * @param specialty The specialty of the counselor.
  * @return A vector of key-value pairs representing the counselor's data.
  */
-std::vector<std::pair<std::string, std::string>> Counseling::createDBContent(
-    const std::string &counselorName, const std::string &specialty) {
+std::vector<std::pair<std::string, std::string>> Counseling::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
-  content.push_back({"counselorName", counselorName});
-  content.push_back({"specialty", specialty});
+  for (auto property : format) {
+    content.push_back(property);
+  }
   return content;
 }
 
@@ -69,7 +104,8 @@ std::string Counseling::deleteCounselor(const std::string &counselorId) {
   if (dbManager.deleteResource(collection_name, counselorId)) {
     return "Success";
   }
-  throw std::runtime_error("Document with the specified _id not found.");
+  throw std::runtime_error(
+      "Counseling: Document with the specified _id not found.");
 }
 
 /**
@@ -96,12 +132,12 @@ std::string Counseling::searchCounselorsAll() {
  * @return A string indicating the result of the operation.
  * @todo Implement counselor update logic.
  */
-std::string Counseling::updateCounselor(const std::string &counselorId,
-                                        const std::string &counselorName,
-                                        const std::string &specialty) {
+std::string Counseling::updateCounselor(std::string request_body) {
   try {
-    auto content = createDBContent(counselorName, specialty);
-    dbManager.updateResource(collection_name, counselorId, content);
+    cleanCache();
+    std::string id = checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception &e) {
     return "Error: " + std::string(e.what());
   }

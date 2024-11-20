@@ -35,17 +35,22 @@ std::string Shelter::checkInputFormat(std::string content) {
         id = element.get_utf8().value.to_string();
         continue;
       }
-      throw std::invalid_argument("The request with unrelative argument.");
+      cleanCache();
+      throw std::invalid_argument(
+          "Shelter: The request with unrelative argument.");
     }
   }
   int capacity = atoi(format["Capacity"].c_str());
   int current = atoi(format["CurrentUse"].c_str());
   if (capacity <= 0 || current > capacity) {
-    throw std::invalid_argument("The request with invalid argument.");
+    cleanCache();
+    throw std::invalid_argument("Shelter: The request with invalid argument.");
   }
   for (auto property : format) {
     if (property.second == "") {
-      throw std::invalid_argument("The request missing some properties.");
+      cleanCache();
+      throw std::invalid_argument(
+          "Shelter: The request missing some properties.");
     }
   }
   return id;
@@ -146,5 +151,6 @@ std::string Shelter::deleteShelter(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "SUC";
   }
-  throw std::runtime_error("Shelter Document with the specified _id not found.");
+  throw std::runtime_error(
+      "Shelter Document with the specified _id not found.");
 }

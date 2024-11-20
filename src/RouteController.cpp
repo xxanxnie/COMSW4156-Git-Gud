@@ -247,24 +247,20 @@ void RouteController::addCounseling(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::string counselorName =
-        resource["counselorName"].get_utf8().value.to_string();
-    std::string specialty = resource["specialty"].get_utf8().value.to_string();
-
     std::string result =
-        counselingManager.addCounselor(counselorName, specialty);
+        counselingManager.addCounselor(req.body);
 
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
     } else {
       res.code = 201;
-      res.write("Counseling resource added successfully.");
+      res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -286,34 +282,18 @@ void RouteController::updateCounseling(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::string id = "";
-    std::string counselorName = "";
-    std::string specialty = "";
-
-    for (auto element : resource.view()) {
-      if (element.key().to_string() == "id") {
-        id = element.get_utf8().value.to_string();
-      } else if (element.key().to_string() == "counselorName") {
-        counselorName = element.get_utf8().value.to_string();
-      } else if (element.key().to_string() == "specialty") {
-        specialty = element.get_utf8().value.to_string();
-      }
-    }
-
-    std::string result =
-        counselingManager.updateCounselor(id, counselorName, specialty);
-
-    if (result == "Success") {
-      res.code = 200;
-      res.write("Counseling resource updated successfully.");
-    } else {
+    std::string result = counselingManager.updateCounselor(req.body);
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+    } else {
+      res.code = 200;
+      res.write("Counseling resource update successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -353,6 +333,7 @@ void RouteController::deleteCounseling(const crow::request& req,
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -515,7 +496,7 @@ void RouteController::updateFood(const crow::request& req,
       res.code = 400;
       res.write(result);
     } else {
-      res.code = 201;
+      res.code = 200;
       res.write("Food resource update successfully.");
     }
     res.end();
