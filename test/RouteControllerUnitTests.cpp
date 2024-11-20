@@ -51,11 +51,7 @@ class MockOutreachService : public Outreach {
                       const std::string& collection_name)
       : Outreach(*dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addOutreachService,
-              (const std::string& targetAudience,
-               const std::string& programName, const std::string& description,
-               const std::string& programDate, const std::string& location,
-               const std::string& contactInfo),
+  MOCK_METHOD(std::string, addOutreachService, (std::string request_body),
               (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (), (override));
 };
@@ -370,20 +366,27 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
   std::string body =
-      R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
+      R"({
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
   crow::request req;
   req.add_header("API-Key", "def456VOL");
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService("Youth", "OutreachProgram", "Help",
-                                            "2023-01-01", "NYC", "123-456"))
+  ON_CALL(*mockOutreach, addOutreachService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "OutreachService resource added successfully.");
+  EXPECT_EQ(res.body, "Success");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
@@ -403,14 +406,21 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
   std::string body =
-      R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
+      R"({
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService("Youth", "OutreachProgram", "Help",
-                                            "2023-01-01", "NYC", "123-456"))
+  ON_CALL(*mockOutreach, addOutreachService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);

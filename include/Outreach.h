@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -12,36 +13,26 @@
 
 class Outreach {
  public:
-  Outreach(DatabaseManager& dbManager, const std::string& collection_name)
-      : dbManager(dbManager), collection_name(collection_name) {}
+  Outreach(DatabaseManager& dbManager, const std::string& collection_name);
 
   std::string collection_name;
+  void cleanCache();
+  std::string checkInputFormat(std::string content);
+  std::unordered_map<std::string, std::string> format;
+  virtual std::string addOutreachService(std::string request_body);
 
-  virtual std::string addOutreachService(const std::string& targetAudience,
-                                         const std::string& programName,
-                                         const std::string& description,
-                                         const std::string& programDate,
-                                         const std::string& location,
-                                         const std::string& contactInfo);
-
-  std::vector<std::pair<std::string, std::string>> createDBContent(
-      const std::string& targetAudience, const std::string& programName,
-      const std::string& description, const std::string& programDate,
-      const std::string& location, const std::string& contactInfo);
+  std::vector<std::pair<std::string, std::string>> createDBContent();
 
   virtual std::string getAllOutreachServices();
   virtual std::string deleteOutreach(std::string id);
-  virtual std::string updateOutreach(const std::string& id, 
-                                   const std::string& targetAudience, 
-                                   const std::string& programName,
-                                   const std::string& description,
-                                   const std::string& programDate,
-                                   const std::string& location,
-                                   const std::string& contactInfo);
+  virtual std::string updateOutreach(std::string request_body);
 
-  std::string printOutreachServices(const std::vector<bsoncxx::document::value>& services) const;
+  std::string printOutreachServices(
+      const std::vector<bsoncxx::document::value>& services) const;
+
  private:
   DatabaseManager& dbManager;
+  std::vector<std::string> cols;
 };
 
 #endif  // OUTREACH_H

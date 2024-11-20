@@ -2,13 +2,52 @@
 
 #include "Outreach.h"
 /*
-Name: programName	
-Address	
-Description	
+Name: programName
+City
+Address
+Description
 TargetAudience
 ContactInfo
 Hours of Operation
 */
+Outreach::Outreach(DatabaseManager& dbManager,
+                   const std::string& collection_name)
+    : dbManager(dbManager), collection_name(collection_name) {
+  cols = std::vector<std::string>({"Name", "City", "Address", "Description",
+                                   "ContactInfo", "HoursOfOperation",
+                                   "TargetAudience"});
+  cleanCache();
+}
+void Outreach::cleanCache() {
+  for (auto name : cols) {
+    format[name] = "";
+  }
+}
+std::string Outreach::checkInputFormat(std::string content) {
+  auto resource = bsoncxx::from_json(content);
+  std::string id;
+  for (auto element : resource.view()) {
+    if (format.find(element.key().to_string()) != format.end()) {
+      format[element.key().to_string()] = element.get_utf8().value.to_string();
+    } else {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+        continue;
+      }
+      cleanCache();
+      throw std::invalid_argument(
+          "Outreach: The request with unrelative argument.");
+    }
+  }
+  for (auto property : format) {
+    if (property.second == "") {
+      cleanCache();
+      throw std::invalid_argument(
+          "Outreach: The request missing some properties.");
+    }
+  }
+  return id;
+}
 /**
  * @brief Add the outreach program information to the database.
  *
@@ -23,20 +62,16 @@ Hours of Operation
  * @param contactInfo Contact information for the outreach program.
  * @return A string indicating the ID or failure of the operation.
  */
-std::string Outreach::addOutreachService(const std::string& targetAudience,
-                                         const std::string& programName,
-                                         const std::string& description,
-                                         const std::string& programDate,
-                                         const std::string& location,
-                                         const std::string& contactInfo) {
+std::string Outreach::addOutreachService(std::string request_body) {
   try {
-    auto content = createDBContent(targetAudience, programName, description,
-                                   programDate, location, contactInfo);
-    std::string ID = dbManager.insertResource(collection_name, content);
+    cleanCache();
+    checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
-    return "Error";
+    return "Error: " + std::string(e.what());
   }
 }
 
@@ -55,17 +90,11 @@ std::string Outreach::addOutreachService(const std::string& targetAudience,
  * @return A vector of key-value pairs representing the outreach program
  * content.
  */
-std::vector<std::pair<std::string, std::string>> Outreach::createDBContent(
-    const std::string& targetAudience, const std::string& programName,
-    const std::string& description, const std::string& programDate,
-    const std::string& location, const std::string& contactInfo) {
+std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
-  content.push_back({"targetAudience", targetAudience});
-  content.push_back({"programName", programName});
-  content.push_back({"description", description});
-  content.push_back({"programDate", programDate});
-  content.push_back({"location", location});
-  content.push_back({"contactInfo", contactInfo});
+  for (auto property : format) {
+    content.push_back(property);
+  }
   return content;
 }
 
@@ -81,10 +110,16 @@ std::vector<std::pair<std::string, std::string>> Outreach::createDBContent(
 std::string Outreach::getAllOutreachServices() {
   std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
-  if (result.empty()) {
-    return "[]";
+  if (result.size() > 0) {
+    bsoncxx::builder::basic::array arrayBuilder;
+    for (const auto &doc : result) {
+      arrayBuilder.append(doc.view());
+    }
+    std::cout << printOutreachServices(result);
+    // getShelterID(result[0]);
+    return bsoncxx::to_json(arrayBuilder.view());
   }
-  return printOutreachServices(result);
+  return "[]";
 }
 
 /**
@@ -118,46 +153,16 @@ std::string Outreach::deleteOutreach(std::string id) {
   throw std::runtime_error("Document with the specified _id not found.");
 }
 
-std::string Outreach::updateOutreach(
-    const std::string& id, 
-    const std::string& targetAudience, 
-    const std::string& programName,
-    const std::string& description,
-    const std::string& programDate,
-    const std::string& location,
-    const std::string& contactInfo) {
-
+std::string Outreach::updateOutreach(std::string request_body) {
   try {
-    // Create a vector of key-value pairs for the updates
-    std::vector<std::pair<std::string, std::string>> updates;
-
-    // Only add non-empty fields to the update list
-    if (!targetAudience.empty()) {
-      updates.push_back({"targetAudience", targetAudience});
-    }
-    if (!programName.empty()) {
-      updates.push_back({"programName", programName});
-    }
-    if (!description.empty()) {
-      updates.push_back({"description", description});
-    }
-    if (!programDate.empty()) {
-      updates.push_back({"programDate", programDate});
-    }
-    if (!location.empty()) {
-      updates.push_back({"location", location});
-    }
-    if (!contactInfo.empty()) {
-      updates.push_back({"contactInfo", contactInfo});
-    }
-
-    // Call the updateResource method in DatabaseManager to apply the updates
-    dbManager.updateResource("outreachServices", id, updates);
+    cleanCache();
+    std::string id = checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception& e) {
     // Return error message if there is an exception
     return "Error: " + std::string(e.what());
   }
-
   // Return success message
   return "Outreach Service updated successfully.";
 }

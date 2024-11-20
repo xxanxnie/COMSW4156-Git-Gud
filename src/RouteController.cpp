@@ -530,29 +530,13 @@ void RouteController::addOutreachService(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    // Initialize the OutreachService
-    std::vector<std::string> content;
-
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {  // Exclude ID if present
-        content.push_back(element.get_utf8().value.to_string());
-      }
-    }
-
-    if (content.size() < 6) {
-      throw std::runtime_error("Not enough data to add OutreachService.");
-    }
-
-    std::string result = outreachManager.addOutreachService(
-        content[0], content[1], content[2], content[3], content[4], content[5]);
-
+    std::string result = outreachManager.addOutreachService(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
     } else {
       res.code = 201;
-      res.write("OutreachService resource added successfully.");
+      res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
@@ -592,23 +576,8 @@ void RouteController::getAllOutreachServices(const crow::request& req,
   }
 }
 
-/**
- * @brief Adds a new outreach service resource.
- *
- * This method extracts the outreach service details from the incoming
- * HTTP request, processes the data, and adds it to the database using
- * the Outreach class. It constructs the response based on
- * the outcome of the operation.
- *
- * @param req The HTTP request containing the outreach service data in JSON
- * format.
- * @param res The HTTP response that will be sent back to the client.
- *
- * @throws std::runtime_error if there is not enough data to add the outreach
- * service.
- */
-void RouteController::addOutreachService(const crow::request& req,
-                                         crow::response& res) {
+void RouteController::updateOutreach(const crow::request& req,
+                                     crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -617,93 +586,23 @@ void RouteController::addOutreachService(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
-
-    for (auto element : resource.view()) {
-      if (element.key().to_string() != "id") {  // Exclude ID if present
-        content.push_back(element.get_utf8().value.to_string());
-      }
-    }
-
-    if (content.size() < 6) {
-      throw std::runtime_error("Not enough data to add OutreachService.");
-    }
-
-    outreachManager.addOutreachService(content[0], content[1], content[2],
-                                       content[3], content[4], content[5]);
-
-    res.code = 201;
-    res.write("OutreachService resource added successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);  // Custom exception handling
-  }
-}
-
-void RouteController::updateOutreach(const crow::request& req, crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
-    return;
-  }
-
-  try {
-    // parse the incoming request JSON
-    auto resource = bsoncxx::from_json(req.body);
-    
-    std::string id;
-    std::string targetAudience;
-    std::string programName;
-    std::string description;
-    std::string programDate;
-    std::string location;
-    std::string contactInfo;
-
-    // extract the data from the JSON body
-    for (auto element : resource.view()) {
-      std::string key = element.key().to_string();
-      if (key == "id") {
-        id = element.get_utf8().value.to_string();
-      } else if (key == "targetAudience") {
-        targetAudience = element.get_utf8().value.to_string();
-      } else if (key == "programName") {
-        programName = element.get_utf8().value.to_string();
-      } else if (key == "description") {
-        description = element.get_utf8().value.to_string();
-      } else if (key == "programDate") {
-        programDate = element.get_utf8().value.to_string();
-      } else if (key == "location") {
-        location = element.get_utf8().value.to_string();
-      } else if (key == "contactInfo") {
-        contactInfo = element.get_utf8().value.to_string();
-      }
-    }
-
-    if (id.empty()) {       // need id to update 
+    std::string result = outreachManager.updateOutreach(req.body);
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
-      res.write("Missing outreach service ID.");
-      res.end();
-      return;
+      res.write(result);
+    } else {
+      res.code = 200;
+      res.write("Outreach resource update successfully.");
     }
-
-    outreachManager.updateOutreach(id, targetAudience, programName, 
-                                          description, programDate, location, contactInfo);
-
-    // success response message
-    res.code = 200; 
-    res.write("OutreachService resource updated successfully.");
     res.end();
-
   } catch (const std::exception& e) {
-    res = handleException(e);  // Custom exception handler
+    res = handleException(e);
+    res.end();
   }
 }
-
 
 void RouteController::deleteOutreach(const crow::request& req,
-                                    crow::response& res) {
+                                     crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -972,4 +871,3 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
             deleteHealthcareService(req, res);
           });
 }
-
