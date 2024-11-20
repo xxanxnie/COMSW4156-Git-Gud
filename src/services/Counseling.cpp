@@ -149,12 +149,12 @@ std::string Counseling::updateCounselor(std::string request_body) {
  * @param counselor The BSON document containing the counselor's information.
  * @return The ID of the counselor as a string.
  */
-std::string Counseling::getCounselorID(
-    const bsoncxx::document::view &counselor) {
-  std::string id = counselor["_id"].get_oid().value.to_string();
-  std::cout << id << std::endl;
-  return id;
-}
+// std::string Counseling::getCounselorID(
+//     const bsoncxx::document::view &counselor) {
+//   std::string id = counselor["_id"].get_oid().value.to_string();
+//   std::cout << id << std::endl;
+//   return id;
+// }
 
 /**
  * @brief Converts a vector of BSON documents to a JSON string.

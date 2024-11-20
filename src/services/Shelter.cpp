@@ -117,10 +117,10 @@ std::string Shelter::searchShelterAll() {
   return "[]";
 }
 
-std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
-  std::string id = shelter["_id"].get_oid().value.to_string();
-  return id;
-}
+// std::string Shelter::getShelterID(bsoncxx::document::value &shelter) {
+//   std::string id = shelter["_id"].get_oid().value.to_string();
+//   return id;
+// }
 
 std::string Shelter::printShelters(
     std::vector<bsoncxx::document::value> &shelters) const {

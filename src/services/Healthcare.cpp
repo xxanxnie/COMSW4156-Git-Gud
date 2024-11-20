@@ -175,28 +175,28 @@ std::string Healthcare::printHealthcareServices(
   return ret;
 }
 
-std::string Healthcare::validateHealthcareServiceInput(
-    const std::map<std::string, std::string>& content) {
-  std::string missingFields;
+// std::string Healthcare::validateHealthcareServiceInput(
+//     const std::map<std::string, std::string>& content) {
+//   std::string missingFields;
 
-  std::unordered_set<std::string> requiredFields = {
-      "provider", "serviceType", "location", "operatingHours", "contactInfo"};
-  std::unordered_set<std::string> allowedFields = {
-      "provider",       "serviceType", "location",
-      "operatingHours", "contactInfo", "eligibilityCriteria"};
+//   std::unordered_set<std::string> requiredFields = {
+//       "provider", "serviceType", "location", "operatingHours", "contactInfo"};
+//   std::unordered_set<std::string> allowedFields = {
+//       "provider",       "serviceType", "location",
+//       "operatingHours", "contactInfo", "eligibilityCriteria"};
 
-  for (const auto& field : requiredFields) {
-    if (content.find(field) == content.end()) {
-      missingFields += "Missing " + field + ". ";
-    }
-  }
+//   for (const auto& field : requiredFields) {
+//     if (content.find(field) == content.end()) {
+//       missingFields += "Missing " + field + ". ";
+//     }
+//   }
 
-  for (const auto& [key, value] : content) {
-    if (allowedFields.find(key) == allowedFields.end()) {
-      missingFields += "Unexpected field: " + key + ". ";
-    }
-  }
+//   for (const auto& [key, value] : content) {
+//     if (allowedFields.find(key) == allowedFields.end()) {
+//       missingFields += "Unexpected field: " + key + ". ";
+//     }
+//   }
 
-  return missingFields.empty() ? ""
-                               : "Input validation failed: " + missingFields;
-}
+//   return missingFields.empty() ? ""
+//                                : "Input validation failed: " + missingFields;
+// }

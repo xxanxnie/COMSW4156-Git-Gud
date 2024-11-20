@@ -20,7 +20,7 @@ class Shelter {
   std::vector<std::pair<std::string, std::string>> createDBContent();
   std::string printShelters(
       std::vector<bsoncxx::document::value>& shelters) const;
-  std::string getShelterID(bsoncxx::document::value& shelter);
+  // std::string getShelterID(bsoncxx::document::value& shelter);
   std::string collection_name;
   std::unordered_map<std::string, std::string> format;
 
