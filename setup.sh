@@ -79,53 +79,11 @@ mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR" || { echo "Failed to change to build directory"; exit 1; }
 cmake ..
 
-# # Clean up
-# find "$SRC_DIR" "$TEST_DIR" "$BUILD_DIR" \
-#      -type f \( -name '*.o' -o -name '*.gcno' -o -name '*.gcov' -o -name '*.gcda' -o -name '*.info' \) \
-#      -delete
-
 # Compile the project
 make -C "$BUILD_DIR" || { echo "Compilation failed"; exit 1; }
 
 sudo apt-get update
 sudo apt-get install libmongoc-1.0-0
-
-# # Run tests
-# "$BUILD_DIR/test_setup" || { echo "Tests failed"; exit 1; }
-
-# # Run gcov
-# gcov "$SRC_DIR"/*.cpp
-
-# # Run lcov and generate coverage info
-# lcov --capture \
-#      --directory "$BASE_PATH" \
-#      --output-file "$BUILD_DIR/coverage.info" \
-#      --filter range \
-#      --ignore-errors inconsistent,empty,unused,path \
-#      --include "$SRC_DIR/*" \
-#      --exclude "$BASE_PATH/include/*" \
-
-# # Generate HTML report
-# genhtml --filter range \
-#         --ignore-errors inconsistent \
-#         "$BUILD_DIR/coverage.info" \
-#         --output-directory "$COVERAGE_DIR"
-
-# # Open the coverage report
-# if command -v xdg-open &> /dev/null; then
-#     xdg-open "$COVERAGE_DIR/index.html"
-# elif command -v open &> /dev/null; then
-#     open "$COVERAGE_DIR/index.html"
-# else
-#     echo "Coverage report generated at $COVERAGE_DIR/index.html"
-# fi
-
-# # Clean up
-# find "$SRC_DIR" "$TEST_DIR" "$BUILD_DIR" \
-#      -type f \( -name '*.o' -o -name '*.gcno' -o -name '*.gcov' -o -name '*.gcda' -o -name '*.info' \) \
-#      -delete
-
-# echo "Setup complete. Coverage analysis results saved in $BUILD_DIR/coverage.info"
 
 # Clean up downloaded archives if they exist
 for archive in asio-1.30.2.tar.gz boost_1_86_0.tar.gz mongo-cxx-driver-r3.11.0.tar.gz

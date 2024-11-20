@@ -50,10 +50,24 @@ TEST_F(HealthcareServiceUnitTests, GetAllHealthcareServices) {
 }
 
 TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
+  std::map<std::string, std::string> updates = {
+      {"provider", "City Hospital"},
+      {"serviceType", "General Checkup"},
+      {"location", "123 Main St"},
+      {"operatingHours", "9 AM - 5 PM"},
+      {"eligibilityCriteria", "Adults"},
+      {"contactInfo", "123-456-7890"}
+  };
+
+  // for comparison in mock call
   std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"provider", "City Hospital"},     {"serviceType", "General Checkup"},
-      {"location", "123 Main St"},       {"operatingHours", "9 AM - 5 PM"},
-      {"eligibilityCriteria", "Adults"}, {"contactInfo", "123-456-7890"}};
+      {"provider", "City Hospital"},
+      {"serviceType", "General Checkup"},
+      {"location", "123 Main St"},
+      {"operatingHours", "9 AM - 5 PM"},
+      {"eligibilityCriteria", "Adults"},
+      {"contactInfo", "123-456-7890"}
+  };
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(::testing::Invoke(
@@ -63,9 +77,81 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
             EXPECT_EQ(content, expectedContent);
           }));
 
-  std::string result = healthcareService->addHealthcareService(
-      "City Hospital", "General Checkup", "123 Main St", "9 AM - 5 PM",
-      "Adults", "123-456-7890");
+  std::string result = healthcareService->addHealthcareService(updates);
 
   EXPECT_EQ(result, "Success");
 }
+
+TEST_F(HealthcareServiceUnitTests, DeleteHealthcare) {
+  std::string mockId = "123";
+
+  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+      .WillByDefault([&](const std::string& collectionName,
+                         const std::string& resourceId) -> bool {
+        EXPECT_EQ(resourceId, mockId);
+        EXPECT_EQ(collectionName, "HealthcareTest");
+        return true;
+      });
+
+  std::string result = healthcareService->deleteHealthcare(mockId);
+  EXPECT_EQ(result, "Healthcare record deleted successfully.");
+
+  std::vector<bsoncxx::document::value> mockResult;
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+                                      ::testing::Return()));
+
+  std::string healthcareItems = healthcareService->getAllHealthcareServices();
+  EXPECT_EQ(healthcareItems, "[]");
+}
+
+TEST_F(HealthcareServiceUnitTests, UpdateHealthcare) {
+  std::string mockId = "123";
+  std::vector<std::pair<std::string, std::string>> updateResource = {
+      {"provider", "Updated Healthcare Provider"},
+      {"serviceType", "Updated Emergency Care"},
+      {"location", "789 Oak St"},
+      {"operatingHours", "24/7"},
+      {"contactInfo", "321-654-0987"}
+  };
+
+  ON_CALL(*mockDbManager, updateResource(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string& collectionName, const std::string& resourceId,
+              const std::vector<std::pair<std::string, std::string>>& content) -> bool {
+            EXPECT_EQ(resourceId, mockId);
+            EXPECT_EQ(collectionName, "HealthcareTest");
+            EXPECT_EQ(content, updateResource);
+            return true;
+          });
+
+  std::string result = healthcareService->updateHealthcare(mockId, {
+      {"provider", "Updated Healthcare Provider"},
+      {"serviceType", "Updated Emergency Care"},
+      {"location", "789 Oak St"},
+      {"operatingHours", "24/7"},
+      {"contactInfo", "321-654-0987"}
+  });
+  EXPECT_EQ(result, "Healthcare record updated successfully.");
+  
+  std::vector<bsoncxx::document::value> mockResult;
+  mockResult.push_back(bsoncxx::builder::stream::document{}
+                       << "provider" << "Updated Healthcare Provider"
+                       << "serviceType" << "Updated Emergency Care"
+                       << "location" << "789 Oak St"
+                       << "operatingHours" << "24/7"
+                       << "contactInfo" << "321-654-0987"
+                       << bsoncxx::builder::stream::finalize);
+
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+                                      ::testing::Return()));
+
+  std::string healthcareItems = healthcareService->getAllHealthcareServices();
+  EXPECT_TRUE(healthcareItems.find("Updated Healthcare Provider") != std::string::npos);
+  EXPECT_TRUE(healthcareItems.find("Updated Emergency Care") != std::string::npos);
+  EXPECT_TRUE(healthcareItems.find("789 Oak St") != std::string::npos);
+  EXPECT_TRUE(healthcareItems.find("24/7") != std::string::npos);
+  EXPECT_TRUE(healthcareItems.find("321-654-0987") != std::string::npos);
+}
+

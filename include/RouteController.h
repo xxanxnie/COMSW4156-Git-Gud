@@ -50,8 +50,8 @@ class RouteController {
   // Counseling-related handlers
   void getCounseling(const crow::request& req, crow::response& res);
   void addCounseling(const crow::request& req, crow::response& res);
-  // void updateCounseling(const crow::request& req, crow::response& res);
-  // void deleteCounseling(const crow::request& req, crow::response& res);
+  void updateCounseling(const crow::request& req, crow::response& res);
+  void deleteCounseling(const crow::request& req, crow::response& res);
 
   // Outreach-related handlers
   void addOutreachService(const crow::request& req, crow::response& res);
@@ -62,10 +62,14 @@ class RouteController {
   // Food-related handlers
   void addFood(const crow::request& req, crow::response& res);
   void getAllFood(const crow::request& req, crow::response& res);
+  void updateFood(const crow::request& req, crow::response& res);
+  void deleteFood(const crow::request& req, crow::response& res);
 
   // Healthcare-related handlers
   void addHealthcareService(const crow::request& req, crow::response& res);
   void getAllHealthcareServices(const crow::request& req, crow::response& res);
+  void updateHealthcareService(const crow::request& req, crow::response& res);
+  void deleteHealthcareService(const crow::request& req, crow::response& res);
 };
 
 #endif
