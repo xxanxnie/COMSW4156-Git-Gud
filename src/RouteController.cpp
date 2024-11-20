@@ -153,7 +153,7 @@ void RouteController::updateShelter(const crow::request& req,
       res.code = 400;
       res.write(result);
     } else {
-      res.code = 201;
+      res.code = 200;
       res.write("Shelter resource update successfully.");
     }
     res.end();
@@ -247,8 +247,7 @@ void RouteController::addCounseling(const crow::request& req,
   }
 
   try {
-    std::string result =
-        counselingManager.addCounselor(req.body);
+    std::string result = counselingManager.addCounselor(req.body);
 
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
@@ -614,37 +613,19 @@ void RouteController::addHealthcareService(const crow::request& req,
     res.end();
     return;
   }
-
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::map<std::string, std::string> content;
-    std::string id = "";
-
-    for (auto element : resource.view()) {
-      content[element.key().to_string()] = element.get_utf8().value.to_string();
-    }
-
-    std::string validationMessage =
-        healthcareManager.validateHealthcareServiceInput(content);
-    if (!validationMessage.empty()) {
-      res.code = 400;
-      res.write(validationMessage);
-      res.end();
-      return;
-    }
-
-    std::string result = healthcareManager.addHealthcareService(content);
-
+    std::string result = healthcareManager.addHealthcareService(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
     } else {
       res.code = 201;
-      res.write("HealthcareService resource added successfully.");
+      res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -689,34 +670,18 @@ void RouteController::updateHealthcareService(const crow::request& req,
   }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::map<std::string, std::string> content;
-    std::string id = "";
-
-    for (auto element : resource.view()) {
-      if (element.key().to_string() == "id") {
-        id = element.get_utf8().value.to_string();
-      } else {
-        content[element.key().to_string()] =
-            element.get_utf8().value.to_string();
-      }
-    }
-
-    std::string validationMessage =
-        healthcareManager.validateHealthcareServiceInput(content);
-    if (!validationMessage.empty()) {
+    std::string result = healthcareManager.updateHealthcare(req.body);
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
-      res.write(validationMessage);
-      res.end();
-      return;
+      res.write(result);
+    } else {
+      res.code = 200;
+      res.write("Healthcare resource update successfully.");
     }
-
-    std::string result = healthcareManager.updateHealthcare(id, content);
-    res.code = 201;
-    res.write(result);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 

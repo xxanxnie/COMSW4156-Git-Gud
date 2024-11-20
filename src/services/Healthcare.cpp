@@ -10,13 +10,52 @@
 #include "DatabaseManager.h"
 /*
 Name:	provider
-Address	
-Category	
-Description: serviceType	
+City
+Address
+Description: serviceType
 ContactInfo
 eligibilityCriteria
 Hours of Operation
 */
+Healthcare::Healthcare(DatabaseManager& dbManager,
+                       const std::string& collection_name)
+    : dbManager(dbManager), collection_name(collection_name) {
+  cols = std::vector<std::string>({"Name", "City", "Address", "Description",
+                                   "ContactInfo", "HoursOfOperation",
+                                   "eligibilityCriteria"});
+  cleanCache();
+}
+void Healthcare::cleanCache() {
+  for (auto name : cols) {
+    format[name] = "";
+  }
+}
+std::string Healthcare::checkInputFormat(std::string content) {
+  auto resource = bsoncxx::from_json(content);
+  std::string id;
+  for (auto element : resource.view()) {
+    if (format.find(element.key().to_string()) != format.end()) {
+      format[element.key().to_string()] = element.get_utf8().value.to_string();
+    } else {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+        continue;
+      }
+      cleanCache();
+      throw std::invalid_argument(
+          "Healthcare: The request with unrelative argument.");
+    }
+  }
+
+  for (auto property : format) {
+    if (property.second == "") {
+      cleanCache();
+      throw std::invalid_argument(
+          "Healthcare: The request missing some properties.");
+    }
+  }
+  return id;
+}
 /**
  * @brief Adds a new healthcare service to the database.
  *
@@ -32,11 +71,12 @@ Hours of Operation
  * @return A string indicating whether the operation was successful (item ID)
  *         or an error message in case of failure.
  */
-std::string Healthcare::addHealthcareService(
-    const std::map<std::string, std::string>& updates) {
+std::string Healthcare::addHealthcareService(std::string request_body) {
   try {
-    auto content = createDBContent(updates);
-    std::string ID = dbManager.insertResource(collection_name, content);
+    cleanCache();
+    checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
@@ -58,24 +98,11 @@ std::string Healthcare::addHealthcareService(
  * @param contactInfo The contact information for the healthcare service.
  * @return A vector of key-value pairs representing the healthcare service.
  */
-std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(
-    const std::map<std::string, std::string>& updates) {
+std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
-
-  if (updates.count("provider"))
-    content.push_back({"provider", updates.at("provider")});
-  if (updates.count("serviceType"))
-    content.push_back({"serviceType", updates.at("serviceType")});
-  if (updates.count("location"))
-    content.push_back({"location", updates.at("location")});
-  if (updates.count("operatingHours"))
-    content.push_back({"operatingHours", updates.at("operatingHours")});
-  if (updates.count("eligibilityCriteria"))
-    content.push_back(
-        {"eligibilityCriteria", updates.at("eligibilityCriteria")});
-  if (updates.count("contactInfo"))
-    content.push_back({"contactInfo", updates.at("contactInfo")});
-
+  for (auto property : format) {
+    content.push_back(property);
+  }
   return content;
 }
 
@@ -91,23 +118,27 @@ std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent(
 std::string Healthcare::getAllHealthcareServices() {
   std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(collection_name, {}, result);
-  if (result.empty()) {
-    return "[]";
+  if (result.size() > 0) {
+    bsoncxx::builder::basic::array arrayBuilder;
+    for (const auto& doc : result) {
+      arrayBuilder.append(doc.view());
+    }
+    std::cout << printHealthcareServices(result);
+    return bsoncxx::to_json(arrayBuilder.view());
   }
-  return printHealthcareServices(result);
+  return "[]";
 }
 
-std::string Healthcare::updateHealthcare(
-    const std::string& id, const std::map<std::string, std::string>& updates) {
+std::string Healthcare::updateHealthcare(std::string request_body) {
   try {
-    auto content = createDBContent(updates);
-    dbManager.updateResource(collection_name, id, content);
+    cleanCache();
+    std::string id = checkInputFormat(request_body);
+    auto content_new = createDBContent();
+    dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception& e) {
-    return "Update failed: " + std::string(e.what()) +
-           ". Please check the input and try again.";
+    return "Error: " + std::string(e.what());
   }
-
-  return "Healthcare record updated successfully.";
+  return "Update";
 }
 
 std::string Healthcare::deleteHealthcare(std::string id) {
