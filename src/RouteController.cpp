@@ -187,7 +187,7 @@ void RouteController::deleteShelter(const crow::request& req,
       }
     }
     shelterManager.deleteShelter(id);
-    res.code = 201;
+    res.code = 200;
     res.write("Shelter resource deleted successfully.");
     res.end();
   } catch (const std::exception& e) {
@@ -378,64 +378,18 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
   }
 
   try {
-    // Input validation
-    if (req.body.empty()) {
-      res.code = 400;
-      res.write("Invalid input: Request body cannot be empty.");
-      res.end();
-      return;
-    }
-
-    auto resource = bsoncxx::from_json(req.body);
-
-    // Required fields validation
-    const std::vector<std::string> requiredFields = {
-        "FoodType", "Provider", "location", "quantity", "expirationDate"};
-
-    for (const auto& field : requiredFields) {
-      if (!resource[field]) {
-        res.code = 400;
-        res.write("Invalid input: Missing required field '" + field + "'");
-        res.end();
-        return;
-      }
-
-      // Check for empty values
-      if (resource[field].get_utf8().value.empty()) {
-        res.code = 400;
-        res.write("Invalid input: Field '" + field + "' cannot be empty");
-        res.end();
-        return;
-      }
-    }
-
-    // Quantity validation - must be a valid number
-    try {
-      std::stoi(resource["quantity"].get_utf8().value.to_string());
-    } catch (const std::exception&) {
-      res.code = 400;
-      res.write("Invalid input: Quantity must be a valid number");
-      res.end();
-      return;
-    }
-
-    // If all validation passes, continue with existing logic
-    std::vector<std::pair<std::string, std::string>> keyValues;
-    for (auto element : resource.view()) {
-      keyValues.emplace_back(element.key().to_string(),
-                             element.get_utf8().value.to_string());
-    }
-    std::string result = foodManager.addFood(keyValues);
+    std::string result = foodManager.addFood(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
     } else {
       res.code = 201;
-      res.write("Food resource added successfully.");
+      res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -525,16 +479,12 @@ void RouteController::deleteFood(const crow::request& req,
     }
 
     std::string result = foodManager.deleteFood(id);
-    if (result == "Success") {
-      res.code = 200;
-      res.write("Food resource deleted successfully.");
-    } else {
-      res.code = 400;
-      res.write(result);
-    }
+    res.code = 200;
+    res.write("Food resource deleted successfully.");
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 
@@ -559,76 +509,19 @@ void RouteController::updateFood(const crow::request& req,
     res.end();
     return;
   }
-
   try {
-    // Input validation
-    if (req.body.empty()) {
-      res.code = 400;
-      res.write("Invalid input: Request body cannot be empty.");
-      res.end();
-      return;
-    }
-
-    auto resource = bsoncxx::from_json(req.body);
-
-    // Validate ID
-    if (!resource["id"]) {
-      res.code = 400;
-      res.write("Invalid input: 'id' field is required");
-      res.end();
-      return;
-    }
-
-    // Validate update fields
-    const std::vector<std::string> validFields = {
-        "FoodType", "Provider", "location", "quantity", "expirationDate"};
-    std::vector<std::pair<std::string, std::string>> updates;
-    bool hasValidField = false;
-
-    for (const auto& field : validFields) {
-      if (resource[field]) {
-        // Validate quantity if it's being updated
-        if (field == "quantity") {
-          try {
-            std::stoi(resource[field].get_utf8().value.to_string());
-          } catch (const std::exception&) {
-            res.code = 400;
-            res.write("Invalid input: Quantity must be a valid number");
-            res.end();
-            return;
-          }
-        }
-
-        std::string value = resource[field].get_utf8().value.to_string();
-        if (!value.empty()) {
-          updates.emplace_back(field, value);
-          hasValidField = true;
-        }
-      }
-    }
-
-    if (!hasValidField) {
-      res.code = 400;
-      res.write(
-          "Invalid input: At least one valid field must be provided for "
-          "update");
-      res.end();
-      return;
-    }
-
-    std::string id = resource["id"].get_utf8().value.to_string();
-
-    std::string result = foodManager.updateFood(id, updates);
-    if (result == "Success") {
-      res.code = 200;
-      res.write("Food resource updated successfully.");
-    } else {
+    std::string result = foodManager.updateFood(req.body);
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+    } else {
+      res.code = 201;
+      res.write("Food resource update successfully.");
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
 

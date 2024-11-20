@@ -146,5 +146,5 @@ std::string Shelter::deleteShelter(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "SUC";
   }
-  throw std::runtime_error("Document with the specified _id not found.");
+  throw std::runtime_error("Shelter Document with the specified _id not found.");
 }

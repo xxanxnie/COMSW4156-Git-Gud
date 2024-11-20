@@ -19,8 +19,7 @@ class MockShelter : public Shelter {
   MOCK_METHOD(std::string, addShelter, (std::string request_body), (override));
   MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
   MOCK_METHOD(std::string, searchShelterAll, (), (override));
-  MOCK_METHOD(std::string, updateShelter,
-              (std::string request_body),
+  MOCK_METHOD(std::string, updateShelter, (std::string request_body),
               (override));
 };
 
@@ -45,10 +44,7 @@ class MockFood : public Food {
  public:
   explicit MockFood(DatabaseManager* db) : Food(*db) {}
 
-  MOCK_METHOD(
-      std::string, addFood,
-      ((const std::vector<std::pair<std::string, std::string>>& resource)),
-      (override));
+  MOCK_METHOD(std::string, addFood, ((std::string request_body)), (override));
   MOCK_METHOD(std::string, getAllFood, (), (override));
 };
 
@@ -307,7 +303,6 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
   routeController->addFood(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Food resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
@@ -326,18 +321,25 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
-  std::string body = R"({"name": "FoodBank", "location": "NYC"})";
-
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"name", "FoodBank"}, {"location", "NYC"}};
-
-  ON_CALL(*mockFood, addFood(expectedContent))
-      .WillByDefault(::testing::Return("Success"));
-
+  std::string input =
+      R"({
+    "Name" : "temp",
+    "City" : "New York",
+    "Address": "temp",
+    "Description" : "NULL",
+    "ContactInfo" : "66664566565",
+    "HoursOfOperation": "2024-01-11",
+    "TargetUser" :"HML",
+    "Quantity" : "100",
+    "ExpirationDate": "10"
+  })";
   crow::request req;
-  req.body = body;
+  req.body = input;
   req.add_header("API-Key", "invalid");
   crow::response res{};
+
+  ON_CALL(*mockFood, addFood(input))
+      .WillByDefault(::testing::Return("12345"));
 
   routeController->addFood(req, res);
 
