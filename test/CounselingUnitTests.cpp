@@ -46,8 +46,18 @@ TEST_F(CounselingUnitTests, SearchCounselorsAll) {
 }
 
 TEST_F(CounselingUnitTests, AddCounselor) {
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"counselorName", "Jane Smith"}, {"specialty", "Family Therapy"}};
+  std::string input = R"({
+        "Name" : "OrganicFarm",
+        "City" : "New York",
+        "Address": "temp",
+        "Description" : "Vegetables",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
+  counseling->checkInputFormat(input);
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      counseling->createDBContent();
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(::testing::Invoke(
@@ -55,52 +65,87 @@ TEST_F(CounselingUnitTests, AddCounselor) {
               const std::vector<std::pair<std::string, std::string>> &content) {
             EXPECT_EQ(collectionName, "Counseling");
             EXPECT_EQ(content, expectedContent);
+            return "12345";
           }));
 
-  std::string result = counseling->addCounselor("Jane Smith", "Family Therapy");
+  std::string result = counseling->addCounselor(input);
 
-  EXPECT_EQ(result, "Success");
+  EXPECT_EQ(result, "12345");
 }
 
-// TEST_F(CounselingUnitTests, UpdateCounselor) {
-//     std::string id = "12345";
-//     std::string field = "specialty";
-//     std::string value = "Trauma Therapy";
+TEST_F(CounselingUnitTests, updateCounseling) {
+  std::string input =
+      R"({
+      "id":"123456789" ,
+    "Name" : "OrganicFarm",
+        "City" : "New York",
+        "Address": "temp",
+        "Description" : "Vegetables",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+  })";
+  counseling->checkInputFormat(input);
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      counseling->createDBContent();
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          updateResource(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string &collectionName, const std::string &resourceId,
+              const std::vector<std::pair<std::string, std::string>> &content)
+              -> bool {
+            EXPECT_EQ(resourceId, id_temp);
+            EXPECT_EQ(collectionName, "Counseling");
+            EXPECT_EQ(content, expectedContent);
+            return true;
+          });
 
-//     std::vector<std::pair<std::string, std::string>> expectedUpdates = {
-//         {field, value}
-//     };
+  std::string result = counseling->updateCounselor(input);
+  EXPECT_EQ(result, "Success");
 
-//     ON_CALL(*mockDbManager, updateResource(::testing::_, ::testing::_,
-//     ::testing::_))
-//         .WillByDefault(::testing::Invoke(
-//             [&](const std::string& collectionName,
-//                 const std::string& resourceId,
-//                 const std::vector<std::pair<std::string, std::string>>&
-//                 updates) { EXPECT_EQ(collectionName, "Counseling");
-//                 EXPECT_EQ(resourceId, id);
-//                 EXPECT_EQ(updates, expectedUpdates);
-//             }
-//         ));
+  // Verify the updated data can be retrieved
+  std::vector<bsoncxx::document::value> mockResult;
+  mockResult.push_back(bsoncxx::builder::stream::document{}
+                       << "Name"
+                       << "OrganicFarm" << "City" << "New York" << "Address"
+                       << "temp" << "Description" << "Vegetables"
+                       << "ContactInfo" << "66664566565" << "HoursOfOperation"
+                       << "2024-01-11" << "counselorName" << "Jack"
+                       << bsoncxx::builder::stream::finalize);
 
-//     std::string result = counseling->updateCounselor(id, field, value);
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+                                      ::testing::Return()));
 
-//     EXPECT_EQ(result, "Update");
-// }
+  std::string counselingItems = counseling->searchCounselorsAll();
+  EXPECT_TRUE(counselingItems.find("OrganicFarm") != std::string::npos);
+  EXPECT_TRUE(counselingItems.find("Jack") != std::string::npos);
+  EXPECT_TRUE(counselingItems.find("2024-01-11") != std::string::npos);
+}
 
-// TEST_F(CounselingUnitTests, DeleteCounselor) {
-//     std::string id = "12345";
+TEST_F(CounselingUnitTests, DeleteCounselor) {
+  std::string mockId = "123";
 
-//     ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
-//         .WillByDefault(::testing::Invoke(
-//             [&](const std::string& collectionName, const std::string&
-//             resourceId) {
-//                 EXPECT_EQ(collectionName, "Counseling");
-//                 EXPECT_EQ(resourceId, id);
-//             }
-//         ));
+  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+      .WillByDefault([&](const std::string &collectionName,
+                         const std::string &resourceId) -> bool {
+        EXPECT_EQ(resourceId, mockId);
+        EXPECT_EQ(collectionName, "Counseling");
+        return true;
+      });
 
-//     std::string result = counseling->deleteCounselor(id);
+  std::string result = counseling->deleteCounselor(mockId);
+  EXPECT_EQ(result, "Success");
 
-//     EXPECT_EQ(result, "Delete");
-// }
+  // Verify deletion by checking empty results
+  std::vector<bsoncxx::document::value> mockResult;
+  ON_CALL(*mockDbManager,
+          findCollection(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+                                      ::testing::Return()));
+
+  std::string counselingItems = counseling->searchCounselorsAll();
+  EXPECT_EQ(counselingItems, "[]");
+}

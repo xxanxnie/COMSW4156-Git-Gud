@@ -56,11 +56,13 @@ void DatabaseManager::printCollection(const std::string &collectionName) {
   }
 }
 
-void DatabaseManager::insertResource(
+std::string DatabaseManager::insertResource(
     const std::string &collectionName,
     const std::vector<std::pair<std::string, std::string>> &keyValues) {
   auto collection = (*conn)["GitGud"][collectionName];
-  collection.insert_one(createDocument(keyValues).view());
+  auto item = collection.insert_one(createDocument(keyValues).view());
+  std::cout << item->inserted_id().get_oid().value.to_string() << std::endl;
+  return item->inserted_id().get_oid().value.to_string();
 }
 
 bool DatabaseManager::deleteResource(const std::string &collectionName,
@@ -73,11 +75,11 @@ bool DatabaseManager::deleteResource(const std::string &collectionName,
 
   auto result = collection.delete_one(filter_builder.view());
   if (result && result->deleted_count() > 0) {
-      std::cout << "Document deleted successfully.\n";
-      return 1;
+    std::cout << "Document deleted successfully.\n";
+    return 1;
   } else {
-      std::cout << "No document found with the given _id.\n";
-      return 0;
+    std::cout << "No document found with the given _id.\n";
+    return 0;
   }
 }
 
@@ -98,10 +100,16 @@ void DatabaseManager::updateResource(
   }
   updateDoc << bsoncxx::builder::stream::close_document;
   bsoncxx::oid oid(resourceId);
-  collection.update_one(bsoncxx::builder::stream::document{}
-                            << "_id" << oid
-                            << bsoncxx::builder::stream::finalize,
-                        updateDoc.view());
+  auto check = collection.find_one(bsoncxx::builder::stream::document{}
+                                   << "_id" << oid
+                                   << bsoncxx::builder::stream::finalize);
+  if (!check) {
+    throw std::invalid_argument("The request with wrong id.");
+  }
+  auto result = collection.update_one(bsoncxx::builder::stream::document{}
+                                          << "_id" << oid
+                                          << bsoncxx::builder::stream::finalize,
+                                      updateDoc.view());
 }
 
 void DatabaseManager::findResource(const std::string &collectionName,
