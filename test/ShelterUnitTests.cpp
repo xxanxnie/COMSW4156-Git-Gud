@@ -22,15 +22,40 @@ class ShelterUnitTests : public ::testing::Test {
     delete mockDbManager;
   }
 };
+TEST_F(ShelterUnitTests, AddNewShelter) {
+  shelter->checkInputFormat(
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}");
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      shelter->createDBContent();
+  ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string& collectionName,
+              const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(collectionName, "ShelterTest");
+            EXPECT_EQ(content, expectedContent);
+            return "12345";
+          });
+  std::string ret = shelter->addShelter(
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}");
+  EXPECT_EQ(ret, "12345");
+}
 
 TEST_F(ShelterUnitTests, searchShelterAll) {
   std::vector<bsoncxx::document::value> mockResult;
   mockResult.push_back(bsoncxx::builder::stream::document{}
-                       << "ORG" << "NGO"
-                       << "User" << "HML"
-                       << "location" << "New York"
-                       << "capacity" << "10"
-                       << "curUse" << "0"
+                       << "Name" << "temp" << "City" << "New York" << "Address"
+                       << "temp" << "Description" << "NULL" << "ContactInfo"
+                       << "66664566565" << "HoursOfOperation" << "2024-01-11"
+                       << "ORG" << "NGO" << "TargetUser" << "HML"
+                       << "Capacity" << "100" << "CurrentUse" << "10"
                        << bsoncxx::builder::stream::finalize);
 
   ON_CALL(*mockDbManager,
@@ -46,8 +71,16 @@ TEST_F(ShelterUnitTests, searchShelterAll) {
 }
 
 TEST_F(ShelterUnitTests, UpdateShelter) {
+  shelter->checkInputFormat(R"({
+        "id":"123456789" ,
+        "CurrentUse" : "10", "Capacity" : "100", 
+        "TargetUser" : "HML", "ORG" : "NGO", 
+        "HoursOfOperation" : "2024-01-11", 
+        "ContactInfo" : "66664566565", "Description" : "NULL", 
+        "Address" : "temp", "City" : "New York", "Name" : "temp"
+        })");
   std::vector<std::pair<std::string, std::string>> expectedContent =
-      shelter->createDBContent("tmp", "tmp", "tmp", "1", "0");
+      shelter->createDBContent();
   std::string id_temp = "123456789";
   ON_CALL(*mockDbManager,
           updateResource(::testing::_, ::testing::_, ::testing::_))
@@ -58,14 +91,21 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
             EXPECT_EQ(collectionName, "ShelterTest");
             EXPECT_EQ(content, expectedContent);
           });
-  std::string ret = shelter->updateShelter(id_temp, "tmp", "tmp", "tmp", 1, 0);
+  std::string ret = shelter->updateShelter(
+      R"({
+        "id":"123456789" ,
+        "CurrentUse" : "10", "Capacity" : "100", 
+        "TargetUser" : "HML", "ORG" : "NGO", 
+        "HoursOfOperation" : "2024-01-11", 
+        "ContactInfo" : "66664566565", "Description" : "NULL", 
+        "Address" : "temp", "City" : "New York", "Name" : "temp"
+        })");
   EXPECT_EQ(ret, "Update");
 }
 
 TEST_F(ShelterUnitTests, DeleteShelter) {
   std::string id_temp = "123456789";
-  ON_CALL(*mockDbManager,
-          deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
                          const std::string& resourceId) {
         EXPECT_EQ(resourceId, id_temp);

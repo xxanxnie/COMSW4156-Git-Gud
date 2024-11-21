@@ -4,23 +4,24 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#include <unordered_map>
 #include "DatabaseManager.h"
 
 class Food {
  private:
   DatabaseManager& db;
+  std::vector<std::string> cols;
 
  public:
   Food(DatabaseManager& db);
-
-  virtual std::string addFood(
-      const std::vector<std::pair<std::string, std::string>>& reasource);
-
+  void cleanCache();
+  std::string checkInputFormat(std::string content);
+  std::unordered_map<std::string, std::string> format;
+  virtual std::string addFood(std::string request_body);
+  std::vector<std::pair<std::string, std::string>> createDBContent();
   virtual std::string getAllFood();
-  
-  virtual std::string updateFood(const std::string& id, 
-      const std::vector<std::pair<std::string, std::string>>& resource);
+
+  virtual std::string updateFood(std::string request_body);
 
   virtual std::string deleteFood(const std::string& id);
 };

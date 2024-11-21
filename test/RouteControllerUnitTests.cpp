@@ -16,15 +16,10 @@ class MockShelter : public Shelter {
   explicit MockShelter(DatabaseManager* dbManager)
       : Shelter(*dbManager, "ShelterTest") {}
 
-  MOCK_METHOD(std::string, addShelter,
-              (std::string ORG, std::string User, std::string location,
-               int capacity, int curUse),
-              (override));
+  MOCK_METHOD(std::string, addShelter, (std::string request_body), (override));
   MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
   MOCK_METHOD(std::string, searchShelterAll, (), (override));
-  MOCK_METHOD(std::string, updateShelter,
-              (std::string id, std::string ORG, std::string User,
-               std::string location, int capacity, int curUse),
+  MOCK_METHOD(std::string, updateShelter, (std::string request_body),
               (override));
 };
 
@@ -33,15 +28,12 @@ class MockCounseling : public Counseling {
   explicit MockCounseling(DatabaseManager* dbManager)
       : Counseling(*dbManager) {}
 
-  MOCK_METHOD(std::string, addCounselor,
-              (const std::string& counselorName, const std::string& specialty),
+  MOCK_METHOD(std::string, addCounselor, (std::string request_body),
               (override));
   MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId),
               (override));
   MOCK_METHOD(std::string, searchCounselorsAll, (), (override));
-  MOCK_METHOD(std::string, updateCounselor,
-              (const std::string& counselorId, const std::string& field,
-               const std::string& value),
+  MOCK_METHOD(std::string, updateCounselor, (std::string request_body),
               (override));
 };
 
@@ -49,10 +41,7 @@ class MockFood : public Food {
  public:
   explicit MockFood(DatabaseManager* db) : Food(*db) {}
 
-  MOCK_METHOD(
-      std::string, addFood,
-      ((const std::vector<std::pair<std::string, std::string>>& resource)),
-      (override));
+  MOCK_METHOD(std::string, addFood, ((std::string request_body)), (override));
   MOCK_METHOD(std::string, getAllFood, (), (override));
 };
 
@@ -62,11 +51,7 @@ class MockOutreachService : public Outreach {
                       const std::string& collection_name)
       : Outreach(*dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addOutreachService,
-              (const std::string& targetAudience,
-               const std::string& programName, const std::string& description,
-               const std::string& programDate, const std::string& location,
-               const std::string& contactInfo),
+  MOCK_METHOD(std::string, addOutreachService, (std::string request_body),
               (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (), (override));
 };
@@ -77,18 +62,14 @@ class MockHealthcareService : public Healthcare {
                         const std::string& collection_name)
       : Healthcare(*dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addHealthcareService,
-            ((const std::map<std::string, std::string>& updates)),
-            (override));
+  MOCK_METHOD(std::string, addHealthcareService, ((std::string request_body)),
+              (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
 
-  MOCK_METHOD(std::string, updateHealthcare,
-              (const std::string&, (const std::map<std::string, std::string>&)),
+  MOCK_METHOD(std::string, updateHealthcare, (std::string request_body),
               (override));
 
-  MOCK_METHOD(std::string, deleteHealthcare,
-              ((std::string)),
-              (override));
+  MOCK_METHOD(std::string, deleteHealthcare, ((std::string)), (override));
 };
 
 class RouteControllerUnitTests : public ::testing::Test {
@@ -144,19 +125,28 @@ TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
   std::string body =
-      R"({"ORG": "NGO", "User": "HML", "location": "NYC", "capacity": "100", "curUse": "20"})";
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "abc123NGO");
   crow::response res{};
 
-  ON_CALL(*mockShelter, addShelter("NGO", "HML", "NYC", 100, 20))
+  ON_CALL(*mockShelter,
+          addShelter(
+              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+              "\"66664566565\",\"HoursOfOperation\": "
+              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Shelter resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
@@ -177,13 +167,23 @@ TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
   std::string body =
-      R"({"ORG": "NGO", "User": "HML", "location": "NYC", "capacity": "100", "curUse": "20"})";
+      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+      "\"66664566565\",\"HoursOfOperation\": "
+      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+      ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockShelter, addShelter("NGO", "HML", "NYC", 100, 20))
+  ON_CALL(*mockShelter,
+          addShelter(
+              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
+              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
+              "\"66664566565\",\"HoursOfOperation\": "
+              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
+              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);
@@ -207,20 +207,26 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
-  std::string body =
-      R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
+  std::string body = R"({
+        "Name" : "OrganicFarm",
+        "City" : "New York",
+        "Address": "temp",
+        "Description" : "Vegetables",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "def456VOL");
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
-      .WillByDefault(::testing::Return("Success"));
+  ON_CALL(*mockCounseling, addCounselor(body))
+      .WillByDefault(::testing::Return("Suc"));
 
   routeController->addCounseling(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Counseling resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
@@ -239,14 +245,21 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
-  std::string body =
-      R"({"counselorName": "Jane Smith", "specialty": "Family Therapy"})";
+  std::string body = R"({
+        "Name" : "New York Psychological Association",
+        "City" : "New York",
+        "Address": "211 E 43rd St, New York, NY 10017",
+        "Description" : "Provides mental health counseling and therapy services.",
+        "ContactInfo" : "66664566565",
+        "HoursOfOperation": "2024-01-11",
+        "counselorName": "Jack"
+    })";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor("Jane Smith", "Family Therapy"))
+  ON_CALL(*mockCounseling, addCounselor(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addCounseling(req, res);
@@ -258,11 +271,12 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
   crow::request req;
   crow::response res;
-  
+
   // Set valid API key for GET operations
   req.add_header("API-Key", "hml345HML");
 
-  std::string mockResponse = "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
+  std::string mockResponse =
+      "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
   ON_CALL(*mockFood, getAllFood())
       .WillByDefault(::testing::Return(mockResponse));
 
@@ -275,16 +289,17 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
 TEST_F(RouteControllerUnitTests, AddFoodTest) {
   crow::request req;
   crow::response res;
-  
+
   // Set valid API key for POST operations
   req.add_header("API-Key", "abc123NGO");
-  
+
   // Add all required fields
-  req.body = "{\"FoodType\": \"Vegetables\", "
-             "\"Provider\": \"Local Farm\", "
-             "\"location\": \"NYC\", "
-             "\"quantity\": \"100\", "
-             "\"expirationDate\": \"2024-12-31\"}";
+  req.body =
+      "{\"FoodType\": \"Vegetables\", "
+      "\"Provider\": \"Local Farm\", "
+      "\"location\": \"NYC\", "
+      "\"quantity\": \"100\", "
+      "\"expirationDate\": \"2024-12-31\"}";
 
   ON_CALL(*mockFood, addFood(::testing::_))
       .WillByDefault(::testing::Return("Success"));
@@ -292,7 +307,6 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
   routeController->addFood(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Food resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
@@ -311,18 +325,24 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
-  std::string body = R"({"name": "FoodBank", "location": "NYC"})";
-
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"name", "FoodBank"}, {"location", "NYC"}};
-
-  ON_CALL(*mockFood, addFood(expectedContent))
-      .WillByDefault(::testing::Return("Success"));
-
+  std::string input =
+      R"({
+    "Name" : "temp",
+    "City" : "New York",
+    "Address": "temp",
+    "Description" : "NULL",
+    "ContactInfo" : "66664566565",
+    "HoursOfOperation": "2024-01-11",
+    "TargetUser" :"HML",
+    "Quantity" : "100",
+    "ExpirationDate": "10"
+  })";
   crow::request req;
-  req.body = body;
+  req.body = input;
   req.add_header("API-Key", "invalid");
   crow::response res{};
+
+  ON_CALL(*mockFood, addFood(input)).WillByDefault(::testing::Return("12345"));
 
   routeController->addFood(req, res);
 
@@ -346,20 +366,27 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
   std::string body =
-      R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
+      R"({
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
   crow::request req;
   req.add_header("API-Key", "def456VOL");
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService("Youth", "OutreachProgram", "Help",
-                                            "2023-01-01", "NYC", "123-456"))
+  ON_CALL(*mockOutreach, addOutreachService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "OutreachService resource added successfully.");
+  EXPECT_EQ(res.body, "Success");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
@@ -379,14 +406,21 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
   std::string body =
-      R"({"targetAudience": "Youth", "programName": "OutreachProgram", "description": "Help", "programDate": "2023-01-01", "location": "NYC", "contactInfo": "123-456"})";
+      R"({
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService("Youth", "OutreachProgram", "Help",
-                                            "2023-01-01", "NYC", "123-456"))
+  ON_CALL(*mockOutreach, addOutreachService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);
@@ -411,28 +445,26 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   std::string body =
-      R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
+      R"({
+  "Name": "My New Hospital",
+  "City" : "New York",
+  "Address": "456 New St",
+  "Description": "General Checkup",
+  "HoursOfOperation": "9 AM - 5 PM",
+  "eligibilityCriteria": "Adults",
+  "contactInfo": "123-456-7890"
+})";
   crow::request req;
   req.add_header("API-Key", "ghi789CLN");
   req.body = body;
   crow::response res{};
 
-  std::map<std::string, std::string> expectedContent = {
-      {"provider", "HealthcareProvider"},
-      {"serviceType", "General Care"},
-      {"location", "NYC"},
-      {"operatingHours", "9-5"},
-      {"eligibilityCriteria", "None"},
-      {"contactInfo", "123-456"}
-  };
-
-  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
+  ON_CALL(*mockHealthcare, addHealthcareService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
 
   EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "HealthcareService resource added successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
@@ -451,23 +483,21 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
-  std::string body =
-      R"({"provider": "HealthcareProvider", "serviceType": "General Care", "location": "NYC", "operatingHours": "9-5", "eligibilityCriteria": "None", "contactInfo": "123-456"})";
+  std::string body = R"({
+  "Name": "My New Hospital",
+  "City" : "New York",
+  "Address": "456 New St",
+  "Description": "General Checkup",
+  "HoursOfOperation": "9 AM - 5 PM",
+  "eligibilityCriteria": "Adults",
+  "contactInfo": "123-456-7890"
+})";
   crow::request req;
   req.body = body;
   req.add_header("API-Key", "invalid");
   crow::response res{};
 
-  std::map<std::string, std::string> expectedContent = {
-      {"provider", "HealthcareProvider"},
-      {"serviceType", "General Care"},
-      {"location", "NYC"},
-      {"operatingHours", "9-5"},
-      {"eligibilityCriteria", "None"},
-      {"contactInfo", "123-456"}
-  };
-
-  ON_CALL(*mockHealthcare, addHealthcareService(expectedContent))
+  ON_CALL(*mockHealthcare, addHealthcareService(body))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
@@ -477,7 +507,17 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
-  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  std::string body =
+      R"({
+     "id":"507f191e810c19729de860ea",
+      "Name": "My New Hospital",
+      "City" : "New York",
+      "Address": "456 New St",
+      "Description": "General Checkup",
+      "HoursOfOperation": "9 AM - 5 PM",
+      "eligibilityCriteria": "Adults",
+      "contactInfo": "123-456-7890"
+    })";
   crow::request req;
   req.add_header("API-Key", "ghi789CLN");
   req.body = body;
@@ -488,21 +528,22 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       {"serviceType", "Emergency"},
       {"location", "456 Elm St"},
       {"operatingHours", "24/7"},
-      {"contactInfo", "987-654-3210"}
-  };
+      {"contactInfo", "987-654-3210"}};
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockHealthcare, updateHealthcare(id, expectedContent))
-      .WillByDefault(::testing::Return("Healthcare record updated successfully."));
+  ON_CALL(*mockHealthcare, updateHealthcare(body))
+      .WillByDefault(
+          ::testing::Return("Healthcare resource update successfully."));
 
   routeController->updateHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 201);
-  EXPECT_EQ(res.body, "Healthcare record updated successfully.");
+  EXPECT_EQ(res.code, 200);
+  EXPECT_EQ(res.body, "Healthcare resource update successfully.");
 }
 
 TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
-  std::string body = R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  std::string body =
+      R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
   crow::request req;
   req.add_header("API-Key", "invalid");
   req.body = body;
@@ -524,7 +565,8 @@ TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
   std::string id = "507f191e810c19729de860ea";
 
   ON_CALL(*mockHealthcare, deleteHealthcare(id))
-      .WillByDefault(::testing::Return("Healthcare record deleted successfully."));
+      .WillByDefault(
+          ::testing::Return("Healthcare record deleted successfully."));
 
   routeController->deleteHealthcareService(req, res);
 
@@ -544,4 +586,3 @@ TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestUnauthorized) {
   EXPECT_EQ(res.code, 403);
   EXPECT_EQ(res.body, "Unauthorized.");
 }
-

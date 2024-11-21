@@ -21,7 +21,7 @@ class DatabaseManager {
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues,
       std::vector<bsoncxx::document::value>& result);
-  virtual void insertResource(
+  virtual std::string insertResource(
       const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues);
   virtual bool deleteResource(const std::string& collectionName,

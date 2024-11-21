@@ -18,7 +18,7 @@ class MockDatabaseManager : public DatabaseManager {
       (override));
 
   MOCK_METHOD(
-      void, insertResource,
+      std::string, insertResource,
       (const std::string &collectionName,
        (const std::vector<std::pair<std::string, std::string>> &keyValues)),
       (override));

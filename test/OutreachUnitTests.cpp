@@ -71,14 +71,19 @@ TEST_F(OutreachServiceUnitTests, GetAllOutreachServices) {
  * the expected parameters.
  */
 TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
-  std::vector<std::pair<std::string, std::string>> expectedContent = {
-      {"targetAudience", "HML"},
-      {"programName", "Emergency Shelter Access"},
-      {"description",
-       "Provide information and assistance for accessing shelters."},
-      {"programDate", "05/01/24 - 12/31/24"},
-      {"location", "Bowery Mission, 227 Bowery, NY"},
-      {"contactInfo", "Sarah Johnson, sarah@email.com"}};
+  std::string input = R"({
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
+  outreachService->checkInputFormat(input);
+
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      outreachService->createDBContent();
 
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(::testing::Invoke(
@@ -86,13 +91,51 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
               const std::vector<std::pair<std::string, std::string>>& content) {
             EXPECT_EQ(collectionName, "Outreach");
             EXPECT_EQ(content, expectedContent);
+            return "12345";
           }));
 
-  std::string result = outreachService->addOutreachService(
-      "HML", "Emergency Shelter Access",
-      "Provide information and assistance for accessing shelters.",
-      "05/01/24 - 12/31/24", "Bowery Mission, 227 Bowery, NY",
-      "Sarah Johnson, sarah@email.com");
+  std::string result = outreachService->addOutreachService(input);
 
-  EXPECT_EQ(result, "Success");
+  EXPECT_EQ(result, "12345");
+}
+
+TEST_F(OutreachServiceUnitTests, UpdateOutreach) {
+  std::string input = R"({
+  "id":"123456789",
+    "Name":"Emergency Shelter Access",
+    "City":"New York",
+    "Address":"200 Varick St, New York, NY 10014",
+    "Description":"Provide information and assistance for accessing shelters.",
+    "ContactInfo":"Sarah Johnson, sarah@email.com",
+    "HoursOfOperation":"05/01/24 - 12/31/24",
+    "TargetAudience":"HML"
+})";
+  outreachService->checkInputFormat(input);
+  std::vector<std::pair<std::string, std::string>> expectedContent =
+      outreachService->createDBContent();
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager,
+          updateResource(::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(
+          [&](const std::string& collectionName, const std::string& resourceId,
+              const std::vector<std::pair<std::string, std::string>>& content) {
+            EXPECT_EQ(resourceId, id_temp);
+            EXPECT_EQ(collectionName, "Outreach");
+            EXPECT_EQ(content, expectedContent);
+          });
+  std::string ret = outreachService->updateOutreach(input);
+  EXPECT_EQ(ret, "Outreach Service updated successfully.");
+}
+
+TEST_F(OutreachServiceUnitTests, DeleteOutreach) {
+  std::string id_temp = "123456789";
+  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+      .WillByDefault([&](const std::string& collectionName,
+                         const std::string& resourceId) {
+        EXPECT_EQ(resourceId, id_temp);
+        EXPECT_EQ(collectionName, "Outreach");
+        return 1;
+      });
+  std::string ret = outreachService->deleteOutreach(id_temp);
+  EXPECT_EQ(ret, "Outreach Service deleted successfully.");
 }
