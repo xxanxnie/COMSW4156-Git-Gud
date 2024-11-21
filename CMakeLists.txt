@@ -29,9 +29,9 @@ set(INCLUDE_PATHS
     /usr/local/include/bsoncxx/v_noabi
     /usr/local/include/libmongoc-1.0
     /usr/local/include/libbson-1.0
-    /opt/homebrew/opt/poco/lib
-    /opt/homebrew/opt/openssl@3/lib
-    /opt/homebrew/opt/curl/lib
+    /opt/homebrew/opt/poco/include
+    /opt/homebrew/opt/openssl@3/include
+    /opt/homebrew/opt/curl/include
     include
 )
 
@@ -44,19 +44,11 @@ link_directories(
     /opt/homebrew/opt/curl/lib
 )
 
-# Add these lines to find MongoDB C++ driver
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
-
-find_package(Poco REQUIRED COMPONENTS Foundation Net NetSSL Crypto Util)
-find_package(CURL REQUIRED)
-include_directories(${CURL_INCLUDE_DIRS})
 include_directories ("/usr/local/include/mongocxx/v_noabi")
 include_directories("/usr/local/include/libmongoc-1.0")
 include_directories("/usr/local/include/bsoncxx/v_noabi")
 include_directories("/usr/local/include/libbson-1.0")
 include_directories("/usr/local/lib -lmongocxx -lbsoncxx")
-include_directories(${Poco_INCLUDE_DIRS})
-
 
 set(SOURCE_FILES 
     src/main.cpp 
@@ -82,7 +74,6 @@ set(TEST_FILES
 set(SOURCE_FILES_NO_MAIN
     src/RouteController.cpp
     src/DatabaseManager.cpp
-    src/SubscriptionManager.cpp
     src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
@@ -118,7 +109,6 @@ target_link_libraries(GitGud PRIVATE
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
-    ${CURL_LIBRARIES} 
     PocoFoundation
     PocoNet
     PocoNetSSL
@@ -126,6 +116,7 @@ target_link_libraries(GitGud PRIVATE
     PocoUtil
     ssl
     crypto
+    curl
 )
 
 enable_testing()
@@ -146,7 +137,6 @@ target_link_libraries(GitGudTests PRIVATE
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
-    ${CURL_LIBRARIES} 
     PocoFoundation
     PocoNet
     PocoNetSSL
@@ -154,6 +144,7 @@ target_link_libraries(GitGudTests PRIVATE
     PocoUtil
     ssl
     crypto
+    curl
 )
 
 include(GoogleTest)
