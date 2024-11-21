@@ -60,7 +60,7 @@ if [ ! -d "Poco" ]; then
     cd Poco || { echo "Failed to change to Poco directory"; exit 1; }
     mkdir -p cmake-build
     cd cmake-build || { echo "Failed to change to Poco build directory"; exit 1; }
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$EXTERNAL_LIBRARIES_DIR/Poco"
+    cmake .. -DCMAKE_BUILD_TYPE=Release
     make -j$(nproc)
     make install
     cd ../../
