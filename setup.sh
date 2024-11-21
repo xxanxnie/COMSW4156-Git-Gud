@@ -52,6 +52,33 @@ else
     echo "MongoDB C++ Driver already exists, skipping installation."
 fi
 
+# Download and install jwt-cpp
+if [ ! -d "jwt-cpp" ]; then
+    echo "Installing jwt-cpp..."
+    git clone https://github.com/Thalhammer/jwt-cpp.git
+    cd jwt-cpp
+    mkdir build && cd build
+    cmake ..
+    sudo make install
+    cd ../..
+else
+    echo "jwt-cpp already exists, skipping installation."
+fi
+
+# Download and install bcrypt
+if [ ! -d "bcrypt" ]; then
+    echo "Installing bcrypt..."
+    git clone https://github.com/trusch/libbcrypt.git bcrypt
+    cd bcrypt
+    mkdir build && cd build
+    cmake ..
+    make
+    sudo make install
+    cd ../..
+else
+    echo "bcrypt already exists, skipping installation."
+fi
+
 echo "All external libraries processed successfully."
 
 # Return to external libraries directory

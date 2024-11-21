@@ -20,7 +20,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libmongoc-1.0-0 curl cmake build-essential
+        sudo apt-get install -y libmongoc-1.0-0 curl cmake build-essential \
+            libssl-dev libboost-all-dev
 
     - name: Setup External Libraries
       run: |
@@ -51,6 +52,23 @@ jobs:
         sudo cmake --build . --target install
         cd ../..
         rm mongo-cxx-driver.tar.gz
+
+        # Install jwt-cpp
+        git clone https://github.com/Thalhammer/jwt-cpp.git
+        cd jwt-cpp
+        mkdir build && cd build
+        cmake ..
+        sudo make install
+        cd ../..
+
+        # Install bcrypt
+        git clone https://github.com/trusch/libbcrypt.git bcrypt
+        cd bcrypt
+        mkdir build && cd build
+        cmake ..
+        make
+        sudo make install
+        cd ../..
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
