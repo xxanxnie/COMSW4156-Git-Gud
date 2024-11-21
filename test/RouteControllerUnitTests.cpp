@@ -84,18 +84,6 @@ class MockSubscriptionManager : public SubscriptionManager {
   MOCK_METHOD(void, notifySubscribers, ((const std::string&), (const std::string& )), (override));
 };
 
-class MockSubscriptionManager : public SubscriptionManager {
- public:
-  explicit MockSubscriptionManager(DatabaseManager* dbManager)
-      : SubscriptionManager(*dbManager) {}
-
-  MOCK_METHOD(std::string, addSubscriber, 
-              ((const std::map<std::string, std::string>& subscriberDetails)), (override));
-  MOCK_METHOD(std::string, deleteSubscriber, (const std::string& id), (override));
-  MOCK_METHOD((std::map<std::string, std::string>), getSubscribers, (const std::string&, (const std::string&)), (override));
-  MOCK_METHOD(void, notifySubscribers, ((const std::string&), (const std::string& )), (override));
-};
-
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;

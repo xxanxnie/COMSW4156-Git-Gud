@@ -38,8 +38,9 @@ TEST_F(SubscriptionManagerUnitTests, AddSubscriber) {
       {"contact", "user@example.com"}
   };
 
+  // Mocking insertResource to return a string ID
   ON_CALL(*mockDbManager, insertResource("Subscribers", expectedKeyValues))
-      .WillByDefault(::testing::Return());
+      .WillByDefault(::testing::Return("mock_id_12345"));
 
   std::string result = subscriptionManager->addSubscriber(subscriberDetails);
 
