@@ -35,6 +35,18 @@ set(INCLUDE_PATHS
     include
 )
 
+# Add these lines to find MongoDB C++ driver
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
+
+# Include directories
+set(INCLUDE_PATHS 
+    ${BOOST_ROOT}
+    ${CROW_INCLUDE_DIR}
+    ${ASIO_INCLUDE_DIR}
+    /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
+    include
+|)
+
 # Include directories
 include_directories(${INCLUDE_PATHS})
 
