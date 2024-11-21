@@ -16,6 +16,10 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/MailRecipient.h"
 
+#include <curl/curl.h>    
+#include <curl/easy.h>   
+#include <curl/curlver.h> 
+
 using Poco::Net::InvalidCertificateHandler;
 using Poco::Net::AcceptCertificateHandler;
 using Poco::Net::Context;
@@ -67,10 +71,11 @@ void SubscriptionManager::notifySubscribers(const std::string& resource, const s
 
     for (const auto& [id, contact] : subscribers) {
         if (contact.find('@') != std::string::npos) {
-            // contact is an email
-            sendEmail(contact, "Notification", "A new update for " + resource + " in " + city + " is available.");
-            // contact is a webhook URL
-            sendWebhook(contact, "{\"message\": \"A new update for " + resource + " in " + city + " is available.\"}");
+            sendEmail(contact, "Notification", 
+                      "A new update for " + resource + " in " + city + " is available.");
+        } else {
+            sendWebhook(contact, 
+                        "{\"message\": \"A new update for " + resource + " in " + city + " is available.\"}");
         }
     }
 }
@@ -126,16 +131,23 @@ void SubscriptionManager::sendEmail(const std::string& to, const std::string& su
 
 void SubscriptionManager::sendWebhook(const std::string& url, const std::string& payload) {
     CURL *curl = curl_easy_init();
-    if(curl) {
+    if (curl) {
+        std::cout << "sending request..";
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
 
+        CURLcode res = curl_easy_perform(curl);
         CURLcode res = curl_easy_perform(curl);
 
         if(res != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
         }
+        if(res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        }
 
+        curl_easy_cleanup(curl);
+    }
         curl_easy_cleanup(curl);
     }
     std::cout << "req sent!";

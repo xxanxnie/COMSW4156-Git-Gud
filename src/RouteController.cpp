@@ -761,7 +761,7 @@ void RouteController::deleteHealthcareService(const crow::request& req,
 }
 
 void RouteController::subscribeToResources(const crow::request& req, crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
+  if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
     res.end();
@@ -795,6 +795,20 @@ void RouteController::subscribeToResources(const crow::request& req, crow::respo
     res.end();
   }
 }
+
+void RouteController::receiveWebhook(const crow::request& req, crow::response& res) {
+    try {
+        std::cout << "Webhook received!" << std::endl;
+        std::cout << "Body: " << req.body << std::endl;
+
+        res.code = 200;
+        res.write("Webhook received successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
 
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
@@ -921,4 +935,11 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             subscribeToResources(req, res);
           });
+
+  CROW_ROUTE(app, "/webhook")
+    .methods(crow::HTTPMethod::POST)(
+        [this](const crow::request& req, crow::response& res) {
+            receiveWebhook(req, res);
+        });
+
 }

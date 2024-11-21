@@ -44,6 +44,7 @@ class RouteController {
 
   void index(crow::response& res);
   void subscribeToResources(const crow::request& req, crow::response& res);
+  void receiveWebhook(const crow::request& req, crow::response& res);
 
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
