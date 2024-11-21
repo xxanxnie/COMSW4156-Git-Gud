@@ -69,6 +69,7 @@ set(TEST_FILES
     test/OutreachUnitTests.cpp
     test/ShelterUnitTests.cpp
     test/RouteControllerUnitTests.cpp
+    test/SubscriptionManagerUnitTests.cpp
 )
 
 set(SOURCE_FILES_NO_MAIN
