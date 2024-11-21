@@ -237,63 +237,90 @@ void RouteController::getCounseling(const crow::request& req,
  *   "specialty": "String"
  * }
  */
+
 void RouteController::addCounseling(const crow::request& req,
                                     crow::response& res) {
-    // Check for JWT token authentication
-    auto authHeader = req.get_header_value("Authorization");
-    if (authHeader.empty()) {
-        res.code = 401;
-        res.write("Authentication required. Please provide a valid token.");
-        res.end();
-        return;
-    }
-
-    std::string token = extractToken(authHeader);
-    if (token.empty()) {
-        res.code = 401;
-        res.write("Invalid authorization header format.");
-        res.end();
-        return;
-    }
-
-    // Verify token and check role authorization
-    AuthService& authService = AuthService::getInstance();
-    if (!authService.verifyJWT(token)) {
-        res.code = 401;
-        res.write("Invalid or expired token.");
-        res.end();
-        return;
-    }
-
-    // // Optional: Check for specific role authorization
-    // if (!authService.hasRole(token, "NGO")) {  // Or any other appropriate role
-    //     res.code = 403;
-    //     res.write("Insufficient permissions to perform this action.");
-    //     res.end();
-    //     return;
-    // }
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
 
   try {
-    auto resource = bsoncxx::from_json(req.body);
-    std::string counselorName =
-        resource["counselorName"].get_utf8().value.to_string();
-    std::string specialty = resource["specialty"].get_utf8().value.to_string();
+    std::string result = counselingManager.addCounselor(req.body);
 
-    std::string result =
-        counselingManager.addCounselor(counselorName, specialty);
-
-    if (result == "Success") {
-      res.code = 201;
-      res.write("Counseling resource added successfully.");
-    } else {
+    if (result.find("Error") != std::string::npos) {
       res.code = 400;
+      res.write(result);
+    } else {
+      res.code = 201;
       res.write(result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    res.end();
   }
 }
+
+// void RouteController::addCounseling(const crow::request& req,
+//                                     crow::response& res) {
+//     // Check for JWT token authentication
+//     auto authHeader = req.get_header_value("Authorization");
+//     if (authHeader.empty()) {
+//         res.code = 401;
+//         res.write("Authentication required. Please provide a valid token.");
+//         res.end();
+//         return;
+//     }
+
+//     std::string token = extractToken(authHeader);
+//     if (token.empty()) {
+//         res.code = 401;
+//         res.write("Invalid authorization header format.");
+//         res.end();
+//         return;
+//     }
+
+//     // Verify token and check role authorization
+//     AuthService& authService = AuthService::getInstance();
+//     if (!authService.verifyJWT(token)) {
+//         res.code = 401;
+//         res.write("Invalid or expired token.");
+//         res.end();
+//         return;
+//     }
+
+//     // // Optional: Check for specific role authorization
+//     // if (!authService.hasRole(token, "NGO")) {  // Or any other appropriate role
+//     //     res.code = 403;
+//     //     res.write("Insufficient permissions to perform this action.");
+//     //     res.end();
+//     //     return;
+//     // }
+
+//   try {
+//     auto resource = bsoncxx::from_json(req.body);
+//     std::string counselorName =
+//         resource["counselorName"].get_utf8().value.to_string();
+//     std::string specialty = resource["specialty"].get_utf8().value.to_string();
+
+//     std::string result =
+//         counselingManager.addCounselor(counselorName, specialty);
+
+//     if (result == "Success") {
+//       res.code = 201;
+//       res.write("Counseling resource added successfully.");
+//     } else {
+//       res.code = 400;
+//       res.write(result);
+//     }
+//     res.end();
+//   } catch (const std::exception& e) {
+//     res = handleException(e);
+//   }
+// }
 
 /**
  * Update the counseling information in our database
