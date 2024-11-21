@@ -45,7 +45,7 @@ set(INCLUDE_PATHS
     ${ASIO_INCLUDE_DIR}
     /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
     include
-|)
+)
 
 # Include directories
 include_directories(${INCLUDE_PATHS})
