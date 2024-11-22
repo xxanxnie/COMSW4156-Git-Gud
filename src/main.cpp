@@ -53,8 +53,9 @@ int main(int argc, char* argv[]) {
   Food food(dbManager);
   Outreach outreach(dbManager, "OutreachService");
   Healthcare healthcare(dbManager, "HealthcareService");
+  AuthService authService(dbManager);
 
-  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food);
+  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food, authService);
   routeController.initRoutes(app);  
   app.port(8080).multithreaded().run();
 

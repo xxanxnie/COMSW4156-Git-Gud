@@ -72,6 +72,11 @@ class MockHealthcareService : public Healthcare {
   MOCK_METHOD(std::string, deleteHealthcare, ((std::string)), (override));
 };
 
+class MockAuthService : public AuthService {
+ public:
+  MockAuthService(DatabaseManager& dbManager) : AuthService(dbManager) {}
+};
+
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
@@ -80,6 +85,7 @@ class RouteControllerUnitTests : public ::testing::Test {
   MockFood* mockFood;
   MockOutreachService* mockOutreach;
   MockHealthcareService* mockHealthcare;
+  MockAuthService* mockAuthService;
   RouteController* routeController;
 
   void SetUp() override {
@@ -91,9 +97,17 @@ class RouteControllerUnitTests : public ::testing::Test {
         new MockOutreachService(mockDbManager, "OutreachServiceTest");
     mockHealthcare =
         new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
-    routeController =
-        new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
-                            *mockHealthcare, *mockOutreach, *mockFood);
+    mockAuthService = new MockAuthService(*mockDbManager);
+    
+    routeController = new RouteController(
+        *mockDbManager, 
+        *mockShelter, 
+        *mockCounseling,
+        *mockHealthcare, 
+        *mockOutreach, 
+        *mockFood,
+        *mockAuthService  // Pass the mock auth service
+    );
   }
 
   void TearDown() override {

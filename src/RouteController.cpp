@@ -74,7 +74,6 @@ bool RouteController::authenticateToken(const crow::request& req, crow::response
         return false;
     }
 
-    AuthService& authService = AuthService::getInstance();
     if (!authService.verifyJWT(token)) {
         res.code = 401;
         res.write("Invalid or expired token.");
