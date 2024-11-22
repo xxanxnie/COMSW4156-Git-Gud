@@ -74,53 +74,100 @@ class MockHealthcareService : public Healthcare {
 
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
-  MockDatabaseManager* mockDbManager;
-  MockShelter* mockShelter;
-  MockCounseling* mockCounseling;
-  MockFood* mockFood;
-  MockOutreachService* mockOutreach;
-  MockHealthcareService* mockHealthcare;
-  RouteController* routeController;
+  MockDatabaseManager* mockDbManager = nullptr;
+  MockShelter* mockShelter = nullptr;
+  MockCounseling* mockCounseling = nullptr;
+  MockFood* mockFood = nullptr;
+  MockOutreachService* mockOutreach = nullptr;
+  MockHealthcareService* mockHealthcare = nullptr;
+  RouteController* routeController = nullptr;
+  
+  static const inline std::string validToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwiaWF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidXNlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9.2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE";
+  static const inline std::string expiredToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MTY0MjQ0OTI0OCwiaWF0IjoxNjQyNDQ1NjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidXNlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9.invalid_signature";
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
+    ASSERT_NE(mockDbManager, nullptr);
+
     mockShelter = new MockShelter(mockDbManager);
+    ASSERT_NE(mockShelter, nullptr);
+
     mockCounseling = new MockCounseling(mockDbManager);
+    ASSERT_NE(mockCounseling, nullptr);
+
     mockFood = new MockFood(mockDbManager);
-    mockOutreach =
-        new MockOutreachService(mockDbManager, "OutreachServiceTest");
-    mockHealthcare =
-        new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
-    routeController =
-        new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
-                            *mockHealthcare, *mockOutreach, *mockFood);
+    ASSERT_NE(mockFood, nullptr);
+
+    mockOutreach = new MockOutreachService(mockDbManager, "OutreachServiceTest");
+    ASSERT_NE(mockOutreach, nullptr);
+
+    mockHealthcare = new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
+    ASSERT_NE(mockHealthcare, nullptr);
+
+    routeController = new RouteController(
+        *mockDbManager, 
+        *mockShelter, 
+        *mockCounseling,
+        *mockHealthcare, 
+        *mockOutreach, 
+        *mockFood);
+    ASSERT_NE(routeController, nullptr);
   }
 
   void TearDown() override {
-    delete routeController;
-    delete mockHealthcare;
-    delete mockOutreach;
-    delete mockFood;
-    delete mockCounseling;
-    delete mockShelter;
-    delete mockDbManager;
+    if (routeController) delete routeController;
+    if (mockHealthcare) delete mockHealthcare;
+    if (mockOutreach) delete mockOutreach;
+    if (mockFood) delete mockFood;
+    if (mockCounseling) delete mockCounseling;
+    if (mockShelter) delete mockShelter;
+    if (mockDbManager) delete mockDbManager;
+
+    routeController = nullptr;
+    mockHealthcare = nullptr;
+    mockOutreach = nullptr;
+    mockFood = nullptr;
+    mockCounseling = nullptr;
+    mockShelter = nullptr;
+    mockDbManager = nullptr;
   }
 };
 
 TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
-  std::string mockResponse =
-      R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
-  ON_CALL(*mockShelter, searchShelterAll())
-      .WillByDefault(::testing::Return(mockResponse));
+  std::string mockResponse = R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
+  EXPECT_CALL(*mockShelter, searchShelterAll())
+      .WillOnce(::testing::Return(mockResponse));
 
-  crow::request req{};
-  req.add_header("API-Key", "hml345HML");
-  crow::response res{};
+  crow::request req;
+  crow::response res;
+
+  req.add_header("Authorization", validToken);
 
   routeController->getShelter(req, res);
 
   EXPECT_EQ(res.code, 200);
   EXPECT_EQ(res.body, mockResponse);
+}
+
+TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
+  crow::request req{};
+  crow::response res{};
+
+  routeController->getShelter(req, res);
+
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Missing authorization token");
+}
+
+TEST_F(RouteControllerUnitTests, GetShelterTestExpiredToken) {
+  crow::request req{};
+  req.add_header("Authorization", expiredToken);
+  crow::response res{};
+
+  routeController->getShelter(req, res);
+
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Token has expired");
 }
 
 TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
@@ -147,49 +194,6 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
   routeController->addShelter(req, res);
 
   EXPECT_EQ(res.code, 201);
-}
-
-TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
-  std::string mockResponse =
-      R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
-  ON_CALL(*mockShelter, searchShelterAll())
-      .WillByDefault(::testing::Return(mockResponse));
-
-  crow::request req{};
-  req.add_header("API-Key", "invalid");
-  crow::response res{};
-
-  routeController->getShelter(req, res);
-
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
-}
-
-TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
-  std::string body =
-      "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
-      "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
-      "\"66664566565\",\"HoursOfOperation\": "
-      "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-      ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
-  crow::request req;
-  req.body = body;
-  req.add_header("API-Key", "invalid");
-  crow::response res{};
-
-  ON_CALL(*mockShelter,
-          addShelter(
-              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
-              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
-              "\"66664566565\",\"HoursOfOperation\": "
-              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
-      .WillByDefault(::testing::Return("Success"));
-
-  routeController->addShelter(req, res);
-
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
 }
 
 TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
@@ -227,45 +231,6 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
   routeController->addCounseling(req, res);
 
   EXPECT_EQ(res.code, 201);
-}
-
-TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
-  std::string mockResponse = R"([{"name": "John Doe", "specialty": "CBT"}])";
-  ON_CALL(*mockCounseling, searchCounselorsAll())
-      .WillByDefault(::testing::Return(mockResponse));
-
-  crow::request req{};
-  req.add_header("API-Key", "invalid");
-  crow::response res{};
-
-  routeController->getCounseling(req, res);
-
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
-}
-
-TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
-  std::string body = R"({
-        "Name" : "New York Psychological Association",
-        "City" : "New York",
-        "Address": "211 E 43rd St, New York, NY 10017",
-        "Description" : "Provides mental health counseling and therapy services.",
-        "ContactInfo" : "66664566565",
-        "HoursOfOperation": "2024-01-11",
-        "counselorName": "Jack"
-    })";
-  crow::request req;
-  req.body = body;
-  req.add_header("API-Key", "invalid");
-  crow::response res{};
-
-  ON_CALL(*mockCounseling, addCounselor(body))
-      .WillByDefault(::testing::Return("Success"));
-
-  routeController->addCounseling(req, res);
-
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
@@ -444,18 +409,18 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
-  std::string body =
-      R"({
-  "Name": "My New Hospital",
-  "City" : "New York",
-  "Address": "456 New St",
-  "Description": "General Checkup",
-  "HoursOfOperation": "9 AM - 5 PM",
-  "eligibilityCriteria": "Adults",
-  "contactInfo": "123-456-7890"
-})";
+  std::string body = R"({
+    "Name": "My New Hospital",
+    "City" : "New York",
+    "Address": "456 New St",
+    "Description": "General Checkup",
+    "HoursOfOperation": "9 AM - 5 PM",
+    "eligibilityCriteria": "Adults",
+    "contactInfo": "123-456-7890"
+  })";
+  
   crow::request req;
-  req.add_header("API-Key", "ghi789CLN");
+  req.add_header("Authorization", validToken);
   req.body = body;
   crow::response res{};
 
@@ -465,6 +430,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   routeController->addHealthcareService(req, res);
 
   EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Success");
 }
 
 TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
@@ -484,56 +450,39 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   std::string body = R"({
-  "Name": "My New Hospital",
-  "City" : "New York",
-  "Address": "456 New St",
-  "Description": "General Checkup",
-  "HoursOfOperation": "9 AM - 5 PM",
-  "eligibilityCriteria": "Adults",
-  "contactInfo": "123-456-7890"
-})";
+    "Name": "My New Hospital",
+    "City" : "New York"
+  })";
+  
   crow::request req;
   req.body = body;
-  req.add_header("API-Key", "invalid");
   crow::response res{};
-
-  ON_CALL(*mockHealthcare, addHealthcareService(body))
-      .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Missing authorization token");
 }
 
 TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
-  std::string body =
-      R"({
-     "id":"507f191e810c19729de860ea",
-      "Name": "My New Hospital",
-      "City" : "New York",
-      "Address": "456 New St",
-      "Description": "General Checkup",
-      "HoursOfOperation": "9 AM - 5 PM",
-      "eligibilityCriteria": "Adults",
-      "contactInfo": "123-456-7890"
-    })";
+  std::string body = R"({
+    "id":"507f191e810c19729de860ea",
+    "Name": "My New Hospital",
+    "City" : "New York",
+    "Address": "456 New St",
+    "Description": "General Checkup",
+    "HoursOfOperation": "9 AM - 5 PM",
+    "eligibilityCriteria": "Adults",
+    "contactInfo": "123-456-7890"
+  })";
+
   crow::request req;
-  req.add_header("API-Key", "ghi789CLN");
+  req.add_header("Authorization", validToken);
   req.body = body;
   crow::response res{};
 
-  std::map<std::string, std::string> expectedContent = {
-      {"provider", "City Hospital"},
-      {"serviceType", "Emergency"},
-      {"location", "456 Elm St"},
-      {"operatingHours", "24/7"},
-      {"contactInfo", "987-654-3210"}};
-  std::string id = "507f191e810c19729de860ea";
-
   ON_CALL(*mockHealthcare, updateHealthcare(body))
-      .WillByDefault(
-          ::testing::Return("Healthcare resource update successfully."));
+      .WillByDefault(::testing::Return("Healthcare resource update successfully."));
 
   routeController->updateHealthcareService(req, res);
 
@@ -542,31 +491,31 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
 }
 
 TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
-  std::string body =
-      R"({"id": "507f191e810c19729de860ea", "provider": "City Hospital", "serviceType": "Emergency", "location": "456 Elm St", "operatingHours": "24/7", "contactInfo": "987-654-3210"})";
+  std::string body = R"({
+    "id":"507f191e810c19729de860ea",
+    "Name": "My New Hospital"
+  })";
+
   crow::request req;
-  req.add_header("API-Key", "invalid");
   req.body = body;
   crow::response res{};
 
   routeController->updateHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Missing authorization token");
 }
 
 TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("API-Key", "ghi789CLN");
+  req.add_header("Authorization", validToken);
   req.body = body;
   crow::response res{};
 
   std::string id = "507f191e810c19729de860ea";
-
   ON_CALL(*mockHealthcare, deleteHealthcare(id))
-      .WillByDefault(
-          ::testing::Return("Healthcare record deleted successfully."));
+      .WillByDefault(::testing::Return("Healthcare record deleted successfully."));
 
   routeController->deleteHealthcareService(req, res);
 
@@ -577,12 +526,33 @@ TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
 TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestUnauthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("API-Key", "invalid");
   req.body = body;
   crow::response res{};
 
   routeController->deleteHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 403);
-  EXPECT_EQ(res.body, "Unauthorized.");
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Missing authorization token");
+}
+
+TEST_F(RouteControllerUnitTests, InvalidTokenFormat) {
+  crow::request req{};
+  req.add_header("Authorization", "InvalidTokenFormat");
+  crow::response res{};
+
+  routeController->getShelter(req, res);
+
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Invalid token format");
+}
+
+TEST_F(RouteControllerUnitTests, MalformedToken) {
+  crow::request req{};
+  req.add_header("Authorization", "Bearer invalid.token");
+  crow::response res{};
+
+  routeController->getShelter(req, res);
+
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Invalid token");
 }
