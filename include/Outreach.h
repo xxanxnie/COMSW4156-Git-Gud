@@ -23,7 +23,7 @@ class Outreach {
 
   std::vector<std::pair<std::string, std::string>> createDBContent();
 
-  virtual std::string getAllOutreachServices();
+  virtual std::string getAllOutreachServices(int start = 0);
   virtual std::string deleteOutreach(std::string id);
   virtual std::string updateOutreach(std::string request_body);
 

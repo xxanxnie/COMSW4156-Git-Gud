@@ -2,9 +2,10 @@
 #define FOOD_RESOURCE_H
 
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-#include <unordered_map>
+
 #include "DatabaseManager.h"
 
 class Food {
@@ -19,7 +20,7 @@ class Food {
   std::unordered_map<std::string, std::string> format;
   virtual std::string addFood(std::string request_body);
   std::vector<std::pair<std::string, std::string>> createDBContent();
-  virtual std::string getAllFood();
+  virtual std::string getAllFood(int start = 0);
 
   virtual std::string updateFood(std::string request_body);
 

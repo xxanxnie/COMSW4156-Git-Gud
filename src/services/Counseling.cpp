@@ -31,11 +31,20 @@ Counseling::Counseling(DatabaseManager &dbManager)
                                    "HoursOfOperation"});
   cleanCache();
 }
+/**
+ * @brief Resets the cached data format.
+ */
 void Counseling::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
   }
 }
+/**
+ * @brief Validates the input format and extracts the ID if provided.
+ * @param content The input JSON string containing counselor data.
+ * @return The extracted ID as a string.
+ * @throws std::invalid_argument If the input is missing required fields or contains invalid fields.
+ */
 std::string Counseling::checkInputFormat(std::string content) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
@@ -63,9 +72,8 @@ std::string Counseling::checkInputFormat(std::string content) {
 }
 /**
  * @brief Adds a new counselor to the database.
- * @param counselorName The name of the counselor.
- * @param specialty The specialty of the counselor.
- * @return A string indicating ID or an error message.
+ * @param request_body A JSON string containing the counselor data.
+ * @return The ID of the newly added counselor or an error message.
  */
 std::string Counseling::addCounselor(std::string request_body) {
   try {
@@ -79,11 +87,8 @@ std::string Counseling::addCounselor(std::string request_body) {
     return "Error: " + std::string(e.what());
   }
 }
-
 /**
  * @brief Creates the database content for a counselor.
- * @param counselorName The name of the counselor.
- * @param specialty The specialty of the counselor.
  * @return A vector of key-value pairs representing the counselor's data.
  */
 std::vector<std::pair<std::string, std::string>> Counseling::createDBContent() {
@@ -91,14 +96,15 @@ std::vector<std::pair<std::string, std::string>> Counseling::createDBContent() {
   for (auto property : format) {
     content.push_back(property);
   }
+  cleanCache();
   return content;
 }
 
 /**
  * @brief Deletes a counselor from the database.
  * @param counselorId The ID of the counselor to delete.
- * @return A string indicating the result of the operation.
- * @todo Implement counselor deletion logic.
+ * @return "Success" if the operation succeeds.
+ * @throws std::runtime_error If the specified document is not found.
  */
 std::string Counseling::deleteCounselor(const std::string &counselorId) {
   if (dbManager.deleteResource(collection_name, counselorId)) {
@@ -110,11 +116,12 @@ std::string Counseling::deleteCounselor(const std::string &counselorId) {
 
 /**
  * @brief Searches for all counselors in the database.
+ * @param start The starting index for pagination.
  * @return A JSON string containing all counselors' information.
  */
-std::string Counseling::searchCounselorsAll() {
+std::string Counseling::searchCounselorsAll(int start) {
   std::vector<bsoncxx::document::value> result;
-  dbManager.findCollection(collection_name, {}, result);
+  dbManager.findCollection(start, collection_name, {}, result);
   std::string ret;
   if (!result.empty()) {
     ret = printCounselors(result);
@@ -126,11 +133,8 @@ std::string Counseling::searchCounselorsAll() {
 
 /**
  * @brief Updates a counselor's information in the database.
- * @param counselorId The ID of the counselor to update.
- * @param counselorName The new name of the counselor.
- * @param specialty The new specialty of the counselor.
- * @return A string indicating the result of the operation.
- * @todo Implement counselor update logic.
+ * @param request_body A JSON string containing updated counselor data.
+ * @return "Success" if the update succeeds or an error message.
  */
 std::string Counseling::updateCounselor(std::string request_body) {
   try {

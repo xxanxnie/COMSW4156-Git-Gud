@@ -45,7 +45,8 @@ class RouteController {
 
   void initRoutes(crow::SimpleApp& app);
   void index(crow::response& res);
-
+  std::optional<std::string> get_param(
+      const std::map<std::string, std::string>& params, const std::string& key);
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
   void updateShelter(const crow::request& req, crow::response& res);

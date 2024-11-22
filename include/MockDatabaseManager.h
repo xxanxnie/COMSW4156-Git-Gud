@@ -12,7 +12,7 @@ class MockDatabaseManager : public DatabaseManager {
 
   MOCK_METHOD(
       void, findCollection,
-      (const std::string &collectionName,
+      ((int start),(const std::string &collectionName),
        (const std::vector<std::pair<std::string, std::string>> &keyValues),
        (std::vector<bsoncxx::document::value> & result)),
       (override));

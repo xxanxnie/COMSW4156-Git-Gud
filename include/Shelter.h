@@ -15,7 +15,7 @@ class Shelter {
   std::string checkInputFormat(std::string content);
   virtual std::string addShelter(std::string request_body);
   virtual std::string deleteShelter(std::string id);
-  virtual std::string searchShelterAll();
+  virtual std::string searchShelterAll(int start = 0);
   virtual std::string updateShelter(std::string request_body);
   std::vector<std::pair<std::string, std::string>> createDBContent();
   std::string printShelters(
