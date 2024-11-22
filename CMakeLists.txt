@@ -23,6 +23,10 @@ endif()
 set(BCRYPT_INCLUDE_DIR "/usr/local/include")
 set(BCRYPT_LIBRARY "/usr/local/lib/libbcrypt.a")
 
+# Add spdlog
+find_package(spdlog CONFIG REQUIRED)
+message(STATUS "spdlog version: ${spdlog_VERSION}")
+
 # Include directories
 set(INCLUDE_PATHS 
     ${BOOST_ROOT}
@@ -111,6 +115,7 @@ target_link_libraries(GitGud PRIVATE
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
+    spdlog::spdlog
 )
 
 enable_testing()
@@ -133,6 +138,7 @@ target_link_libraries(GitGudTests PRIVATE
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
+    spdlog::spdlog
 )
 
 include(GoogleTest)
