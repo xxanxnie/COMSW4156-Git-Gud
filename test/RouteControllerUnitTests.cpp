@@ -646,7 +646,7 @@ TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
 
   routeController->deleteHealthcareService(req, res);
 
-  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.code, 200);
   EXPECT_EQ(res.body, "Healthcare record deleted successfully.");
 }
 

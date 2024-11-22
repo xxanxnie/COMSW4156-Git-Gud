@@ -792,7 +792,7 @@ void RouteController::deleteOutreach(const crow::request& req,
       }
     }
     outreachManager.deleteOutreach(id);
-    res.code = 201;
+    res.code = 200;
     std::string message = "Outreach resource deleted successfully.";
     res.write(message);
     LOG_INFO("RouteController", "deleteOutreach success: code={}, id={}",
@@ -978,7 +978,7 @@ void RouteController::deleteHealthcareService(const crow::request& req,
     }
 
     std::string msg = healthcareManager.deleteHealthcare(id);
-    res.code = 201;
+    res.code = 200;
     res.write(msg);
     LOG_INFO("RouteController",
              "deleteHealthcareService success: code={}, id={}", res.code, id);
