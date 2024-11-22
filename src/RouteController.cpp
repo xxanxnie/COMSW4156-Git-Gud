@@ -56,6 +56,34 @@ bool authenticatePermissionsToPost(const crow::request& req) {
          authenticate(req, "CLN") || authenticate(req, "GOV");
 }
 
+// Add this helper method to RouteController class
+bool RouteController::authenticateToken(const crow::request& req, crow::response& res) {
+    auto authHeader = req.get_header_value("Authorization");
+    if (authHeader.empty()) {
+        res.code = 401;
+        res.write("Authentication required. Please provide a valid token.");
+        res.end();
+        return false;
+    }
+
+    std::string token = extractToken(authHeader);
+    if (token.empty()) {
+        res.code = 401;
+        res.write("Invalid authorization header format.");
+        res.end();
+        return false;
+    }
+
+    if (!authService.verifyJWT(token)) {
+        res.code = 401;
+        res.write("Invalid or expired token.");
+        res.end();
+        return false;
+    }
+
+    return true;
+}
+
 /**
  * Redirects to the homepage.
  *
@@ -79,10 +107,7 @@ void RouteController::index(crow::response& res) {
  */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -107,10 +132,7 @@ void RouteController::getShelter(const crow::request& req,
  */
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -140,10 +162,7 @@ void RouteController::addShelter(const crow::request& req,
  */
 void RouteController::updateShelter(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -170,10 +189,7 @@ void RouteController::updateShelter(const crow::request& req,
  */
 void RouteController::deleteShelter(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -206,10 +222,7 @@ void RouteController::deleteShelter(const crow::request& req,
  */
 void RouteController::getCounseling(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -240,10 +253,7 @@ void RouteController::getCounseling(const crow::request& req,
 
 void RouteController::addCounseling(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -264,64 +274,6 @@ void RouteController::addCounseling(const crow::request& req,
   }
 }
 
-// void RouteController::addCounseling(const crow::request& req,
-//                                     crow::response& res) {
-//     // Check for JWT token authentication
-//     auto authHeader = req.get_header_value("Authorization");
-//     if (authHeader.empty()) {
-//         res.code = 401;
-//         res.write("Authentication required. Please provide a valid token.");
-//         res.end();
-//         return;
-//     }
-
-//     std::string token = extractToken(authHeader);
-//     if (token.empty()) {
-//         res.code = 401;
-//         res.write("Invalid authorization header format.");
-//         res.end();
-//         return;
-//     }
-
-//     // Verify token and check role authorization
-//     AuthService& authService = AuthService::getInstance();
-//     if (!authService.verifyJWT(token)) {
-//         res.code = 401;
-//         res.write("Invalid or expired token.");
-//         res.end();
-//         return;
-//     }
-
-//     // // Optional: Check for specific role authorization
-//     // if (!authService.hasRole(token, "NGO")) {  // Or any other appropriate role
-//     //     res.code = 403;
-//     //     res.write("Insufficient permissions to perform this action.");
-//     //     res.end();
-//     //     return;
-//     // }
-
-//   try {
-//     auto resource = bsoncxx::from_json(req.body);
-//     std::string counselorName =
-//         resource["counselorName"].get_utf8().value.to_string();
-//     std::string specialty = resource["specialty"].get_utf8().value.to_string();
-
-//     std::string result =
-//         counselingManager.addCounselor(counselorName, specialty);
-
-//     if (result == "Success") {
-//       res.code = 201;
-//       res.write("Counseling resource added successfully.");
-//     } else {
-//       res.code = 400;
-//       res.write(result);
-//     }
-//     res.end();
-//   } catch (const std::exception& e) {
-//     res = handleException(e);
-//   }
-// }
-
 /**
  * Update the counseling information in our database
  * PATCH with this key in json format
@@ -332,10 +284,7 @@ void RouteController::addCounseling(const crow::request& req,
  */
 void RouteController::updateCounseling(const crow::request& req,
                                        crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -363,10 +312,7 @@ void RouteController::updateCounseling(const crow::request& req,
  */
 void RouteController::deleteCounseling(const crow::request& req,
                                        crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -409,10 +355,7 @@ void RouteController::deleteCounseling(const crow::request& req,
  * interaction or JSON parsing.
  */
 void RouteController::addFood(const crow::request& req, crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -448,10 +391,7 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
  */
 void RouteController::getAllFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -483,10 +423,7 @@ void RouteController::getAllFood(const crow::request& req,
  */
 void RouteController::deleteFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -542,10 +479,7 @@ void RouteController::deleteFood(const crow::request& req,
  */
 void RouteController::updateFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
   try {
@@ -581,10 +515,7 @@ void RouteController::updateFood(const crow::request& req,
  */
 void RouteController::addOutreachService(const crow::request& req,
                                          crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -616,10 +547,7 @@ void RouteController::addOutreachService(const crow::request& req,
  */
 void RouteController::getAllOutreachServices(const crow::request& req,
                                              crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -637,10 +565,7 @@ void RouteController::getAllOutreachServices(const crow::request& req,
 
 void RouteController::updateOutreach(const crow::request& req,
                                      crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -662,10 +587,7 @@ void RouteController::updateOutreach(const crow::request& req,
 
 void RouteController::deleteOutreach(const crow::request& req,
                                      crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -703,12 +625,10 @@ void RouteController::deleteOutreach(const crow::request& req,
  */
 void RouteController::addHealthcareService(const crow::request& req,
                                            crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
+
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -739,10 +659,7 @@ void RouteController::addHealthcareService(const crow::request& req,
  */
 void RouteController::getAllHealthcareServices(const crow::request& req,
                                                crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -758,10 +675,7 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
 
 void RouteController::updateHealthcareService(const crow::request& req,
                                               crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 
@@ -783,10 +697,7 @@ void RouteController::updateHealthcareService(const crow::request& req,
 
 void RouteController::deleteHealthcareService(const crow::request& req,
                                               crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  if (!authenticateToken(req, res)) {
     return;
   }
 

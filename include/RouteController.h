@@ -26,20 +26,24 @@ class RouteController {
   Healthcare& healthcareManager;
   Outreach& outreachManager;
   Food& foodManager;
+  AuthService& authService;
+
+  bool authenticateToken(const crow::request& req, crow::response& res);
 
  public:
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
-                  Outreach& outreachManager, Food& foodManager)
+                  Outreach& outreachManager, Food& foodManager,
+                  AuthService& authService)
       : dbManager(dbManager),
         shelterManager(shelterManager),
         counselingManager(counselingManager),
         healthcareManager(healthcareManager),
         outreachManager(outreachManager),
-        foodManager(foodManager) {}
+        foodManager(foodManager),
+        authService(authService) {}
 
   void initRoutes(crow::SimpleApp& app);
-
   void index(crow::response& res);
 
   // Shelter-related handlers
