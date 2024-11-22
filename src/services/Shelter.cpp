@@ -12,6 +12,15 @@ TargetUser
 Capacity
 CurrentUse
 */
+
+/**
+ * @brief Constructs a Shelter object.
+ * 
+ * Initializes the Shelter object with a reference to the database manager and the collection name.
+ * 
+ * @param dbManager A reference to the DatabaseManager for database operations.
+ * @param collection_name The name of the collection where shelter data is stored.
+ */
 Shelter::Shelter(DatabaseManager &dbManager, std::string collection_name)
     : dbManager(dbManager), collection_name(collection_name) {
   cols = std::vector<std::string>({"Name", "City", "Address", "Description",
@@ -19,11 +28,28 @@ Shelter::Shelter(DatabaseManager &dbManager, std::string collection_name)
                                    "TargetUser", "Capacity", "CurrentUse"});
   cleanCache();
 }
+/**
+ * @brief Clears the internal cache.
+ * 
+ * Resets all property values in the cache to empty strings.
+ */
 void Shelter::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
   }
 }
+/**
+ * @brief Validates and parses the input JSON string for a shelter entry.
+ * 
+ * Ensures all required fields are present, validates capacity and current use, 
+ * and extracts the ID if provided.
+ * 
+ * @param content A JSON string containing the shelter data.
+ * 
+ * @return The extracted ID as a string, or an empty string if no ID is provided.
+ * 
+ * @throws std::invalid_argument If required fields are missing or contain invalid values.
+ */
 std::string Shelter::checkInputFormat(std::string content) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
@@ -56,14 +82,11 @@ std::string Shelter::checkInputFormat(std::string content) {
   return id;
 }
 /**
- * Add the shelter information to our database
- *
- * @param ORG     The organization who gave the infomation.
- * @param User     The target this service provide for.
- * @param location     The location of the shelter.
- * @param capacity     The maximum number of users that the shelter can handle.
- * @param curUse       The current users that using this shelter.
- * @return item ID in database or Error message
+ * @brief Adds a new shelter to the database.
+ * 
+ * @param request_body A JSON string containing the shelter data.
+ * 
+ * @return The ID of the newly added shelter, or an error message if the operation fails.
  */
 std::string Shelter::addShelter(std::string request_body) {
   try {
@@ -78,15 +101,9 @@ std::string Shelter::addShelter(std::string request_body) {
 }
 
 /**
- * Concat the input into data content format
- *
- * @param ORG     The organization who gave the infomation.
- * @param User     The target this service provide for.
- * @param location     The location of the shelter.
- * @param capacity     The maximum number of users that the shelter can handle.
- * @param curUse       The current users that using this shelter.
- * @return std::vector<std::pair<std::string, std::string>> concat the value in
- * to vector of pair
+ * @brief Formats the shelter data into key-value pairs for database insertion.
+ * 
+ * @return A vector of key-value pairs representing the shelter data.
  */
 std::vector<std::pair<std::string, std::string>> Shelter::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
@@ -95,11 +112,12 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent() {
   }
   return content;
 }
-
 /**
- * Get the all data content in Shelter collection, and print it
- *
- * @return string, concat the content value
+ * @brief Retrieves all shelters from the database and prints their details.
+ * 
+ * @param start The starting index for pagination.
+ * 
+ * @return A JSON string containing all shelters, or an empty array ("[]") if none are found.
  */
 std::string Shelter::searchShelterAll(int start) {
   std::vector<bsoncxx::document::value> result;
@@ -121,7 +139,13 @@ std::string Shelter::searchShelterAll(int start) {
 //   std::string id = shelter["_id"].get_oid().value.to_string();
 //   return id;
 // }
-
+/**
+ * @brief Formats the details of all shelters into a human-readable string.
+ * 
+ * @param shelters A vector of BSON documents representing shelters.
+ * 
+ * @return A formatted string of shelter details.
+ */
 std::string Shelter::printShelters(
     std::vector<bsoncxx::document::value> &shelters) const {
   std::string ret;
@@ -135,7 +159,13 @@ std::string Shelter::printShelters(
   }
   return ret;
 }
-
+/**
+ * @brief Updates an existing shelter in the database.
+ * 
+ * @param request_body A JSON string containing the updated shelter data.
+ * 
+ * @return A success message if the operation is successful, or an error message if it fails.
+ */
 std::string Shelter::updateShelter(std::string request_body) {
   try {
     cleanCache();
@@ -147,6 +177,15 @@ std::string Shelter::updateShelter(std::string request_body) {
   }
   return "Update";
 }
+/**
+ * @brief Deletes a shelter from the database.
+ * 
+ * @param id The ID of the shelter to delete.
+ * 
+ * @return A success message if the deletion is successful.
+ * 
+ * @throws std::runtime_error If the specified shelter is not found.
+ */
 std::string Shelter::deleteShelter(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "SUC";

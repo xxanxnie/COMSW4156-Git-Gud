@@ -17,6 +17,13 @@ ContactInfo
 eligibilityCriteria
 Hours of Operation
 */
+
+/**
+ * @brief Constructs a Healthcare object.
+ * 
+ * @param dbManager A reference to the DatabaseManager object for database operations.
+ * @param collection_name The name of the collection where healthcare services are stored.
+ */
 Healthcare::Healthcare(DatabaseManager& dbManager,
                        const std::string& collection_name)
     : dbManager(dbManager), collection_name(collection_name) {
@@ -25,11 +32,26 @@ Healthcare::Healthcare(DatabaseManager& dbManager,
                                    "eligibilityCriteria"});
   cleanCache();
 }
+/**
+ * @brief Clears the internal cache by resetting all properties to empty strings.
+ */
 void Healthcare::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
   }
 }
+/**
+ * @brief Validates and parses the input JSON string for a healthcare service.
+ * 
+ * Checks the input JSON string to ensure all required fields are present and valid. 
+ * Extracts the ID if provided.
+ * 
+ * @param content A JSON string containing the healthcare service data.
+ * 
+ * @return The extracted ID as a string, or an empty string if no ID is provided.
+ * 
+ * @throws std::invalid_argument If required fields are missing or unexpected fields are present.
+ */
 std::string Healthcare::checkInputFormat(std::string content) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
@@ -58,18 +80,10 @@ std::string Healthcare::checkInputFormat(std::string content) {
 }
 /**
  * @brief Adds a new healthcare service to the database.
- *
- * This function adds a healthcare service to the database by constructing
- * a set of key-value pairs and inserting them into the specified collection.
- *
- * @param provider The name of the healthcare provider.
- * @param serviceType The type of service being provided (e.g., General Care).
- * @param location The location where the service is provided.
- * @param operatingHours The operating hours for the healthcare service.
- * @param eligibilityCriteria The criteria required for eligibility.
- * @param contactInfo The contact information for the healthcare service.
- * @return A string indicating whether the operation was successful (item ID)
- *         or an error message in case of failure.
+ * 
+ * @param request_body A JSON string containing the healthcare service data.
+ * 
+ * @return The ID of the newly added healthcare service, or an error message if the operation fails.
  */
 std::string Healthcare::addHealthcareService(std::string request_body) {
   try {
@@ -85,17 +99,8 @@ std::string Healthcare::addHealthcareService(std::string request_body) {
 }
 
 /**
- * @brief Creates a key-value representation of a healthcare service.
- *
- * This function converts the parameters of a healthcare service into a
- * vector of key-value pairs for insertion into the database.
- *
- * @param provider The name of the healthcare provider.
- * @param serviceType The type of service being provided.
- * @param location The location where the service is provided.
- * @param operatingHours The operating hours for the healthcare service.
- * @param eligibilityCriteria The criteria required for eligibility.
- * @param contactInfo The contact information for the healthcare service.
+ * @brief Converts the healthcare service data into key-value pairs for database storage.
+ * 
  * @return A vector of key-value pairs representing the healthcare service.
  */
 std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
@@ -108,12 +113,12 @@ std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
 
 /**
  * @brief Retrieves all healthcare services from the database.
- *
- * This function fetches all the documents in the healthcare services
- * collection from the database and returns them in a formatted string.
- *
- * @return A string containing all healthcare services in JSON format.
- *         Returns an empty array ("[]") if no services are found.
+ * 
+ * Queries the database for all documents in the healthcare services collection and returns them in JSON format.
+ * 
+ * @param start The starting index for pagination.
+ * 
+ * @return A JSON string containing all healthcare services, or an empty array ("[]") if none are found.
  */
 std::string Healthcare::getAllHealthcareServices(int start) {
   std::vector<bsoncxx::document::value> result;
@@ -128,7 +133,13 @@ std::string Healthcare::getAllHealthcareServices(int start) {
   }
   return "[]";
 }
-
+/**
+ * @brief Updates an existing healthcare service in the database.
+ * 
+ * @param request_body A JSON string containing the updated healthcare service data.
+ * 
+ * @return "Update" if the operation is successful, or an error message if it fails.
+ */
 std::string Healthcare::updateHealthcare(std::string request_body) {
   try {
     cleanCache();
@@ -140,7 +151,15 @@ std::string Healthcare::updateHealthcare(std::string request_body) {
   }
   return "Update";
 }
-
+/**
+ * @brief Deletes a healthcare service from the database.
+ * 
+ * @param id The ID of the healthcare service to delete.
+ * 
+ * @return A success message if the service is deleted, or an error if the operation fails.
+ * 
+ * @throws std::runtime_error If the specified healthcare record is not found.
+ */
 std::string Healthcare::deleteHealthcare(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "Healthcare record deleted successfully.";
@@ -151,15 +170,11 @@ std::string Healthcare::deleteHealthcare(std::string id) {
 }
 
 /**
- * @brief Prints all healthcare services in a formatted string.
- *
- * This function takes a vector of BSON documents representing healthcare
- * services and converts them into a human-readable string, omitting the
- * document's ObjectId.
- *
+ * @brief Converts a vector of healthcare services into a human-readable string.
+ * 
  * @param services A vector of BSON documents representing healthcare services.
- * @return A string containing the formatted information of all healthcare
- * services.
+ * 
+ * @return A formatted string containing the details of all healthcare services.
  */
 std::string Healthcare::printHealthcareServices(
     std::vector<bsoncxx::document::value>& services) const {

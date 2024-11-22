@@ -15,17 +15,38 @@ TargetUser
 Quantity
 ExpirationDate
 */
+
+/**
+ * @brief Constructs a Food object.
+ * @param db Reference to the DatabaseManager object.
+ */
 Food::Food(DatabaseManager& db) : db(db) {
   cols = std::vector<std::string>({"Name", "City", "Address", "Description",
                                    "ContactInfo", "HoursOfOperation",
                                    "TargetUser", "Quantity", "ExpirationDate"});
   cleanCache();
 }
+/**
+ * @brief Resets the cache format to an empty state.
+ */
 void Food::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
   }
 }
+/**
+ * @brief Validates the input JSON format and extracts the ID if present.
+ *
+ * This method ensures all required fields are provided and valid in the
+ * request body. It also checks that the quantity is a positive integer.
+ *
+ * @param content A JSON string containing the food resource data.
+ *
+ * @return The extracted ID as a string, if present in the input.
+ *
+ * @throws std::invalid_argument If the input is empty, missing required fields,
+ * or contains invalid data.
+ */
 std::string Food::checkInputFormat(std::string content) {
   if (content.empty()) {
     throw std::invalid_argument("Invalid input: Request body cannot be empty.");
@@ -55,6 +76,11 @@ std::string Food::checkInputFormat(std::string content) {
   }
   return id;
 }
+/**
+ * @brief Creates a vector of key-value pairs representing the food resource.
+ *
+ * @return A vector containing all key-value pairs for the food resource.
+ */
 std::vector<std::pair<std::string, std::string>> Food::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
   for (auto property : format) {
@@ -95,20 +121,18 @@ std::string Food::addFood(std::string request_body) {
     return "Error inserting food resource: " + std::string(e.what());
   }
 }
-
 /**
  * @brief Deletes a food resource from the database.
  *
- * This method takes the ID of the food resource and removes it from the
- * database.
+ * This method removes a food resource from the database by its ID.
  *
  * @param id The ID of the food resource to be deleted.
  *
- * @return std::string Returns "Success" if the food resource is deleted
- * successfully, or an error message if the deletion fails.
+ * @return "Success" if the resource is deleted, or an error message if deletion
+ * fails.
  *
- * @exception std::exception Throws if an error occurs during the database
- * deletion.
+ * @throws std::runtime_error If the specified document is not found in the
+ * database.
  */
 std::string Food::deleteFood(const std::string& id) {
   if (db.deleteResource("Food", id)) {
@@ -120,19 +144,20 @@ std::string Food::deleteFood(const std::string& id) {
 /**
  * @brief Retrieves all food resources from the database.
  *
- * This method queries the database for all food resources and returns them
- * as a JSON-formatted string. If no food items are found, it returns an empty
- * JSON array.
+ * This method queries the database for all food resources and returns them as
+ * a JSON string. If no food items are found, it returns an empty JSON array.
  *
- * @return A string containing all food resources in JSON format.
+ * @param start The starting index for pagination.
  *
- * @exception std::exception Throws if an error occurs during the database query
- * or data serialization.
+ * @return A JSON string containing all food resources in the database.
+ *
+ * @throws std::exception If an error occurs during the database query or
+ * serialization.
  */
 std::string Food::getAllFood(int start) {
   std::vector<bsoncxx::document::value> foodItems;
 
-  db.findCollection(start,"Food", {}, foodItems);
+  db.findCollection(start, "Food", {}, foodItems);
 
   if (foodItems.empty()) {
     return "[]";
@@ -149,17 +174,16 @@ std::string Food::getAllFood(int start) {
 /**
  * @brief Updates a food resource in the database.
  *
- * This method takes the ID of the food resource and new key-value pairs
- * to update the resource in the database.
+ * This method updates a food resource in the database based on its ID and the
+ * provided JSON request body.
  *
- * @param id The ID of the food resource to be updated.
- * @param resource A vector of key-value pairs with the updated values.
+ * @param request_body A JSON string containing the updated food resource
+ * details.
  *
- * @return std::string Returns "Success" if the food resource is updated
- * successfully, or an error message if the update fails.
+ * @return "Success" if the resource is updated successfully, or an error
+ * message if the update fails.
  *
- * @exception std::exception Throws if an error occurs during the database
- * update.
+ * @throws std::exception If an error occurs during database update.
  */
 std::string Food::updateFood(std::string request_body) {
   try {

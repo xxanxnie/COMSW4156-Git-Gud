@@ -10,6 +10,15 @@ TargetAudience
 ContactInfo
 Hours of Operation
 */
+
+/**
+ * @brief Constructs an Outreach object.
+ * 
+ * Initializes the Outreach object with a reference to the database manager and the collection name.
+ * 
+ * @param dbManager A reference to the DatabaseManager for database operations.
+ * @param collection_name The name of the collection where outreach services are stored.
+ */
 Outreach::Outreach(DatabaseManager& dbManager,
                    const std::string& collection_name)
     : dbManager(dbManager), collection_name(collection_name) {
@@ -18,11 +27,27 @@ Outreach::Outreach(DatabaseManager& dbManager,
                                    "TargetAudience"});
   cleanCache();
 }
+/**
+ * @brief Clears the internal cache.
+ * 
+ * Resets all properties to empty strings in preparation for new input.
+ */
 void Outreach::cleanCache() {
   for (auto name : cols) {
     format[name] = "";
   }
 }
+/**
+ * @brief Validates and parses the input JSON string for an outreach service.
+ * 
+ * Ensures all required fields are present and valid. Extracts the ID if provided.
+ * 
+ * @param content A JSON string containing the outreach service data.
+ * 
+ * @return The extracted ID as a string, or an empty string if no ID is provided.
+ * 
+ * @throws std::invalid_argument If required fields are missing or unexpected fields are present.
+ */
 std::string Outreach::checkInputFormat(std::string content) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
@@ -49,18 +74,11 @@ std::string Outreach::checkInputFormat(std::string content) {
   return id;
 }
 /**
- * @brief Add the outreach program information to the database.
- *
- * This method creates a database entry for the outreach program
- * with the provided details.
- *
- * @param targetAudience The intended audience for the outreach program.
- * @param programName The name of the outreach program.
- * @param description A brief description of the outreach program.
- * @param programDate The duration of the outreach program.
- * @param location The location where the outreach program will take place.
- * @param contactInfo Contact information for the outreach program.
- * @return A string indicating the ID or failure of the operation.
+ * @brief Adds a new outreach service to the database.
+ * 
+ * @param request_body A JSON string containing the outreach service data.
+ * 
+ * @return The ID of the newly added outreach service, or an error message if the operation fails.
  */
 std::string Outreach::addOutreachService(std::string request_body) {
   try {
@@ -76,19 +94,9 @@ std::string Outreach::addOutreachService(std::string request_body) {
 }
 
 /**
- * @brief Create content for the database insertion.
- *
- * This method formats the provided outreach program details
- * into a vector of key-value pairs suitable for database insertion.
- *
- * @param targetAudience The intended audience for the outreach program.
- * @param programName The name of the outreach program.
- * @param description A brief description of the outreach program.
- * @param programDate The duration of the outreach program.
- * @param location The location of the outreach program.
- * @param contactInfo Contact information for the outreach program.
- * @return A vector of key-value pairs representing the outreach program
- * content.
+ * @brief Formats the outreach service data into key-value pairs for database storage.
+ * 
+ * @return A vector of key-value pairs representing the outreach service data.
  */
 std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
   std::vector<std::pair<std::string, std::string>> content;
@@ -99,13 +107,13 @@ std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
 }
 
 /**
- * @brief Retrieve all outreach services from the database.
- *
- * This method queries the database for all outreach services
- * and returns them in a formatted string.
- *
- * @return A string representation of all outreach services,
- *         or "[]" if no services are found.
+ * @brief Retrieves all outreach services from the database.
+ * 
+ * Queries the database and retrieves all documents in the outreach services collection.
+ * 
+ * @param start The starting index for pagination.
+ * 
+ * @return A JSON string containing all outreach services, or an empty array ("[]") if none are found.
  */
 std::string Outreach::getAllOutreachServices(int start) {
   std::vector<bsoncxx::document::value> result;
@@ -123,13 +131,11 @@ std::string Outreach::getAllOutreachServices(int start) {
 }
 
 /**
- * @brief Print the outreach services in a formatted string.
- *
- * This method formats the outreach services into a string
- * for display or further processing.
- *
- * @param services A vector of documents representing the outreach services.
- * @return A formatted string of outreach services.
+ * @brief Converts a list of outreach services into a human-readable format.
+ * 
+ * @param services A vector of BSON documents representing the outreach services.
+ * 
+ * @return A formatted string containing the details of all outreach services.
  */
 std::string Outreach::printOutreachServices(
     const std::vector<bsoncxx::document::value>& services) const {
@@ -145,14 +151,28 @@ std::string Outreach::printOutreachServices(
   }
   return ret;
 }
-
+/**
+ * @brief Deletes an outreach service from the database.
+ * 
+ * @param id The ID of the outreach service to delete.
+ * 
+ * @return A success message if the deletion is successful.
+ * 
+ * @throws std::runtime_error If the specified outreach service is not found.
+ */
 std::string Outreach::deleteOutreach(std::string id) {
   if (dbManager.deleteResource(collection_name, id)) {
     return "Outreach Service deleted successfully.";
   }
   throw std::runtime_error("Document with the specified _id not found.");
 }
-
+/**
+ * @brief Updates an existing outreach service in the database.
+ * 
+ * @param request_body A JSON string containing the updated outreach service data.
+ * 
+ * @return A success message if the operation is successful, or an error message if it fails.
+ */
 std::string Outreach::updateOutreach(std::string request_body) {
   try {
     cleanCache();
