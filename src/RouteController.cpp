@@ -87,7 +87,12 @@ void RouteController::getShelter(const crow::request& req,
   }
 
   try {
-    std::string response = shelterManager.searchShelterAll();
+    int start = 0;
+    auto start_param = req.url_params.get("start");
+    if (start_param && std::stoi(start_param) > 0) {
+      start = std::stoi(start_param);
+    }
+    std::string response = shelterManager.searchShelterAll(start);
     res.code = 200;
     res.write(response);
     res.end();
@@ -214,7 +219,12 @@ void RouteController::getCounseling(const crow::request& req,
   }
 
   try {
-    std::string response = counselingManager.searchCounselorsAll();
+    int start = 0;
+    auto start_param = req.url_params.get("start");
+    if (start_param && std::stoi(start_param) > 0) {
+      start = std::stoi(start_param);
+    }
+    std::string response = counselingManager.searchCounselorsAll(start);
     res.code = 200;
     res.write(response);
     res.end();
@@ -398,7 +408,12 @@ void RouteController::getAllFood(const crow::request& req,
 
   try {
     // Get the response directly from the food manager
-    std::string response = foodManager.getAllFood();
+    int start = 0;
+    auto start_param = req.url_params.get("start");
+    if (start_param && std::stoi(start_param) > 0) {
+      start = std::stoi(start_param);
+    }
+    std::string response = foodManager.getAllFood(start);
 
     // Return the raw response without additional formatting
     res.code = 200;
@@ -565,9 +580,14 @@ void RouteController::getAllOutreachServices(const crow::request& req,
   }
 
   try {
+    int start = 0;
+    auto start_param = req.url_params.get("start");
+    if (start_param && std::stoi(start_param) > 0) {
+      start = std::stoi(start_param);
+    }
     std::string response =
         outreachManager
-            .getAllOutreachServices();  // Retrieve all outreach services
+            .getAllOutreachServices(start);  // Retrieve all outreach services
     res.code = 200;
     res.write(response);
     res.end();
@@ -688,7 +708,12 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
   }
 
   try {
-    std::string response = healthcareManager.getAllHealthcareServices();
+    int start = 0;
+    auto start_param = req.url_params.get("start");
+    if (start_param && std::stoi(start_param) > 0) {
+      start = std::stoi(start_param);
+    }
+    std::string response = healthcareManager.getAllHealthcareServices(start);
     res.code = 200;
     res.write(response);
     res.end();
