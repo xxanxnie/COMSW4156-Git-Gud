@@ -16,7 +16,7 @@ class Counseling {
   std::string checkInputFormat(std::string content);
   virtual std::string addCounselor(std::string request_body);
   virtual std::string deleteCounselor(const std::string& counselorId);
-  virtual std::string searchCounselorsAll();
+  virtual std::string searchCounselorsAll(int start = 0);
   virtual std::string updateCounselor(std::string request_body);
   std::vector<std::pair<std::string, std::string>> createDBContent();
 

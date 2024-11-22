@@ -107,9 +107,9 @@ std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
  * @return A string representation of all outreach services,
  *         or "[]" if no services are found.
  */
-std::string Outreach::getAllOutreachServices() {
+std::string Outreach::getAllOutreachServices(int start) {
   std::vector<bsoncxx::document::value> result;
-  dbManager.findCollection(collection_name, {}, result);
+  dbManager.findCollection(start, collection_name, {}, result);
   if (result.size() > 0) {
     bsoncxx::builder::basic::array arrayBuilder;
     for (const auto &doc : result) {

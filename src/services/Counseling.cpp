@@ -112,9 +112,9 @@ std::string Counseling::deleteCounselor(const std::string &counselorId) {
  * @brief Searches for all counselors in the database.
  * @return A JSON string containing all counselors' information.
  */
-std::string Counseling::searchCounselorsAll() {
+std::string Counseling::searchCounselorsAll(int start) {
   std::vector<bsoncxx::document::value> result;
-  dbManager.findCollection(collection_name, {}, result);
+  dbManager.findCollection(start, collection_name, {}, result);
   std::string ret;
   if (!result.empty()) {
     ret = printCounselors(result);

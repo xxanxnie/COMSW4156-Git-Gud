@@ -115,9 +115,9 @@ std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
  * @return A string containing all healthcare services in JSON format.
  *         Returns an empty array ("[]") if no services are found.
  */
-std::string Healthcare::getAllHealthcareServices() {
+std::string Healthcare::getAllHealthcareServices(int start) {
   std::vector<bsoncxx::document::value> result;
-  dbManager.findCollection(collection_name, {}, result);
+  dbManager.findCollection(start, collection_name, {}, result);
   if (result.size() > 0) {
     bsoncxx::builder::basic::array arrayBuilder;
     for (const auto& doc : result) {
@@ -180,7 +180,8 @@ std::string Healthcare::printHealthcareServices(
 //   std::string missingFields;
 
 //   std::unordered_set<std::string> requiredFields = {
-//       "provider", "serviceType", "location", "operatingHours", "contactInfo"};
+//       "provider", "serviceType", "location", "operatingHours",
+//       "contactInfo"};
 //   std::unordered_set<std::string> allowedFields = {
 //       "provider",       "serviceType", "location",
 //       "operatingHours", "contactInfo", "eligibilityCriteria"};

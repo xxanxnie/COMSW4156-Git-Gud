@@ -32,12 +32,12 @@ TEST_F(CounselingUnitTests, SearchCounselorsAll) {
                        << "specialty" << "Cognitive Behavioral Therapy"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
-  std::string counselors = counseling->searchCounselorsAll();
+  std::string counselors = counseling->searchCounselorsAll(0);
 
   EXPECT_NE(counselors, "[]");
   EXPECT_TRUE(counselors.find("John Doe") != std::string::npos);
@@ -114,12 +114,12 @@ TEST_F(CounselingUnitTests, updateCounseling) {
                        << "2024-01-11" << "counselorName" << "Jack"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
-  std::string counselingItems = counseling->searchCounselorsAll();
+  std::string counselingItems = counseling->searchCounselorsAll(0);
   EXPECT_TRUE(counselingItems.find("OrganicFarm") != std::string::npos);
   EXPECT_TRUE(counselingItems.find("Jack") != std::string::npos);
   EXPECT_TRUE(counselingItems.find("2024-01-11") != std::string::npos);
@@ -141,11 +141,11 @@ TEST_F(CounselingUnitTests, DeleteCounselor) {
 
   // Verify deletion by checking empty results
   std::vector<bsoncxx::document::value> mockResult;
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
-  std::string counselingItems = counseling->searchCounselorsAll();
+  std::string counselingItems = counseling->searchCounselorsAll(0);
   EXPECT_EQ(counselingItems, "[]");
 }

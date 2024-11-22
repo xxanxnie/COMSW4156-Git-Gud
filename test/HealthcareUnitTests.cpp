@@ -36,9 +36,9 @@ TEST_F(HealthcareServiceUnitTests, GetAllHealthcareServices) {
                        << "phone" << "123-456-7890"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string services = healthcareService->getAllHealthcareServices();
@@ -93,9 +93,9 @@ TEST_F(HealthcareServiceUnitTests, DeleteHealthcare) {
   EXPECT_EQ(result, "Healthcare record deleted successfully.");
 
   std::vector<bsoncxx::document::value> mockResult;
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string healthcareItems = healthcareService->getAllHealthcareServices();
@@ -140,9 +140,9 @@ TEST_F(HealthcareServiceUnitTests, UpdateHealthcare) {
                        << "contactInfo" << "321-654-0987"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string healthcareItems = healthcareService->getAllHealthcareServices();

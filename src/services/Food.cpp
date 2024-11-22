@@ -129,10 +129,10 @@ std::string Food::deleteFood(const std::string& id) {
  * @exception std::exception Throws if an error occurs during the database query
  * or data serialization.
  */
-std::string Food::getAllFood() {
+std::string Food::getAllFood(int start) {
   std::vector<bsoncxx::document::value> foodItems;
 
-  db.findCollection("Food", {}, foodItems);
+  db.findCollection(start,"Food", {}, foodItems);
 
   if (foodItems.empty()) {
     return "[]";

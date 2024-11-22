@@ -51,8 +51,8 @@ TEST_F(OutreachServiceUnitTests, GetAllOutreachServices) {
       << bsoncxx::builder::stream::finalize);
 
   ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+          findCollection(::testing::_,::testing::_, ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string services = outreachService->getAllOutreachServices();

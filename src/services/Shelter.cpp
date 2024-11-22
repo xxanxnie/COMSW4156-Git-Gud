@@ -101,9 +101,9 @@ std::vector<std::pair<std::string, std::string>> Shelter::createDBContent() {
  *
  * @return string, concat the content value
  */
-std::string Shelter::searchShelterAll() {
+std::string Shelter::searchShelterAll(int start) {
   std::vector<bsoncxx::document::value> result;
-  dbManager.findCollection(collection_name, {}, result);
+  dbManager.findCollection(start, collection_name, {}, result);
 
   if (result.size() > 0) {
     bsoncxx::builder::basic::array arrayBuilder;

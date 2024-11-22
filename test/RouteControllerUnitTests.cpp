@@ -18,7 +18,7 @@ class MockShelter : public Shelter {
 
   MOCK_METHOD(std::string, addShelter, (std::string request_body), (override));
   MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
-  MOCK_METHOD(std::string, searchShelterAll, (), (override));
+  MOCK_METHOD(std::string, searchShelterAll, (int start), (override));
   MOCK_METHOD(std::string, updateShelter, (std::string request_body),
               (override));
 };
@@ -32,7 +32,7 @@ class MockCounseling : public Counseling {
               (override));
   MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId),
               (override));
-  MOCK_METHOD(std::string, searchCounselorsAll, (), (override));
+  MOCK_METHOD(std::string, searchCounselorsAll, (int start), (override));
   MOCK_METHOD(std::string, updateCounselor, (std::string request_body),
               (override));
 };
@@ -42,7 +42,7 @@ class MockFood : public Food {
   explicit MockFood(DatabaseManager* db) : Food(*db) {}
 
   MOCK_METHOD(std::string, addFood, ((std::string request_body)), (override));
-  MOCK_METHOD(std::string, getAllFood, (), (override));
+  MOCK_METHOD(std::string, getAllFood, (int start), (override));
 };
 
 class MockOutreachService : public Outreach {
@@ -53,7 +53,7 @@ class MockOutreachService : public Outreach {
 
   MOCK_METHOD(std::string, addOutreachService, (std::string request_body),
               (override));
-  MOCK_METHOD(std::string, getAllOutreachServices, (), (override));
+  MOCK_METHOD(std::string, getAllOutreachServices, (int start), (override));
 };
 
 class MockHealthcareService : public Healthcare {
@@ -64,7 +64,7 @@ class MockHealthcareService : public Healthcare {
 
   MOCK_METHOD(std::string, addHealthcareService, ((std::string request_body)),
               (override));
-  MOCK_METHOD(std::string, getAllHealthcareServices, (), (override));
+  MOCK_METHOD(std::string, getAllHealthcareServices, (int start), (override));
 
   MOCK_METHOD(std::string, updateHealthcare, (std::string request_body),
               (override));
@@ -110,7 +110,7 @@ class RouteControllerUnitTests : public ::testing::Test {
 TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
   std::string mockResponse =
       R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
-  ON_CALL(*mockShelter, searchShelterAll())
+  ON_CALL(*mockShelter, searchShelterAll(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -152,7 +152,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
 TEST_F(RouteControllerUnitTests, GetShelterTestUnauthorized) {
   std::string mockResponse =
       R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
-  ON_CALL(*mockShelter, searchShelterAll())
+  ON_CALL(*mockShelter, searchShelterAll(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -194,7 +194,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
   std::string mockResponse = R"([{"name": "John Doe", "specialty": "CBT"}])";
-  ON_CALL(*mockCounseling, searchCounselorsAll())
+  ON_CALL(*mockCounseling, searchCounselorsAll(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -231,7 +231,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, GetCounselingTestUnauthorized) {
   std::string mockResponse = R"([{"name": "John Doe", "specialty": "CBT"}])";
-  ON_CALL(*mockCounseling, searchCounselorsAll())
+  ON_CALL(*mockCounseling, searchCounselorsAll(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -277,7 +277,7 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
 
   std::string mockResponse =
       "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
-  ON_CALL(*mockFood, getAllFood())
+  ON_CALL(*mockFood, getAllFood(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   routeController->getAllFood(req, res);
@@ -311,7 +311,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
 
 TEST_F(RouteControllerUnitTests, GetAllFoodTestUnauthorized) {
   std::string mockResponse = R"([{"name": "FoodBank", "location": "NYC"}])";
-  ON_CALL(*mockFood, getAllFood())
+  ON_CALL(*mockFood, getAllFood(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -352,7 +352,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
   std::string mockResponse = R"([{"programName": "OutreachProgram"}])";
-  ON_CALL(*mockOutreach, getAllOutreachServices())
+  ON_CALL(*mockOutreach, getAllOutreachServices(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -391,7 +391,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestUnauthorized) {
   std::string mockResponse = R"([{"programName": "OutreachProgram"}])";
-  ON_CALL(*mockOutreach, getAllOutreachServices())
+  ON_CALL(*mockOutreach, getAllOutreachServices(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -431,7 +431,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
 
 TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
   std::string mockResponse = R"([{"provider": "HealthcareProvider"}])";
-  ON_CALL(*mockHealthcare, getAllHealthcareServices())
+  ON_CALL(*mockHealthcare, getAllHealthcareServices(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
@@ -469,7 +469,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
 
 TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestUnauthorized) {
   std::string mockResponse = R"([{"provider": "HealthcareProvider"}])";
-  ON_CALL(*mockHealthcare, getAllHealthcareServices())
+  ON_CALL(*mockHealthcare, getAllHealthcareServices(0))
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
