@@ -10,6 +10,7 @@
 
 #include "Food.h"
 #include "Healthcare.h"
+#include "Logger.h"
 #include "Outreach.h"
 
 crow::response handleException(const std::exception& e) {
@@ -56,19 +57,48 @@ bool authenticatePermissionsToPost(const crow::request& req) {
          authenticate(req, "CLN") || authenticate(req, "GOV");
 }
 
+// Add this helper method to RouteController class
+bool RouteController::authenticateToken(const crow::request& req,
+                                        crow::response& res) {
+  auto authHeader = req.get_header_value("Authorization");
+  if (authHeader.empty()) {
+    res.code = 401;
+    res.write("Authentication required. Please provide a valid token.");
+    res.end();
+    return false;
+  }
+
+  std::string token = extractToken(authHeader);
+  if (token.empty()) {
+    res.code = 401;
+    res.write("Invalid authorization header format.");
+    res.end();
+    return false;
+  }
+
+  if (!authService.verifyJWT(token)) {
+    res.code = 401;
+    res.write("Invalid or expired token.");
+    res.end();
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Redirects to the homepage.
  *
  * @return A string containing the name of the html file to be loaded.
  */
 void RouteController::index(crow::response& res) {
-  res.write(
+  LOG_INFO("RouteController", "index endpoint called");
+  std::string message =
       "Welcome to the GitGud API. Use the appropriate endpoints to access "
-      "resources.");
-  res.end();
-  res.write(
-      "Welcome to the GitGud API. Use the appropriate endpoints to access "
-      "resources.");
+      "resources.";
+  res.write(message);
+  LOG_INFO("RouteController", "index response: code={}, message={}", 200,
+           message);
   res.end();
 }
 
@@ -79,10 +109,9 @@ void RouteController::index(crow::response& res) {
  */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "getShelter called with URL: {}", req.url);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in getShelter");
     return;
   }
 
@@ -95,9 +124,13 @@ void RouteController::getShelter(const crow::request& req,
     std::string response = shelterManager.searchShelterAll(start);
     res.code = 200;
     res.write(response);
+    LOG_INFO("RouteController", "getShelter response: code={}, body={}",
+             res.code, response);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "getShelter error: code={}, error={}",
+              res.code, e.what());
   }
 }
 /**
@@ -112,10 +145,9 @@ void RouteController::getShelter(const crow::request& req,
  */
 void RouteController::addShelter(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "addShelter request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in addShelter");
     return;
   }
 
@@ -124,13 +156,20 @@ void RouteController::addShelter(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "addShelter validation error: code={}, message={}", res.code,
+                result);
     } else {
       res.code = 201;
       res.write(result);
+      LOG_INFO("RouteController", "addShelter success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "addShelter error: code={}, error={}",
+              res.code, e.what());
   }
 }
 /**
@@ -145,10 +184,9 @@ void RouteController::addShelter(const crow::request& req,
  */
 void RouteController::updateShelter(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "updateShelter request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in updateShelter");
     return;
   }
 
@@ -157,14 +195,20 @@ void RouteController::updateShelter(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "updateShelter validation error: code={}, message={}", res.code,
+                result);
     } else {
       res.code = 200;
-      res.write("Shelter resource update successfully.");
+      res.write("Shelter resource updated successfully.");
+      LOG_INFO("RouteController", "updateShelter success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController", "updateShelter error: code={}, error={}",
+              res.code, e.what());
   }
 }
 /**
@@ -175,16 +219,14 @@ void RouteController::updateShelter(const crow::request& req,
  */
 void RouteController::deleteShelter(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "deleteShelter request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in deleteShelter");
     return;
   }
 
   try {
     auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
     std::string id = "";
     for (auto element : resource.view()) {
       if (element.key().to_string() == "id") {
@@ -193,10 +235,15 @@ void RouteController::deleteShelter(const crow::request& req,
     }
     shelterManager.deleteShelter(id);
     res.code = 200;
-    res.write("Shelter resource deleted successfully.");
+    std::string message = "Shelter resource deleted successfully.";
+    res.write(message);
+    LOG_INFO("RouteController", "deleteShelter success: code={}, id={}",
+             res.code, id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "deleteShelter error: code={}, error={}",
+              res.code, e.what());
     res.end();
   }
 }
@@ -211,10 +258,9 @@ void RouteController::deleteShelter(const crow::request& req,
  */
 void RouteController::getCounseling(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "getCounseling called with URL: {}", req.url);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in getCounseling");
     return;
   }
 
@@ -227,9 +273,13 @@ void RouteController::getCounseling(const crow::request& req,
     std::string response = counselingManager.searchCounselorsAll(start);
     res.code = 200;
     res.write(response);
+    LOG_INFO("RouteController", "getCounseling response: code={}, body={}",
+             res.code, response);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "getCounseling error: code={}, error={}",
+              res.code, e.what());
   }
 }
 
@@ -250,87 +300,33 @@ void RouteController::getCounseling(const crow::request& req,
 
 void RouteController::addCounseling(const crow::request& req,
                                     crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "addCounseling request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in addCounseling");
     return;
   }
 
   try {
     std::string result = counselingManager.addCounselor(req.body);
-
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "addCounseling validation error: code={}, message={}", res.code,
+                result);
     } else {
       res.code = 201;
       res.write(result);
+      LOG_INFO("RouteController", "addCounseling success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController", "addCounseling error: code={}, error={}",
+              res.code, e.what());
   }
 }
-
-// void RouteController::addCounseling(const crow::request& req,
-//                                     crow::response& res) {
-//     // Check for JWT token authentication
-//     auto authHeader = req.get_header_value("Authorization");
-//     if (authHeader.empty()) {
-//         res.code = 401;
-//         res.write("Authentication required. Please provide a valid token.");
-//         res.end();
-//         return;
-//     }
-
-//     std::string token = extractToken(authHeader);
-//     if (token.empty()) {
-//         res.code = 401;
-//         res.write("Invalid authorization header format.");
-//         res.end();
-//         return;
-//     }
-
-//     // Verify token and check role authorization
-//     AuthService& authService = AuthService::getInstance();
-//     if (!authService.verifyJWT(token)) {
-//         res.code = 401;
-//         res.write("Invalid or expired token.");
-//         res.end();
-//         return;
-//     }
-
-//     // // Optional: Check for specific role authorization
-//     // if (!authService.hasRole(token, "NGO")) {  // Or any other appropriate role
-//     //     res.code = 403;
-//     //     res.write("Insufficient permissions to perform this action.");
-//     //     res.end();
-//     //     return;
-//     // }
-
-//   try {
-//     auto resource = bsoncxx::from_json(req.body);
-//     std::string counselorName =
-//         resource["counselorName"].get_utf8().value.to_string();
-//     std::string specialty = resource["specialty"].get_utf8().value.to_string();
-
-//     std::string result =
-//         counselingManager.addCounselor(counselorName, specialty);
-
-//     if (result == "Success") {
-//       res.code = 201;
-//       res.write("Counseling resource added successfully.");
-//     } else {
-//       res.code = 400;
-//       res.write(result);
-//     }
-//     res.end();
-//   } catch (const std::exception& e) {
-//     res = handleException(e);
-//   }
-// }
 
 /**
  * Update the counseling information in our database
@@ -342,10 +338,9 @@ void RouteController::addCounseling(const crow::request& req,
  */
 void RouteController::updateCounseling(const crow::request& req,
                                        crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "updateCounseling request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in updateCounseling");
     return;
   }
 
@@ -354,13 +349,21 @@ void RouteController::updateCounseling(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "updateCounseling validation error: code={}, message={}",
+                res.code, result);
     } else {
       res.code = 200;
-      res.write("Counseling resource update successfully.");
+      res.write("Counseling resource updated successfully.");
+      LOG_INFO("RouteController",
+               "updateCounseling success: code={}, response={}", res.code,
+               result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "updateCounseling error: code={}, error={}",
+              res.code, e.what());
     res.end();
   }
 }
@@ -373,10 +376,9 @@ void RouteController::updateCounseling(const crow::request& req,
  */
 void RouteController::deleteCounseling(const crow::request& req,
                                        crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "deleteCounseling request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in deleteCounseling");
     return;
   }
 
@@ -388,19 +390,17 @@ void RouteController::deleteCounseling(const crow::request& req,
         id = element.get_utf8().value.to_string();
       }
     }
-
-    std::string result = counselingManager.deleteCounselor(id);
-
-    if (result == "Success") {
-      res.code = 200;
-      res.write("Counseling resource deleted successfully.");
-    } else {
-      res.code = 400;
-      res.write(result);
-    }
+    counselingManager.deleteCounselor(id);
+    res.code = 200;
+    std::string message = "Counseling resource deleted successfully.";
+    res.write(message);
+    LOG_INFO("RouteController", "deleteCounseling success: code={}, id={}",
+             res.code, id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "deleteCounseling error: code={}, error={}",
+              res.code, e.what());
     res.end();
   }
 }
@@ -419,10 +419,9 @@ void RouteController::deleteCounseling(const crow::request& req,
  * interaction or JSON parsing.
  */
 void RouteController::addFood(const crow::request& req, crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "addFood request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in addFood");
     return;
   }
 
@@ -431,14 +430,20 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "addFood validation error: code={}, message={}", res.code,
+                result);
     } else {
       res.code = 201;
       res.write(result);
+      LOG_INFO("RouteController", "addFood success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController", "addFood error: code={}, error={}", res.code,
+              e.what());
   }
 }
 
@@ -458,10 +463,9 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
  */
 void RouteController::getAllFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "getAllFood called with URL: {}", req.url);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in getAllFood");
     return;
   }
 
@@ -477,9 +481,13 @@ void RouteController::getAllFood(const crow::request& req,
     // Return the raw response without additional formatting
     res.code = 200;
     res.write(response);
+    LOG_INFO("RouteController", "getAllFood response: code={}, body={}",
+             res.code, response);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "getAllFood error: code={}, error={}",
+              res.code, e.what());
   }
 }
 
@@ -498,46 +506,31 @@ void RouteController::getAllFood(const crow::request& req,
  */
 void RouteController::deleteFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "deleteFood request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in deleteFood");
     return;
   }
 
   try {
-    // Input validation
-    if (req.body.empty()) {
-      res.code = 400;
-      res.write("Invalid input: Request body cannot be empty.");
-      res.end();
-      return;
-    }
-
     auto resource = bsoncxx::from_json(req.body);
-
-    // Validate ID
-    if (!resource["id"]) {
-      res.code = 400;
-      res.write("Invalid input: 'id' field is required");
-      res.end();
-      return;
+    std::string id = "";
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "id") {
+        id = element.get_utf8().value.to_string();
+      }
     }
-
-    std::string id = resource["id"].get_utf8().value.to_string();
-    if (id.empty()) {
-      res.code = 400;
-      res.write("Invalid input: 'id' cannot be empty");
-      res.end();
-      return;
-    }
-
-    std::string result = foodManager.deleteFood(id);
+    foodManager.deleteFood(id);
     res.code = 200;
-    res.write("Food resource deleted successfully.");
+    std::string message = "Food resource deleted successfully.";
+    res.write(message);
+    LOG_INFO("RouteController", "deleteFood success: code={}, id={}", res.code,
+             id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "deleteFood error: code={}, error={}",
+              res.code, e.what());
     res.end();
   }
 }
@@ -557,25 +550,31 @@ void RouteController::deleteFood(const crow::request& req,
  */
 void RouteController::updateFood(const crow::request& req,
                                  crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "updateFood request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in updateFood");
     return;
   }
+
   try {
     std::string result = foodManager.updateFood(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "updateFood validation error: code={}, message={}", res.code,
+                result);
     } else {
       res.code = 200;
-      res.write("Food resource update successfully.");
+      res.write("Food resource updated successfully.");
+      LOG_INFO("RouteController", "updateFood success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController", "updateFood error: code={}, error={}",
+              res.code, e.what());
   }
 }
 
@@ -596,10 +595,9 @@ void RouteController::updateFood(const crow::request& req,
  */
 void RouteController::addOutreachService(const crow::request& req,
                                          crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "addOutreachService request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in addOutreachService");
     return;
   }
 
@@ -608,13 +606,21 @@ void RouteController::addOutreachService(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "addOutreachService validation error: code={}, message={}",
+                res.code, result);
     } else {
       res.code = 201;
       res.write(result);
+      LOG_INFO("RouteController",
+               "addOutreachService success: code={}, response={}", res.code,
+               result);
     }
     res.end();
   } catch (const std::exception& e) {
-    res = handleException(e);  // Custom exception handling
+    res = handleException(e);
+    LOG_ERROR("RouteController", "addOutreachService error: code={}, error={}",
+              res.code, e.what());
   }
 }
 
@@ -631,10 +637,11 @@ void RouteController::addOutreachService(const crow::request& req,
  */
 void RouteController::getAllOutreachServices(const crow::request& req,
                                              crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "getAllOutreachServices called with URL: {}",
+           req.url);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController",
+              "Authentication failed in getAllOutreachServices");
     return;
   }
 
@@ -644,23 +651,27 @@ void RouteController::getAllOutreachServices(const crow::request& req,
     if (start_param && std::stoi(start_param) > 0) {
       start = std::stoi(start_param);
     }
-    std::string response =
-        outreachManager
-            .getAllOutreachServices(start);  // Retrieve all outreach services
+    std::string response = outreachManager.getAllOutreachServices(
+        start);  // Retrieve all outreach services
     res.code = 200;
     res.write(response);
+    LOG_INFO("RouteController",
+             "getAllOutreachServices response: code={}, body={}", res.code,
+             response);
     res.end();
   } catch (const std::exception& e) {
-    res = handleException(e);  // Custom exception handling
+    res = handleException(e);
+    LOG_ERROR("RouteController",
+              "getAllOutreachServices error: code={}, error={}", res.code,
+              e.what());
   }
 }
 
 void RouteController::updateOutreach(const crow::request& req,
                                      crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "updateOutreach request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in updateOutreach");
     return;
   }
 
@@ -669,29 +680,34 @@ void RouteController::updateOutreach(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "updateOutreach validation error: code={}, message={}",
+                res.code, result);
     } else {
       res.code = 200;
       res.write("Outreach resource update successfully.");
+      LOG_INFO("RouteController",
+               "updateOutreach success: code={}, response={}", res.code,
+               result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController", "updateOutreach error: code={}, error={}",
+              res.code, e.what());
   }
 }
 
 void RouteController::deleteOutreach(const crow::request& req,
                                      crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "deleteOutreach request body: {}", req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController", "Authentication failed in deleteOutreach");
     return;
   }
 
   try {
     auto resource = bsoncxx::from_json(req.body);
-    std::vector<std::string> content;
     std::string id = "";
     for (auto element : resource.view()) {
       if (element.key().to_string() == "id") {
@@ -700,10 +716,15 @@ void RouteController::deleteOutreach(const crow::request& req,
     }
     outreachManager.deleteOutreach(id);
     res.code = 201;
-    res.write("Outreach resource deleted successfully.");
+    std::string message = "Outreach resource deleted successfully.";
+    res.write(message);
+    LOG_INFO("RouteController", "deleteOutreach success: code={}, id={}",
+             res.code, id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController", "deleteOutreach error: code={}, error={}",
+              res.code, e.what());
     res.end();
   }
 }
@@ -723,25 +744,35 @@ void RouteController::deleteOutreach(const crow::request& req,
  */
 void RouteController::addHealthcareService(const crow::request& req,
                                            crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "addHealthcareService request body: {}",
+           req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController",
+              "Authentication failed in addHealthcareService");
     return;
   }
+
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "addHealthcareService validation error: code={}, message={}",
+                res.code, result);
     } else {
       res.code = 201;
       res.write(result);
+      LOG_INFO("RouteController",
+               "addHealthcareService success: code={}, response={}", res.code,
+               result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController",
+              "addHealthcareService error: code={}, error={}", res.code,
+              e.what());
   }
 }
 
@@ -759,10 +790,11 @@ void RouteController::addHealthcareService(const crow::request& req,
  */
 void RouteController::getAllHealthcareServices(const crow::request& req,
                                                crow::response& res) {
-  if (!authenticatePermissionsToGetAll(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "getAllHealthcareServices called with URL: {}",
+           req.url);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController",
+              "Authentication failed in getAllHealthcareServices");
     return;
   }
 
@@ -775,18 +807,25 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
     std::string response = healthcareManager.getAllHealthcareServices(start);
     res.code = 200;
     res.write(response);
+    LOG_INFO("RouteController",
+             "getAllHealthcareServices response: code={}, body={}", res.code,
+             response);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController",
+              "getAllHealthcareServices error: code={}, error={}", res.code,
+              e.what());
   }
 }
 
 void RouteController::updateHealthcareService(const crow::request& req,
                                               crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "updateHealthcareService request body: {}",
+           req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController",
+              "Authentication failed in updateHealthcareService");
     return;
   }
 
@@ -795,23 +834,32 @@ void RouteController::updateHealthcareService(const crow::request& req,
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
+      LOG_ERROR("RouteController",
+                "updateHealthcareService validation error: code={}, message={}",
+                res.code, result);
     } else {
       res.code = 200;
       res.write("Healthcare resource update successfully.");
+      LOG_INFO("RouteController",
+               "updateHealthcareService success: code={}, response={}",
+               res.code, result);
     }
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
-    res.end();
+    LOG_ERROR("RouteController",
+              "updateHealthcareService error: code={}, error={}", res.code,
+              e.what());
   }
 }
 
 void RouteController::deleteHealthcareService(const crow::request& req,
                                               crow::response& res) {
-  if (!authenticatePermissionsToPost(req)) {
-    res.code = 403;
-    res.write("Unauthorized.");
-    res.end();
+  LOG_INFO("RouteController", "deleteHealthcareService request body: {}",
+           req.body);
+  if (!authenticateToken(req, res)) {
+    LOG_ERROR("RouteController",
+              "Authentication failed in deleteHealthcareService");
     return;
   }
 
@@ -828,79 +876,104 @@ void RouteController::deleteHealthcareService(const crow::request& req,
     std::string msg = healthcareManager.deleteHealthcare(id);
     res.code = 201;
     res.write(msg);
+    LOG_INFO("RouteController",
+             "deleteHealthcareService success: code={}, id={}", res.code, id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController",
+              "deleteHealthcareService error: code={}, error={}", res.code,
+              e.what());
     res.end();
   }
 }
 
-void RouteController::registerUser(const crow::request& req, crow::response& res) {
-    try {
-        auto resource = bsoncxx::from_json(req.body);
-        
-        // Validate required fields
-        if (!resource["email"] || !resource["password"]) {
-            res.code = 400;
-            res.write("Missing required fields: email and password");
-            res.end();
-            return;
-        }
+void RouteController::registerUser(const crow::request& req,
+                                   crow::response& res) {
+  LOG_INFO("RouteController", "registerUser request body: {}", req.body);
+  try {
+    auto resource = bsoncxx::from_json(req.body);
 
-        std::string email = resource["email"].get_utf8().value.to_string();
-        std::string password = resource["password"].get_utf8().value.to_string();
-
-        AuthService& authService = AuthService::getInstance();
-        std::string token = authService.registerUser(email, password);
-
-        res.code = 201;
-        res.write(token);
-        res.end();
-    } catch (const UserAlreadyExistsException& e) {
-        res.code = 409;
-        res.write(e.what());
-        res.end();
-    } catch (const AuthException& e) {
-        res.code = 400;
-        res.write(e.what());
-        res.end();
-    } catch (const std::exception& e) {
-        res = handleException(e);
+    if (!resource["email"] || !resource["password"]) {
+      res.code = 400;
+      std::string message = "Missing required fields: email and password";
+      res.write(message);
+      LOG_ERROR("RouteController",
+                "registerUser validation error: code={}, message={}", res.code,
+                message);
+      res.end();
+      return;
     }
+
+    std::string email = resource["email"].get_utf8().value.to_string();
+    std::string password = resource["password"].get_utf8().value.to_string();
+
+    AuthService& authService = AuthService::getInstance();
+    std::string token = authService.registerUser(email, password);
+
+    res.code = 201;
+    res.write(token);
+    LOG_INFO("RouteController", "registerUser success: code={}, user={}",
+             res.code, email);
+    res.end();
+  } catch (const UserAlreadyExistsException& e) {
+    LOG_ERROR("RouteController", "User registration failed: {}", e.what());
+    res.code = 409;
+    res.write(e.what());
+    res.end();
+  } catch (const AuthException& e) {
+    LOG_ERROR("RouteController", "Authentication failed: {}", e.what());
+    res.code = 400;
+    res.write(e.what());
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    LOG_ERROR("RouteController", "registerUser error: code={}, error={}",
+              res.code, e.what());
+  }
 }
 
 void RouteController::loginUser(const crow::request& req, crow::response& res) {
-    try {
-        auto resource = bsoncxx::from_json(req.body);
-        
-        // Validate required fields
-        if (!resource["email"] || !resource["password"]) {
-            res.code = 400;
-            res.write("Missing required fields: email and password");
-            res.end();
-            return;
-        }
+  LOG_INFO("RouteController", "loginUser request body: {}", req.body);
+  try {
+    auto resource = bsoncxx::from_json(req.body);
 
-        std::string email = resource["email"].get_utf8().value.to_string();
-        std::string password = resource["password"].get_utf8().value.to_string();
-
-        AuthService& authService = AuthService::getInstance();
-        std::string token = authService.loginUser(email, password);
-
-        res.code = 200;
-        res.write(token);
-        res.end();
-    } catch (const InvalidCredentialsException& e) {
-        res.code = 401;
-        res.write(e.what());
-        res.end();
-    } catch (const AuthException& e) {
-        res.code = 400;
-        res.write(e.what());
-        res.end();
-    } catch (const std::exception& e) {
-        res = handleException(e);
+    if (!resource["email"] || !resource["password"]) {
+      res.code = 400;
+      res.write("Missing required fields: email and password");
+      LOG_ERROR("RouteController",
+                "loginUser validation error: code={}, message={}", res.code,
+                "Missing required fields");
+      res.end();
+      return;
     }
+
+    std::string email = resource["email"].get_utf8().value.to_string();
+    std::string password = resource["password"].get_utf8().value.to_string();
+
+    AuthService& authService = AuthService::getInstance();
+    std::string token = authService.loginUser(email, password);
+
+    res.code = 200;
+    res.write(token);
+    LOG_INFO("RouteController", "loginUser success: code={}, user={}", res.code,
+             email);
+    res.end();
+  } catch (const InvalidCredentialsException& e) {
+    LOG_ERROR("RouteController", "Login failed: {}", e.what());
+    res.code = 401;
+    res.write(e.what());
+    res.end();
+  } catch (const AuthException& e) {
+    LOG_ERROR("RouteController", "Authentication failed: {}", e.what());
+    res.code = 400;
+    res.write(e.what());
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    LOG_ERROR("RouteController", "loginUser error: code={}, error={}", res.code,
+              e.what());
+  }
 }
 
 void RouteController::initRoutes(crow::SimpleApp& app) {
@@ -1024,14 +1097,14 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           });
 
   CROW_ROUTE(app, "/auth/register")
-      .methods(crow::HTTPMethod::POST)
-      ([this](const crow::request& req, crow::response& res) {
-          registerUser(req, res);
-      });
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
+            registerUser(req, res);
+          });
 
   CROW_ROUTE(app, "/auth/login")
-      .methods(crow::HTTPMethod::POST)
-      ([this](const crow::request& req, crow::response& res) {
-          loginUser(req, res);
-      });
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
+            loginUser(req, res);
+          });
 }

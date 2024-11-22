@@ -23,6 +23,16 @@ jobs:
         sudo apt-get install -y libmongoc-1.0-0 curl cmake build-essential \
             libssl-dev libboost-all-dev
 
+    - name: Install spdlog
+      run: |
+        git clone https://github.com/gabime/spdlog.git
+        cd spdlog
+        git checkout v1.12.0
+        mkdir build && cd build
+        cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        sudo make install
+        sudo ldconfig
+
     - name: Setup External Libraries
       run: |
         mkdir -p external_libraries

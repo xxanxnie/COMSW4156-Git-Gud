@@ -79,6 +79,19 @@ else
     echo "bcrypt already exists, skipping installation."
 fi
 
+# Download and install spdlog
+if [ ! -d "spdlog" ]; then
+    echo "Installing spdlog..."
+    git clone https://github.com/gabime/spdlog.git
+    cd spdlog
+    mkdir build && cd build
+    cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sudo make install
+    cd ../..
+else
+    echo "spdlog already exists, skipping installation."
+fi
+
 echo "All external libraries processed successfully."
 
 # Return to external libraries directory
