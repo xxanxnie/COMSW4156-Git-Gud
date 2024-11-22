@@ -247,6 +247,7 @@ void RouteController::getCounseling(const crow::request& req,
  *   "specialty": "String"
  * }
  */
+
 void RouteController::addCounseling(const crow::request& req,
                                     crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
@@ -272,6 +273,64 @@ void RouteController::addCounseling(const crow::request& req,
     res.end();
   }
 }
+
+// void RouteController::addCounseling(const crow::request& req,
+//                                     crow::response& res) {
+//     // Check for JWT token authentication
+//     auto authHeader = req.get_header_value("Authorization");
+//     if (authHeader.empty()) {
+//         res.code = 401;
+//         res.write("Authentication required. Please provide a valid token.");
+//         res.end();
+//         return;
+//     }
+
+//     std::string token = extractToken(authHeader);
+//     if (token.empty()) {
+//         res.code = 401;
+//         res.write("Invalid authorization header format.");
+//         res.end();
+//         return;
+//     }
+
+//     // Verify token and check role authorization
+//     AuthService& authService = AuthService::getInstance();
+//     if (!authService.verifyJWT(token)) {
+//         res.code = 401;
+//         res.write("Invalid or expired token.");
+//         res.end();
+//         return;
+//     }
+
+//     // // Optional: Check for specific role authorization
+//     // if (!authService.hasRole(token, "NGO")) {  // Or any other appropriate role
+//     //     res.code = 403;
+//     //     res.write("Insufficient permissions to perform this action.");
+//     //     res.end();
+//     //     return;
+//     // }
+
+//   try {
+//     auto resource = bsoncxx::from_json(req.body);
+//     std::string counselorName =
+//         resource["counselorName"].get_utf8().value.to_string();
+//     std::string specialty = resource["specialty"].get_utf8().value.to_string();
+
+//     std::string result =
+//         counselingManager.addCounselor(counselorName, specialty);
+
+//     if (result == "Success") {
+//       res.code = 201;
+//       res.write("Counseling resource added successfully.");
+//     } else {
+//       res.code = 400;
+//       res.write(result);
+//     }
+//     res.end();
+//   } catch (const std::exception& e) {
+//     res = handleException(e);
+//   }
+// }
 
 /**
  * Update the counseling information in our database
@@ -776,6 +835,74 @@ void RouteController::deleteHealthcareService(const crow::request& req,
   }
 }
 
+void RouteController::registerUser(const crow::request& req, crow::response& res) {
+    try {
+        auto resource = bsoncxx::from_json(req.body);
+        
+        // Validate required fields
+        if (!resource["email"] || !resource["password"]) {
+            res.code = 400;
+            res.write("Missing required fields: email and password");
+            res.end();
+            return;
+        }
+
+        std::string email = resource["email"].get_utf8().value.to_string();
+        std::string password = resource["password"].get_utf8().value.to_string();
+
+        AuthService& authService = AuthService::getInstance();
+        std::string token = authService.registerUser(email, password);
+
+        res.code = 201;
+        res.write(token);
+        res.end();
+    } catch (const UserAlreadyExistsException& e) {
+        res.code = 409;
+        res.write(e.what());
+        res.end();
+    } catch (const AuthException& e) {
+        res.code = 400;
+        res.write(e.what());
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+void RouteController::loginUser(const crow::request& req, crow::response& res) {
+    try {
+        auto resource = bsoncxx::from_json(req.body);
+        
+        // Validate required fields
+        if (!resource["email"] || !resource["password"]) {
+            res.code = 400;
+            res.write("Missing required fields: email and password");
+            res.end();
+            return;
+        }
+
+        std::string email = resource["email"].get_utf8().value.to_string();
+        std::string password = resource["password"].get_utf8().value.to_string();
+
+        AuthService& authService = AuthService::getInstance();
+        std::string token = authService.loginUser(email, password);
+
+        res.code = 200;
+        res.write(token);
+        res.end();
+    } catch (const InvalidCredentialsException& e) {
+        res.code = 401;
+        res.write(e.what());
+        res.end();
+    } catch (const AuthException& e) {
+        res.code = 400;
+        res.write(e.what());
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });
@@ -895,4 +1022,16 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             deleteHealthcareService(req, res);
           });
+
+  CROW_ROUTE(app, "/auth/register")
+      .methods(crow::HTTPMethod::POST)
+      ([this](const crow::request& req, crow::response& res) {
+          registerUser(req, res);
+      });
+
+  CROW_ROUTE(app, "/auth/login")
+      .methods(crow::HTTPMethod::POST)
+      ([this](const crow::request& req, crow::response& res) {
+          loginUser(req, res);
+      });
 }

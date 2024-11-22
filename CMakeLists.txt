@@ -20,6 +20,9 @@ else()
     set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
 endif()
 
+set(BCRYPT_INCLUDE_DIR "/usr/local/include")
+set(BCRYPT_LIBRARY "/usr/local/lib/libbcrypt.a")
+
 # Include directories
 set(INCLUDE_PATHS 
     ${BOOST_ROOT}
@@ -29,28 +32,13 @@ set(INCLUDE_PATHS
     /usr/local/include/bsoncxx/v_noabi
     /usr/local/include/libmongoc-1.0
     /usr/local/include/libbson-1.0
+    /usr/local/include/bcrypt
+    /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
     include
 )
 
 # Add these lines to find MongoDB C++ driver
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
-
-
-# Include directories
-set(INCLUDE_PATHS 
-    ${BOOST_ROOT}
-    ${CROW_INCLUDE_DIR}
-    ${ASIO_INCLUDE_DIR}
-    /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
-    include
-)
-
-include_directories ("/usr/local/include/mongocxx/v_noabi")
-include_directories("/usr/local/include/libmongoc-1.0")
-include_directories("/usr/local/include/bsoncxx/v_noabi")
-include_directories("/usr/local/include/libbson-1.0")
-include_directories("/usr/local/lib -lmongocxx -lbsoncxx")
-
 
 set(SOURCE_FILES 
     src/main.cpp 
@@ -61,6 +49,7 @@ set(SOURCE_FILES
     src/services/Healthcare.cpp
     src/services/Outreach.cpp
     src/services/Shelter.cpp
+    src/Auth.cpp
 )
 
 set(TEST_FILES 
@@ -70,6 +59,7 @@ set(TEST_FILES
     test/OutreachUnitTests.cpp
     test/ShelterUnitTests.cpp
     test/RouteControllerUnitTests.cpp
+    #test/AuthUnitTests.cpp
 )
 
 set(SOURCE_FILES_NO_MAIN
@@ -80,10 +70,20 @@ set(SOURCE_FILES_NO_MAIN
     src/services/Healthcare.cpp
     src/services/Outreach.cpp
     src/services/Shelter.cpp
+    src/Auth.cpp
 )
+
+# Add bcrypt to your include paths
+list(APPEND INCLUDE_PATHS ${BCRYPT_INCLUDE_DIR})
 
 # Main project executable
 add_executable(GitGud ${SOURCE_FILES})
+
+# find_package(BCrypt REQUIRED)
+# target_link_libraries(GitGud PRIVATE BCrypt)
+
+find_package(jwt-cpp CONFIG REQUIRED)
+target_link_libraries(GitGud PRIVATE jwt-cpp::jwt-cpp)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(GitGud PRIVATE -Wno-deprecated-declarations)
@@ -103,12 +103,14 @@ target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 
 # Link libraries
 target_link_libraries(GitGud PRIVATE 
+    ${BCRYPT_LIBRARY}
     gtest 
     gtest_main
     gmock
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    jwt-cpp::jwt-cpp
 )
 
 enable_testing()
@@ -123,12 +125,14 @@ endif()
 target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 
 target_link_libraries(GitGudTests PRIVATE 
+    ${BCRYPT_LIBRARY}
     gtest 
     gtest_main
     gmock
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    jwt-cpp::jwt-cpp
 )
 
 include(GoogleTest)
