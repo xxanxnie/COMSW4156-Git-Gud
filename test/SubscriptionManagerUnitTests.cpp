@@ -91,8 +91,8 @@ TEST_F(SubscriptionManagerUnitTests, GetSubscribers) {
   mockDocs.push_back(doc2.extract());
 
   ON_CALL(*mockDbManager, findCollection(0, "Subscribers", expectedQuery, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockDocs),
-                                      ::testing::Return()));
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockDocs),
+                                    ::testing::Return()));
 
   std::map<std::string, std::string> subscribers =
       subscriptionManager->getSubscribers(resource, city);
