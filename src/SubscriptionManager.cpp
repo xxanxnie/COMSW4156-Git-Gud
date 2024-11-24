@@ -53,7 +53,7 @@ std::string SubscriptionManager::deleteSubscriber(const std::string& id) {
 std::map<std::string, std::string> SubscriptionManager::getSubscribers(const std::string& resource, const std::string& city) {
     std::vector<bsoncxx::document::value> docs;
     std::map<std::string, std::string> subscribers;
-    dbManager.findCollection("Subscribers", {{"resources", resource}, {"city", city}}, docs);
+    dbManager.findCollection(0, "Subscribers", {{"resources", resource}, {"city", city}}, docs);
 
     for (const auto& doc : docs) {
         auto view = doc.view();

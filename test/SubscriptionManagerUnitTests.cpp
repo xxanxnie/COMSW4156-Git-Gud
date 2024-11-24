@@ -90,7 +90,7 @@ TEST_F(SubscriptionManagerUnitTests, GetSubscribers) {
        << "contact" << "user2@example.com";
   mockDocs.push_back(doc2.extract());
 
-  ON_CALL(*mockDbManager, findCollection("Subscribers", expectedQuery, ::testing::_))
+  ON_CALL(*mockDbManager, findCollection(0, "Subscribers", expectedQuery, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockDocs),
                                       ::testing::Return()));
 
