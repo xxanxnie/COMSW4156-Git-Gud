@@ -116,8 +116,7 @@ class RouteControllerUnitTests : public ::testing::Test {
     routeController =
         new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
                             *mockHealthcare, *mockOutreach, *mockFood,
-                            *mockAuthService  // Pass the mock auth service
-        , *mockSubscriptionManager);
+                            *mockAuthService, *mockSubscriptionManager);
   }
 
   void TearDown() override {
