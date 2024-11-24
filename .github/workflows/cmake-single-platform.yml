@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libmongoc-1.0-0 curl cmake build-essential \
-            libssl-dev libboost-all-dev
+            libssl-dev libboost-all-dev libpoco-dev libcurl4-openssl-dev
 
     - name: Install spdlog
       run: |
@@ -77,6 +77,16 @@ jobs:
         mkdir build && cd build
         cmake ..
         make
+        sudo make install
+        cd ../..
+
+        # Install Poco library
+        git clone https://github.com/pocoproject/poco.git Poco
+        cd Poco || { echo "Failed to change to Poco directory"; exit 1; }
+        mkdir -p cmake-build
+        cd cmake-build || { echo "Failed to change to Poco build directory"; exit 1; }
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make -j$(nproc)
         sudo make install
         cd ../..
 

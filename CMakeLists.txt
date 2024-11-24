@@ -38,6 +38,9 @@ set(INCLUDE_PATHS
     /usr/local/include/libbson-1.0
     /usr/local/include/bcrypt
     /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
+    /opt/homebrew/opt/poco/include
+    /opt/homebrew/opt/openssl@3/include
+    /opt/homebrew/opt/curl/include
     include
 )
 
@@ -48,6 +51,7 @@ set(SOURCE_FILES
     src/main.cpp 
     src/RouteController.cpp
     src/DatabaseManager.cpp
+    src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
@@ -64,11 +68,13 @@ set(TEST_FILES
     test/ShelterUnitTests.cpp
     test/RouteControllerUnitTests.cpp
     #test/AuthUnitTests.cpp
+    test/SubscriptionManagerUnitTests.cpp
 )
 
 set(SOURCE_FILES_NO_MAIN
     src/RouteController.cpp
     src/DatabaseManager.cpp
+    src/SubscriptionManager.cpp
     src/services/Counseling.cpp
     src/services/Food.cpp
     src/services/Healthcare.cpp
@@ -116,6 +122,14 @@ target_link_libraries(GitGud PRIVATE
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
     spdlog::spdlog
+    PocoFoundation
+    PocoNet
+    PocoNetSSL
+    PocoCrypto
+    PocoUtil
+    ssl
+    crypto
+    curl
 )
 
 enable_testing()
@@ -139,6 +153,14 @@ target_link_libraries(GitGudTests PRIVATE
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
     spdlog::spdlog
+    PocoFoundation
+    PocoNet
+    PocoNetSSL
+    PocoCrypto
+    PocoUtil
+    ssl
+    crypto
+    curl
 )
 
 include(GoogleTest)

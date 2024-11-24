@@ -831,6 +831,14 @@ void RouteController::addHealthcareService(const crow::request& req,
 
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
+    
+    auto resource = bsoncxx::from_json(req.body);
+    std::string city = "";
+
+    for (auto element : resource.view()) {
+      if (element.key().to_string() == "city") city = element.get_utf8().value.to_string();
+    }
+
     if (result.find("Error") != std::string::npos) {
       res.code = 400;
       res.write(result);
@@ -838,6 +846,7 @@ void RouteController::addHealthcareService(const crow::request& req,
                 "addHealthcareService validation error: code={}, message={}",
                 res.code, result);
     } else {
+      subscriptionManager.notifySubscribers("healthcare", city);  
       res.code = 201;
       res.write(result);
       LOG_INFO("RouteController",
@@ -1080,6 +1089,56 @@ void RouteController::loginUser(const crow::request& req, crow::response& res) {
   }
 }
 
+void RouteController::subscribeToResources(const crow::request& req, crow::response& res) {
+  if (!authenticatePermissionsToPost(req)) {
+    res.code = 403;
+    res.write("Unauthorized.");
+    res.end();
+    return;
+  }
+
+  try {
+    auto resource = bsoncxx::from_json(req.body);
+    std::map<std::string, std::string> content;
+
+    for (auto element : resource.view()) {
+      content[element.key().to_string()] = element.get_utf8().value.to_string();
+    }
+
+    if (content.find("resources") == content.end() || 
+        content.find("city") == content.end() || 
+        content.find("contact") == content.end()) {
+      res.code = 400;
+      res.write("Error: Missing required fields (id, resources, city, or contact).");
+      res.end();
+      return;
+    }
+
+    std::string msg = subscriptionManager.addSubscriber(content);
+
+    res.code = 201;
+    res.write(msg);
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    res.end();
+  }
+}
+
+void RouteController::receiveWebhook(const crow::request& req, crow::response& res) {
+    try {
+        std::cout << "Webhook received!" << std::endl;
+        std::cout << "Body: " << req.body << std::endl;
+
+        res.code = 200;
+        res.write("Webhook received successfully.");
+        res.end();
+    } catch (const std::exception& e) {
+        res = handleException(e);
+    }
+}
+
+
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });
@@ -1211,4 +1270,17 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           [this](const crow::request& req, crow::response& res) {
             loginUser(req, res);
           });
+
+  CROW_ROUTE(app, "/resources/subscribe")
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
+            subscribeToResources(req, res);
+          });
+
+  CROW_ROUTE(app, "/webhook")
+    .methods(crow::HTTPMethod::POST)(
+        [this](const crow::request& req, crow::response& res) {
+            receiveWebhook(req, res);
+        });
+
 }

@@ -77,6 +77,18 @@ class MockAuthService : public AuthService {
   MockAuthService(DatabaseManager& dbManager) : AuthService(dbManager) {}
 };
 
+class MockSubscriptionManager : public SubscriptionManager {
+ public:
+  explicit MockSubscriptionManager(DatabaseManager* dbManager)
+      : SubscriptionManager(*dbManager) {}
+
+  MOCK_METHOD(std::string, addSubscriber, 
+              ((const std::map<std::string, std::string>& subscriberDetails)), (override));
+  MOCK_METHOD(std::string, deleteSubscriber, (const std::string& id), (override));
+  MOCK_METHOD((std::map<std::string, std::string>), getSubscribers, (const std::string&, (const std::string&)), (override));
+  MOCK_METHOD(void, notifySubscribers, ((const std::string&), (const std::string& )), (override));
+};
+
 class RouteControllerUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
@@ -86,6 +98,7 @@ class RouteControllerUnitTests : public ::testing::Test {
   MockOutreachService* mockOutreach;
   MockHealthcareService* mockHealthcare;
   MockAuthService* mockAuthService;
+  MockSubscriptionManager* mockSubscriptionManager;
   RouteController* routeController;
 
   void SetUp() override {
@@ -99,11 +112,11 @@ class RouteControllerUnitTests : public ::testing::Test {
         new MockHealthcareService(mockDbManager, "HealthcareServiceTest");
     mockAuthService = new MockAuthService(*mockDbManager);
 
+    mockSubscriptionManager = new MockSubscriptionManager(mockDbManager);
     routeController =
         new RouteController(*mockDbManager, *mockShelter, *mockCounseling,
                             *mockHealthcare, *mockOutreach, *mockFood,
-                            *mockAuthService  // Pass the mock auth service
-        );
+                            *mockAuthService, *mockSubscriptionManager);
   }
 
   void TearDown() override {
@@ -597,6 +610,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       {"provider", "City Hospital"},
       {"serviceType", "Emergency"},
       {"location", "456 Elm St"},
+      {"city", "New York"},
       {"operatingHours", "24/7"},
       {"contactInfo", "987-654-3210"}};
   std::string id = "507f191e810c19729de860ea";

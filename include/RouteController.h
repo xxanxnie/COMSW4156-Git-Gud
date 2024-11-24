@@ -17,6 +17,7 @@
 #include "Outreach.h"
 #include "Shelter.h"
 #include "Auth.h"
+#include "SubscriptionManager.h"
 
 class RouteController {
  private:
@@ -29,24 +30,30 @@ class RouteController {
   AuthService& authService;
 
   bool authenticateToken(const crow::request& req, crow::response& res);
+  SubscriptionManager subscriptionManager;
 
  public:
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
                   Outreach& outreachManager, Food& foodManager,
-                  AuthService& authService)
+                  AuthService& authService, SubscriptionManager& subscriptionManager)
       : dbManager(dbManager),
         shelterManager(shelterManager),
         counselingManager(counselingManager),
         healthcareManager(healthcareManager),
         outreachManager(outreachManager),
         foodManager(foodManager),
-        authService(authService) {}
+        authService(authService),
+        subscriptionManager(subscriptionManager) {}
 
   void initRoutes(crow::SimpleApp& app);
   void index(crow::response& res);
   std::optional<std::string> get_param(
-      const std::map<std::string, std::string>& params, const std::string& key);
+      const std::map<std::string, std::string>& params, const std::string& key);  
+  
+  void subscribeToResources(const crow::request& req, crow::response& res);
+  void receiveWebhook(const crow::request& req, crow::response& res);
+
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
   void updateShelter(const crow::request& req, crow::response& res);

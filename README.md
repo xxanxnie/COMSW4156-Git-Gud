@@ -34,6 +34,18 @@ External Libraries:
 
 **These libraries will be automatically installed when you run the `setup.sh` script.**
 
+Requirements:
+- **Linux**
+  ```bash
+  sudo apt-get update
+  sudo apt-get install -y libssl-dev libpoco-dev libcurl4-openssl-dev
+  ```
+- **Apple - Homebrew**
+  ```bash
+  brew update
+  brew install openssl poco curl  
+  ```
+
 # Set-up and building the project
 From the root directory:
 

@@ -15,6 +15,7 @@ COVERAGE_DIR="$BUILD_DIR/coverage"
 # Create external_libraries directory if it doesn't exist
 mkdir -p "$EXTERNAL_LIBRARIES_DIR"
 
+
 # Install external libraries
 echo "Starting the download of external libraries..."
 
@@ -90,6 +91,21 @@ if [ ! -d "spdlog" ]; then
     cd ../..
 else
     echo "spdlog already exists, skipping installation."
+fi
+
+# Download and install Poco library
+if [ ! -d "Poco" ]; then
+    echo "Downloading and installing Poco library..."
+    git clone https://github.com/pocoproject/poco.git Poco
+    cd Poco || { echo "Failed to change to Poco directory"; exit 1; }
+    mkdir -p cmake-build
+    cd cmake-build || { echo "Failed to change to Poco build directory"; exit 1; }
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    make install
+    cd ../../
+else
+    echo "Poco library already exists, skipping download and installation."
 fi
 
 echo "All external libraries processed successfully."
