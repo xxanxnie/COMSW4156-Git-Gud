@@ -18,7 +18,7 @@ class DatabaseManager {
   virtual void createCollection(const std::string& collectionName);
   virtual void printCollection(const std::string& collectionName);
   virtual void findCollection(
-      const std::string& collectionName,
+      int start, const std::string& collectionName,
       const std::vector<std::pair<std::string, std::string>>& keyValues,
       std::vector<bsoncxx::document::value>& result);
   virtual std::string insertResource(
@@ -34,6 +34,11 @@ class DatabaseManager {
                             const std::string& resourceId);
   virtual bsoncxx::document::value getResources(
       const std::string& resourceType);
+
+  static DatabaseManager& getInstance() {
+    static DatabaseManager instance("mongodb://localhost:27017");
+    return instance;
+  }
 
  protected:
   std::optional<mongocxx::client> conn;

@@ -45,6 +45,7 @@ int main(int argc, char* argv[]) {
   dbManager.createCollection("Outreach");
   dbManager.createCollection("Shelter");
   dbManager.createCollection("Counseling");
+  dbManager.createCollection("Users");
   dbManager.createCollection("Subscribers");
 
   crow::SimpleApp app;
@@ -54,9 +55,10 @@ int main(int argc, char* argv[]) {
   Food food(dbManager);
   Outreach outreach(dbManager, "OutreachService");
   Healthcare healthcare(dbManager, "HealthcareService");
+  AuthService authService(dbManager);
   SubscriptionManager subscriptionManager(dbManager);
 
-  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food, subscriptionManager);
+  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food, authService, subscriptionManager);
   routeController.initRoutes(app);  
   app.port(8080).multithreaded().run();
 

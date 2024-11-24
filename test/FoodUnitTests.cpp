@@ -35,9 +35,9 @@ TEST_F(FoodUnitTests, getAllFood) {
                        << "expirationDate" << "2024-12-31"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string foodItems = food->getAllFood();
@@ -84,9 +84,9 @@ TEST_F(FoodUnitTests, addFood) {
                        << "ExpirationDate" << "2024-11-30"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string foodItems = food->getAllFood();
@@ -115,9 +115,9 @@ TEST_F(FoodUnitTests, deleteFood) {
 
   // Verify deletion by checking empty results
   std::vector<bsoncxx::document::value> mockResult;
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string foodItems = food->getAllFood();
@@ -165,9 +165,9 @@ TEST_F(FoodUnitTests, updateFood) {
                        << "expirationDate" << "2024-01-11"
                        << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<2>(mockResult),
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
+      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 
   std::string foodItems = food->getAllFood();

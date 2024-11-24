@@ -16,6 +16,7 @@
 #include "Healthcare.h"
 #include "Outreach.h"
 #include "Shelter.h"
+#include "Auth.h"
 #include "SubscriptionManager.h"
 
 class RouteController {
@@ -26,23 +27,30 @@ class RouteController {
   Healthcare& healthcareManager;
   Outreach& outreachManager;
   Food& foodManager;
+  AuthService& authService;
+
+  bool authenticateToken(const crow::request& req, crow::response& res);
   SubscriptionManager subscriptionManager;
 
  public:
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
-                  Outreach& outreachManager, Food& foodManager, SubscriptionManager& subscriptionManager)
+                  Outreach& outreachManager, Food& foodManager,
+                  AuthService& authService, SubscriptionManager& subscriptionManager)
       : dbManager(dbManager),
         shelterManager(shelterManager),
         counselingManager(counselingManager),
         healthcareManager(healthcareManager),
         outreachManager(outreachManager),
         foodManager(foodManager),
+        authService(authService),
         subscriptionManager(subscriptionManager) {}
 
   void initRoutes(crow::SimpleApp& app);
-
   void index(crow::response& res);
+  std::optional<std::string> get_param(
+      const std::map<std::string, std::string>& params, const std::string& key);  
+  
   void subscribeToResources(const crow::request& req, crow::response& res);
   void receiveWebhook(const crow::request& req, crow::response& res);
 
@@ -75,6 +83,9 @@ class RouteController {
   void getAllHealthcareServices(const crow::request& req, crow::response& res);
   void updateHealthcareService(const crow::request& req, crow::response& res);
   void deleteHealthcareService(const crow::request& req, crow::response& res);
+
+  void registerUser(const crow::request& req, crow::response& res);
+  void loginUser(const crow::request& req, crow::response& res);
 };
 
 #endif

@@ -20,6 +20,13 @@ else()
     set(BSONCXX_LIB_PATH "/usr/local/lib/libbsoncxx.so")
 endif()
 
+set(BCRYPT_INCLUDE_DIR "/usr/local/include")
+set(BCRYPT_LIBRARY "/usr/local/lib/libbcrypt.a")
+
+# Add spdlog
+find_package(spdlog CONFIG REQUIRED)
+message(STATUS "spdlog version: ${spdlog_VERSION}")
+
 # Include directories
 set(INCLUDE_PATHS 
     ${BOOST_ROOT}
@@ -29,6 +36,8 @@ set(INCLUDE_PATHS
     /usr/local/include/bsoncxx/v_noabi
     /usr/local/include/libmongoc-1.0
     /usr/local/include/libbson-1.0
+    /usr/local/include/bcrypt
+    /usr/local/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc
     /opt/homebrew/opt/poco/include
     /opt/homebrew/opt/openssl@3/include
     /opt/homebrew/opt/curl/include
@@ -72,6 +81,7 @@ set(SOURCE_FILES
     src/services/Healthcare.cpp
     src/services/Outreach.cpp
     src/services/Shelter.cpp
+    src/Auth.cpp
 )
 
 set(TEST_FILES 
@@ -81,6 +91,7 @@ set(TEST_FILES
     test/OutreachUnitTests.cpp
     test/ShelterUnitTests.cpp
     test/RouteControllerUnitTests.cpp
+    #test/AuthUnitTests.cpp
     test/SubscriptionManagerUnitTests.cpp
 )
 
@@ -93,10 +104,20 @@ set(SOURCE_FILES_NO_MAIN
     src/services/Healthcare.cpp
     src/services/Outreach.cpp
     src/services/Shelter.cpp
+    src/Auth.cpp
 )
+
+# Add bcrypt to your include paths
+list(APPEND INCLUDE_PATHS ${BCRYPT_INCLUDE_DIR})
 
 # Main project executable
 add_executable(GitGud ${SOURCE_FILES})
+
+# find_package(BCrypt REQUIRED)
+# target_link_libraries(GitGud PRIVATE BCrypt)
+
+find_package(jwt-cpp CONFIG REQUIRED)
+target_link_libraries(GitGud PRIVATE jwt-cpp::jwt-cpp)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(GitGud PRIVATE -Wno-deprecated-declarations)
@@ -116,12 +137,15 @@ target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 
 # Link libraries
 target_link_libraries(GitGud PRIVATE 
+    ${BCRYPT_LIBRARY}
     gtest 
     gtest_main
     gmock
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    jwt-cpp::jwt-cpp
+    spdlog::spdlog
     PocoFoundation
     PocoNet
     PocoNetSSL
@@ -144,12 +168,15 @@ endif()
 target_include_directories(GitGudTests PRIVATE ${INCLUDE_PATHS})
 
 target_link_libraries(GitGudTests PRIVATE 
+    ${BCRYPT_LIBRARY}
     gtest 
     gtest_main
     gmock
     gmock_main
     ${MONGOCXX_LIB_PATH}
     ${BSONCXX_LIB_PATH}
+    jwt-cpp::jwt-cpp
+    spdlog::spdlog
     PocoFoundation
     PocoNet
     PocoNetSSL

@@ -53,6 +53,46 @@ else
     echo "MongoDB C++ Driver already exists, skipping installation."
 fi
 
+# Download and install jwt-cpp
+if [ ! -d "jwt-cpp" ]; then
+    echo "Installing jwt-cpp..."
+    git clone https://github.com/Thalhammer/jwt-cpp.git
+    cd jwt-cpp
+    mkdir build && cd build
+    cmake ..
+    sudo make install
+    cd ../..
+else
+    echo "jwt-cpp already exists, skipping installation."
+fi
+
+# Download and install bcrypt
+if [ ! -d "bcrypt" ]; then
+    echo "Installing bcrypt..."
+    git clone https://github.com/trusch/libbcrypt.git bcrypt
+    cd bcrypt
+    mkdir build && cd build
+    cmake ..
+    make
+    sudo make install
+    cd ../..
+else
+    echo "bcrypt already exists, skipping installation."
+fi
+
+# Download and install spdlog
+if [ ! -d "spdlog" ]; then
+    echo "Installing spdlog..."
+    git clone https://github.com/gabime/spdlog.git
+    cd spdlog
+    mkdir build && cd build
+    cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sudo make install
+    cd ../..
+else
+    echo "spdlog already exists, skipping installation."
+fi
+
 # Download and install Poco library
 if [ ! -d "Poco" ]; then
     echo "Downloading and installing Poco library..."

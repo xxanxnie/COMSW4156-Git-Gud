@@ -32,11 +32,14 @@ void DatabaseManager::createCollection(const std::string &collectionName) {
 }
 
 void DatabaseManager::findCollection(
-    const std::string &collectionName,
+    int start, const std::string &collectionName,
     const std::vector<std::pair<std::string, std::string>> &keyValues,
     std::vector<bsoncxx::document::value> &result) {
   auto collection = (*conn)["GitGud"][collectionName];
-  auto cursor = collection.find(createDocument(keyValues).view());
+  mongocxx::options::find options;
+  options.limit(20);    // Limit results to 20 documents
+  options.skip(start);  // Skip the first 10 documents
+  auto cursor = collection.find(createDocument(keyValues).view(), options);
 
   for (auto &&doc : cursor) {
     result.push_back(bsoncxx::document::value(doc));
