@@ -47,6 +47,10 @@ set(INCLUDE_PATHS
 # Add these lines to find MongoDB C++ driver
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
 
+# Set paths for OpenSSL libraries
+set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@3")
+find_package(OpenSSL REQUIRED)
+
 set(SOURCE_FILES 
     src/main.cpp 
     src/RouteController.cpp
@@ -111,6 +115,9 @@ FetchContent_MakeAvailable(googletest)
 # Include directories for main executable
 target_include_directories(GitGud PUBLIC ${INCLUDE_PATHS})
 
+# Find Poco libraries
+find_package(Poco REQUIRED Foundation Net NetSSL Crypto Util)
+
 # Link libraries
 target_link_libraries(GitGud PRIVATE 
     ${BCRYPT_LIBRARY}
@@ -122,13 +129,13 @@ target_link_libraries(GitGud PRIVATE
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
     spdlog::spdlog
-    PocoFoundation
-    PocoNet
-    PocoNetSSL
-    PocoCrypto
-    PocoUtil
-    ssl
-    crypto
+    Poco::Foundation
+    Poco::Net
+    Poco::NetSSL
+    Poco::Crypto
+    Poco::Util
+    OpenSSL::SSL
+    OpenSSL::Crypto
     curl
 )
 
@@ -153,13 +160,13 @@ target_link_libraries(GitGudTests PRIVATE
     ${BSONCXX_LIB_PATH}
     jwt-cpp::jwt-cpp
     spdlog::spdlog
-    PocoFoundation
-    PocoNet
-    PocoNetSSL
-    PocoCrypto
-    PocoUtil
-    ssl
-    crypto
+    Poco::Foundation
+    Poco::Net
+    Poco::NetSSL
+    Poco::Crypto
+    Poco::Util
+    OpenSSL::SSL
+    OpenSSL::Crypto
     curl
 )
 
