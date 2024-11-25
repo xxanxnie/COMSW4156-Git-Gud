@@ -105,15 +105,17 @@ void RouteController::index(crow::response& res) {
 /**
  * @brief Handles the HTTP GET request to fetch all shelter data.
  *
- * This method is responsible for processing a GET request that retrieves shelter data from the
- * shelterManager. It handles authentication, pagination (via the "start" parameter), and returns
- * the shelter data in a JSON format.
+ * This method is responsible for processing a GET request that retrieves
+ * shelter data from the shelterManager. It handles authentication, pagination
+ * (via the "start" parameter), and returns the shelter data in a JSON format.
  *
  * @param req The HTTP request object containing the request data.
  * @param res The HTTP response object used to send the response.
  *
- * @throws std::exception If there is an error during data retrieval or response processing.
- * @return void This method directly modifies the `res` parameter to send the response.
+ * @throws std::exception If there is an error during data retrieval or response
+ * processing.
+ * @return void This method directly modifies the `res` parameter to send the
+ * response.
  */
 void RouteController::getShelter(const crow::request& req,
                                  crow::response& res) {
@@ -139,6 +141,7 @@ void RouteController::getShelter(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "getShelter error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 /**
@@ -178,21 +181,26 @@ void RouteController::addShelter(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "addShelter error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP POST request to add a new shelter.
  *
- * This method processes a POST request to add new shelter data. It first checks if the user
- * is authorized to add a shelter. If the user is authorized, it attempts to add the shelter
- * data provided in the request body to the shelterManager. The result (either an ID or an error message)
- * is then returned to the client.
+ * This method processes a POST request to add new shelter data. It first checks
+ * if the user is authorized to add a shelter. If the user is authorized, it
+ * attempts to add the shelter data provided in the request body to the
+ * shelterManager. The result (either an ID or an error message) is then
+ * returned to the client.
  *
  * @param req The HTTP request object containing the shelter data in its body.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If there is an error during the shelter addition process or data handling.
- * @return void This method directly modifies the `res` parameter to send the response.
+ * @throws std::exception If there is an error during the shelter addition
+ * process or data handling.
+ * @return void This method directly modifies the `res` parameter to send the
+ * response.
  */
 void RouteController::updateShelter(const crow::request& req,
                                     crow::response& res) {
@@ -221,21 +229,28 @@ void RouteController::updateShelter(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "updateShelter error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP DELETE request to remove a shelter.
  *
- * This method processes a DELETE request to remove a shelter based on the provided shelter ID
- * in the request body. It first checks if the user has permission to perform the delete operation.
- * If authorized, it attempts to delete the shelter with the specified ID. Upon success, it responds
- * with a success message. If an error occurs, an appropriate error message is returned to the client.
+ * This method processes a DELETE request to remove a shelter based on the
+ * provided shelter ID in the request body. It first checks if the user has
+ * permission to perform the delete operation. If authorized, it attempts to
+ * delete the shelter with the specified ID. Upon success, it responds with a
+ * success message. If an error occurs, an appropriate error message is returned
+ * to the client.
  *
- * @param req The HTTP request object containing the shelter ID in its body for deletion.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the shelter ID in its body for
+ * deletion.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If there is an error during the deletion process or data handling.
- * @return void This method directly modifies the `res` parameter to send the response.
+ * @throws std::exception If there is an error during the deletion process or
+ * data handling.
+ * @return void This method directly modifies the `res` parameter to send the
+ * response.
  */
 void RouteController::deleteShelter(const crow::request& req,
                                     crow::response& res) {
@@ -271,16 +286,21 @@ void RouteController::deleteShelter(const crow::request& req,
 /**
  * @brief Handles the HTTP GET request to retrieve all counseling services.
  *
- * This method processes a GET request to fetch a list of all available counseling services.
- * It first checks if the user has permission to access this information. If authorized, it
- * retrieves the data from the counseling manager and responds with the result. If an error
- * occurs during the process, an appropriate error message is sent back to the client.
+ * This method processes a GET request to fetch a list of all available
+ * counseling services. It first checks if the user has permission to access
+ * this information. If authorized, it retrieves the data from the counseling
+ * manager and responds with the result. If an error occurs during the process,
+ * an appropriate error message is sent back to the client.
  *
- * @param req The HTTP request object containing the parameters for fetching the counseling services.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the parameters for fetching the
+ * counseling services.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while fetching the counseling services or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while fetching the counseling
+ * services or processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::getCounseling(const crow::request& req,
                                     crow::response& res) {
@@ -306,22 +326,28 @@ void RouteController::getCounseling(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "getCounseling error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP POST request to add a new counseling service.
  *
- * This method processes a POST request to add a new counseling service. It first checks if the
- * user has the necessary permissions to post new services. If authorized, it attempts to add
- * the counseling service through the counseling manager. If successful, it returns a success
- * message with the created resource's ID. If an error occurs, an error message is returned.
+ * This method processes a POST request to add a new counseling service. It
+ * first checks if the user has the necessary permissions to post new services.
+ * If authorized, it attempts to add the counseling service through the
+ * counseling manager. If successful, it returns a success message with the
+ * created resource's ID. If an error occurs, an error message is returned.
  *
- * @param req The HTTP request object containing the details of the counseling service to be added.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the details of the counseling
+ * service to be added.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while adding the counseling service or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while adding the counseling service
+ * or processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 
 void RouteController::addCounseling(const crow::request& req,
@@ -351,22 +377,29 @@ void RouteController::addCounseling(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "addCounseling error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP PUT request to update an existing counseling service.
  *
- * This method processes a PUT request to update the details of an existing counseling service.
- * It first checks if the user has the necessary permissions to update the service. If authorized,
- * it attempts to update the counseling service using the provided data. If the update is successful,
- * a success message is returned. If an error occurs, an error message is sent in the response.
+ * This method processes a PUT request to update the details of an existing
+ * counseling service. It first checks if the user has the necessary permissions
+ * to update the service. If authorized, it attempts to update the counseling
+ * service using the provided data. If the update is successful, a success
+ * message is returned. If an error occurs, an error message is sent in the
+ * response.
  *
- * @param req The HTTP request object containing the updated details of the counseling service.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the updated details of the
+ * counseling service.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while updating the counseling service or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while updating the counseling
+ * service or processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::updateCounseling(const crow::request& req,
                                        crow::response& res) {
@@ -401,19 +434,25 @@ void RouteController::updateCounseling(const crow::request& req,
 }
 
 /**
- * @brief Handles the HTTP DELETE request to delete an existing counseling service.
+ * @brief Handles the HTTP DELETE request to delete an existing counseling
+ * service.
  *
- * This method processes a DELETE request to remove a counseling service from the database.
- * It first checks if the user has the necessary permissions to delete the service. If authorized,
- * it attempts to delete the counseling service identified by the `id` provided in the request body.
- * If the deletion is successful, a success message is returned. If there is an error, an error message
- * is sent in the response.
+ * This method processes a DELETE request to remove a counseling service from
+ * the database. It first checks if the user has the necessary permissions to
+ * delete the service. If authorized, it attempts to delete the counseling
+ * service identified by the `id` provided in the request body. If the deletion
+ * is successful, a success message is returned. If there is an error, an error
+ * message is sent in the response.
  *
- * @param req The HTTP request object containing the ID of the counseling service to be deleted.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the ID of the counseling
+ * service to be deleted.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while deleting the counseling service or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while deleting the counseling
+ * service or processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::deleteCounseling(const crow::request& req,
                                        crow::response& res) {
@@ -449,17 +488,23 @@ void RouteController::deleteCounseling(const crow::request& req,
 /**
  * @brief Handles the HTTP POST request to add a new food resource.
  *
- * This method processes a POST request to add a new food item to the system. It first checks if the
- * user has the necessary permissions to perform the operation. If authorized, it attempts to add
- * the food item using the data provided in the request body. If the food item is successfully added,
- * the response will include the result, typically the ID of the newly created food resource. If there
- * is an error during the process, an error message is returned instead.
+ * This method processes a POST request to add a new food item to the system. It
+ * first checks if the user has the necessary permissions to perform the
+ * operation. If authorized, it attempts to add the food item using the data
+ * provided in the request body. If the food item is successfully added, the
+ * response will include the result, typically the ID of the newly created food
+ * resource. If there is an error during the process, an error message is
+ * returned instead.
  *
- * @param req The HTTP request object containing the data of the food item to be added.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the data of the food item to be
+ * added.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while adding the food item or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while adding the food item or
+ * processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::addFood(const crow::request& req, crow::response& res) {
   LOG_INFO("RouteController", "addFood request body: {}", req.body);
@@ -487,23 +532,29 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     res = handleException(e);
     LOG_ERROR("RouteController", "addFood error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP GET request to retrieve all food resources.
  *
- * This method processes a GET request to fetch all food items from the system. It checks if the
- * user has the necessary permissions to access the food resource data. If authorized, it fetches
- * the data starting from a specified point (if provided) and returns the results in the response.
- * The results are returned as raw JSON without any additional formatting. If an error occurs during
- * the process, an appropriate error message is returned instead.
+ * This method processes a GET request to fetch all food items from the system.
+ * It checks if the user has the necessary permissions to access the food
+ * resource data. If authorized, it fetches the data starting from a specified
+ * point (if provided) and returns the results in the response. The results are
+ * returned as raw JSON without any additional formatting. If an error occurs
+ * during the process, an appropriate error message is returned instead.
  *
- * @param req The HTTP request object containing the query parameters and other necessary information.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the query parameters and other
+ * necessary information.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs while fetching the food data or processing the request.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs while fetching the food data or
+ * processing the request.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::getAllFood(const crow::request& req,
                                  crow::response& res) {
@@ -532,23 +583,29 @@ void RouteController::getAllFood(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "getAllFood error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP DELETE request to remove a food resource.
  *
- * This method processes a DELETE request to remove a food item from the system. It checks if the
- * user has the necessary permissions to delete the resource. It then validates the request body to 
- * ensure that the `id` field is provided and not empty. If the validation passes, it proceeds to 
- * delete the food resource with the given ID. If any issues arise (such as missing or invalid data), 
- * the response will include an error message.
+ * This method processes a DELETE request to remove a food item from the system.
+ * It checks if the user has the necessary permissions to delete the resource.
+ * It then validates the request body to ensure that the `id` field is provided
+ * and not empty. If the validation passes, it proceeds to delete the food
+ * resource with the given ID. If any issues arise (such as missing or invalid
+ * data), the response will include an error message.
  *
- * @param req The HTTP request object containing the request body with the food ID to be deleted.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the request body with the food
+ * ID to be deleted.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the validation or deletion process.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @throws std::exception If an error occurs during the validation or deletion
+ * process.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::deleteFood(const crow::request& req,
                                  crow::response& res) {
@@ -584,16 +641,21 @@ void RouteController::deleteFood(const crow::request& req,
 /**
  * @brief Handles the HTTP PUT request to update a food resource.
  *
- * This method processes a PUT request to update the details of an existing food resource in the system. 
- * It checks if the user has the necessary permissions to update the resource. After validation, it attempts 
- * to update the food resource using the provided request body. If successful, it responds with a success message. 
- * If there is any error, it returns an error message. In case of exceptions, the appropriate error response is sent.
+ * This method processes a PUT request to update the details of an existing food
+ * resource in the system. It checks if the user has the necessary permissions
+ * to update the resource. After validation, it attempts to update the food
+ * resource using the provided request body. If successful, it responds with a
+ * success message. If there is any error, it returns an error message. In case
+ * of exceptions, the appropriate error response is sent.
  *
- * @param req The HTTP request object containing the request body with the food resource details to be updated.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the request body with the food
+ * resource details to be updated.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
  * @throws std::exception If an error occurs during the update process.
- * @return void This method modifies the `res` parameter directly to send the response to the client.
+ * @return void This method modifies the `res` parameter directly to send the
+ * response to the client.
  */
 void RouteController::updateFood(const crow::request& req,
                                  crow::response& res) {
@@ -622,23 +684,30 @@ void RouteController::updateFood(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "updateFood error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP POST request to add a new outreach service.
  *
- * This method processes a POST request to add a new outreach service to the system.
- * It first checks if the user has the necessary permissions to create a new service. 
- * If the user is authorized, it attempts to add the outreach service using the data in the request body.
- * If successful, it responds with the ID of the newly created service. If there is an error, 
- * it responds with an error message. The method also handles any exceptions that occur during the process.
+ * This method processes a POST request to add a new outreach service to the
+ * system. It first checks if the user has the necessary permissions to create a
+ * new service. If the user is authorized, it attempts to add the outreach
+ * service using the data in the request body. If successful, it responds with
+ * the ID of the newly created service. If there is an error, it responds with
+ * an error message. The method also handles any exceptions that occur during
+ * the process.
  *
- * @param req The HTTP request object containing the outreach service details to be added.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object containing the outreach service details to
+ * be added.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the process of adding the outreach service.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @throws std::exception If an error occurs during the process of adding the
+ * outreach service.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::addOutreachService(const crow::request& req,
                                          crow::response& res) {
@@ -668,24 +737,29 @@ void RouteController::addOutreachService(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "addOutreachService error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP GET request to retrieve all outreach services.
  *
- * This method processes a GET request to retrieve a list of all outreach services 
- * starting from a specified index (if provided). It checks if the user has the 
- * necessary permissions to view the outreach services. If the user is authorized, 
- * it retrieves the outreach services and returns them in the response. 
- * If an error occurs during the process, it handles the exception and sends an error response.
+ * This method processes a GET request to retrieve a list of all outreach
+ * services starting from a specified index (if provided). It checks if the user
+ * has the necessary permissions to view the outreach services. If the user is
+ * authorized, it retrieves the outreach services and returns them in the
+ * response. If an error occurs during the process, it handles the exception and
+ * sends an error response.
  *
- * @param req The HTTP request object that may contain query parameters like `start` 
- * to specify the starting index for pagination.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object that may contain query parameters like
+ * `start` to specify the starting index for pagination.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the retrieval of outreach services.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @throws std::exception If an error occurs during the retrieval of outreach
+ * services.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::getAllOutreachServices(const crow::request& req,
                                              crow::response& res) {
@@ -716,21 +790,26 @@ void RouteController::getAllOutreachServices(const crow::request& req,
     LOG_ERROR("RouteController",
               "getAllOutreachServices error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP POST request to update an existing outreach service.
  *
- * This method processes a POST request to update an outreach service. It checks if the
- * user has the necessary permissions to update the outreach service. If authorized, 
- * it updates the resource using the provided data and sends an appropriate response.
- * If any error occurs during the process, the exception is handled and an error message is returned.
+ * This method processes a POST request to update an outreach service. It checks
+ * if the user has the necessary permissions to update the outreach service. If
+ * authorized, it updates the resource using the provided data and sends an
+ * appropriate response. If any error occurs during the process, the exception
+ * is handled and an error message is returned.
  *
- * @param req The HTTP request object that contains the data for the outreach service update.
- * @param res The HTTP response object used to send the response back to the client.
+ * @param req The HTTP request object that contains the data for the outreach
+ * service update.
+ * @param res The HTTP response object used to send the response back to the
+ * client.
  *
  * @throws std::exception If an error occurs during the update process.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::updateOutreach(const crow::request& req,
                                      crow::response& res) {
@@ -760,20 +839,25 @@ void RouteController::updateOutreach(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "updateOutreach error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP request to delete an existing outreach service.
  *
- * This method processes a request to delete an outreach service identified by its ID.
- * It first checks if the user has the necessary permissions to perform the delete operation.
- * If authorized, the outreach service is deleted. If any errors occur, appropriate error messages are returned.
+ * This method processes a request to delete an outreach service identified by
+ * its ID. It first checks if the user has the necessary permissions to perform
+ * the delete operation. If authorized, the outreach service is deleted. If any
+ * errors occur, appropriate error messages are returned.
  *
- * @param req The HTTP request object containing the ID of the outreach service to be deleted.
- * @param res The HTTP response object used to send the result back to the client.
+ * @param req The HTTP request object containing the ID of the outreach service
+ * to be deleted.
+ * @param res The HTTP response object used to send the result back to the
+ * client.
  *
  * @throws std::exception If an error occurs during the deletion process.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::deleteOutreach(const crow::request& req,
                                      crow::response& res) {
@@ -809,15 +893,19 @@ void RouteController::deleteOutreach(const crow::request& req,
 /**
  * @brief Handles the HTTP request to add a new healthcare service.
  *
- * This method processes a request to add a new healthcare service. It checks if the user has the necessary permissions
- * to add a service. If authorized, it calls the healthcare manager to add the new service. Based on the result of the
- * addition, it responds with either a success or an error message.
+ * This method processes a request to add a new healthcare service. It checks if
+ * the user has the necessary permissions to add a service. If authorized, it
+ * calls the healthcare manager to add the new service. Based on the result of
+ * the addition, it responds with either a success or an error message.
  *
- * @param req The HTTP request object containing the data for the new healthcare service.
- * @param res The HTTP response object used to send the result back to the client.
+ * @param req The HTTP request object containing the data for the new healthcare
+ * service.
+ * @param res The HTTP response object used to send the result back to the
+ * client.
  *
  * @throws std::exception If an error occurs during the addition process.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::addHealthcareService(const crow::request& req,
                                            crow::response& res) {
@@ -831,12 +919,13 @@ void RouteController::addHealthcareService(const crow::request& req,
 
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
-    
+
     auto resource = bsoncxx::from_json(req.body);
     std::string city = "";
 
     for (auto element : resource.view()) {
-      if (element.key().to_string() == "city") city = element.get_utf8().value.to_string();
+      if (element.key().to_string() == "city")
+        city = element.get_utf8().value.to_string();
     }
 
     if (result.find("Error") != std::string::npos) {
@@ -846,7 +935,7 @@ void RouteController::addHealthcareService(const crow::request& req,
                 "addHealthcareService validation error: code={}, message={}",
                 res.code, result);
     } else {
-      subscriptionManager.notifySubscribers("healthcare", city);  
+      subscriptionManager.notifySubscribers("healthcare", city);
       res.code = 201;
       res.write(result);
       LOG_INFO("RouteController",
@@ -859,21 +948,28 @@ void RouteController::addHealthcareService(const crow::request& req,
     LOG_ERROR("RouteController",
               "addHealthcareService error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 
 /**
  * @brief Handles the HTTP request to retrieve all healthcare services.
  *
- * This method processes a request to fetch a list of all healthcare services. It checks if the user has the necessary 
- * permissions to view all healthcare services. If authorized, it retrieves the services starting from a specified index
- * (default is 0) and sends the response to the client. In case of an error, an appropriate error message is returned.
+ * This method processes a request to fetch a list of all healthcare services.
+ * It checks if the user has the necessary permissions to view all healthcare
+ * services. If authorized, it retrieves the services starting from a specified
+ * index (default is 0) and sends the response to the client. In case of an
+ * error, an appropriate error message is returned.
  *
- * @param req The HTTP request object containing any parameters, such as pagination information.
- * @param res The HTTP response object used to send the result back to the client.
+ * @param req The HTTP request object containing any parameters, such as
+ * pagination information.
+ * @param res The HTTP response object used to send the result back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the retrieval of healthcare services.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @throws std::exception If an error occurs during the retrieval of healthcare
+ * services.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::getAllHealthcareServices(const crow::request& req,
                                                crow::response& res) {
@@ -903,21 +999,28 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
     LOG_ERROR("RouteController",
               "getAllHealthcareServices error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP request to update a healthcare service resource.
  *
- * This method processes a request to update a healthcare service. It first checks if the user has the necessary
- * permissions to perform the update. If authorized, it attempts to update the healthcare resource using the request body.
- * If the update is successful, it returns a success message, otherwise an error message is returned. In case of an exception,
- * an error response is sent.
+ * This method processes a request to update a healthcare service. It first
+ * checks if the user has the necessary permissions to perform the update. If
+ * authorized, it attempts to update the healthcare resource using the request
+ * body. If the update is successful, it returns a success message, otherwise an
+ * error message is returned. In case of an exception, an error response is
+ * sent.
  *
- * @param req The HTTP request object containing the data necessary to update the healthcare service.
- * @param res The HTTP response object used to send the result back to the client.
+ * @param req The HTTP request object containing the data necessary to update
+ * the healthcare service.
+ * @param res The HTTP response object used to send the result back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the update of the healthcare service.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @throws std::exception If an error occurs during the update of the healthcare
+ * service.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::updateHealthcareService(const crow::request& req,
                                               crow::response& res) {
@@ -950,21 +1053,28 @@ void RouteController::updateHealthcareService(const crow::request& req,
     LOG_ERROR("RouteController",
               "updateHealthcareService error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 /**
  * @brief Handles the HTTP request to delete a healthcare service resource.
  *
- * This method processes a request to delete a healthcare service resource. It first checks if the user has the necessary
- * permissions to perform the deletion. If authorized, it retrieves the healthcare service ID from the request body and
- * attempts to delete the corresponding healthcare resource. A success or error message is returned based on the outcome.
- * In case of an exception, an error response is sent.
+ * This method processes a request to delete a healthcare service resource. It
+ * first checks if the user has the necessary permissions to perform the
+ * deletion. If authorized, it retrieves the healthcare service ID from the
+ * request body and attempts to delete the corresponding healthcare resource. A
+ * success or error message is returned based on the outcome. In case of an
+ * exception, an error response is sent.
  *
- * @param req The HTTP request object containing the data necessary to identify and delete the healthcare service.
- * @param res The HTTP response object used to send the result back to the client.
+ * @param req The HTTP request object containing the data necessary to identify
+ * and delete the healthcare service.
+ * @param res The HTTP response object used to send the result back to the
+ * client.
  *
- * @throws std::exception If an error occurs during the deletion of the healthcare service.
- * @return void This method directly modifies the `res` object to send a response to the client.
+ * @throws std::exception If an error occurs during the deletion of the
+ * healthcare service.
+ * @return void This method directly modifies the `res` object to send a
+ * response to the client.
  */
 void RouteController::deleteHealthcareService(const crow::request& req,
                                               crow::response& res) {
@@ -1043,6 +1153,7 @@ void RouteController::registerUser(const crow::request& req,
     res = handleException(e);
     LOG_ERROR("RouteController", "registerUser error: code={}, error={}",
               res.code, e.what());
+    res.end();
   }
 }
 
@@ -1086,10 +1197,12 @@ void RouteController::loginUser(const crow::request& req, crow::response& res) {
     res = handleException(e);
     LOG_ERROR("RouteController", "loginUser error: code={}, error={}", res.code,
               e.what());
+    res.end();
   }
 }
 
-void RouteController::subscribeToResources(const crow::request& req, crow::response& res) {
+void RouteController::subscribeToResources(const crow::request& req,
+                                           crow::response& res) {
   if (!authenticatePermissionsToPost(req)) {
     res.code = 403;
     res.write("Unauthorized.");
@@ -1105,11 +1218,12 @@ void RouteController::subscribeToResources(const crow::request& req, crow::respo
       content[element.key().to_string()] = element.get_utf8().value.to_string();
     }
 
-    if (content.find("resources") == content.end() || 
-        content.find("city") == content.end() || 
+    if (content.find("resources") == content.end() ||
+        content.find("city") == content.end() ||
         content.find("contact") == content.end()) {
       res.code = 400;
-      res.write("Error: Missing required fields (id, resources, city, or contact).");
+      res.write(
+          "Error: Missing required fields (id, resources, city, or contact).");
       res.end();
       return;
     }
@@ -1125,19 +1239,20 @@ void RouteController::subscribeToResources(const crow::request& req, crow::respo
   }
 }
 
-void RouteController::receiveWebhook(const crow::request& req, crow::response& res) {
-    try {
-        std::cout << "Webhook received!" << std::endl;
-        std::cout << "Body: " << req.body << std::endl;
+void RouteController::receiveWebhook(const crow::request& req,
+                                     crow::response& res) {
+  try {
+    std::cout << "Webhook received!" << std::endl;
+    std::cout << "Body: " << req.body << std::endl;
 
-        res.code = 200;
-        res.write("Webhook received successfully.");
-        res.end();
-    } catch (const std::exception& e) {
-        res = handleException(e);
-    }
+    res.code = 200;
+    res.write("Webhook received successfully.");
+    res.end();
+  } catch (const std::exception& e) {
+    res = handleException(e);
+    res.end();
+  }
 }
-
 
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
@@ -1278,9 +1393,8 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
           });
 
   CROW_ROUTE(app, "/webhook")
-    .methods(crow::HTTPMethod::POST)(
-        [this](const crow::request& req, crow::response& res) {
+      .methods(crow::HTTPMethod::POST)(
+          [this](const crow::request& req, crow::response& res) {
             receiveWebhook(req, res);
-        });
-
+          });
 }
