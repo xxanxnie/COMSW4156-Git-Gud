@@ -3,8 +3,12 @@
 #include <csignal>
 #include <iostream>
 #include <map>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
 #include <string>
 
+#include "../external_libraries/Crow/include/crow.h"
 #include "Counseling.h"
 #include "DatabaseManager.h"
 #include "Food.h"
@@ -13,12 +17,6 @@
 #include "RouteController.h"
 #include "Shelter.h"
 #include "SubscriptionManager.h"
-
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
-
-#include "../external_libraries/Crow/include/crow.h"
 
 /**
  *  Method to handle proper termination protocols
@@ -58,8 +56,10 @@ int main(int argc, char* argv[]) {
   AuthService authService(dbManager);
   SubscriptionManager subscriptionManager(dbManager);
 
-  RouteController routeController(dbManager, shelter, counseling, healthcare, outreach, food, authService, subscriptionManager);
-  routeController.initRoutes(app);  
+  RouteController routeController(dbManager, shelter, counseling, healthcare,
+                                  outreach, food, authService,
+                                  subscriptionManager);
+  routeController.initRoutes(app);
   app.port(8080).multithreaded().run();
 
   return 0;
