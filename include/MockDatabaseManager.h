@@ -13,8 +13,8 @@ class MockDatabaseManager : public DatabaseManager {
   MOCK_METHOD(
       void, findCollection,
       (int start, (const std::string &collectionName),
-      (const std::vector<std::pair<std::string, std::string>> &keyValues),
-      (std::vector<bsoncxx::document::value> &result)),
+       (const std::vector<std::pair<std::string, std::string>> &keyValues),
+       (std::vector<bsoncxx::document::value> & result)),
       (override));
 
   MOCK_METHOD(
@@ -30,8 +30,8 @@ class MockDatabaseManager : public DatabaseManager {
       (override));
 
   MOCK_METHOD(bool, deleteResource,
-      (const std::string& collectionName,
-      (const std::string& id)), (override));
+              (const std::string &collectionName, (const std::string &id)),
+              (override));
 };
 
 #endif  // MOCK_DATABASE_MANAGER_H
