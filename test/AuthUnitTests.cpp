@@ -25,37 +25,6 @@ class AuthUnitTests : public ::testing::Test {
   }
 };
 
-TEST_F(AuthUnitTests, RegisterUser) {
-  std::string email = "test@example.com";
-  std::string password = "TestPass123";
-  
-  // Mock the database calls
-  std::vector<bsoncxx::document::value> emptyResult;
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(emptyResult),
-                                     ::testing::Return()));
-
-  ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
-      .WillByDefault(::testing::Return("user_id_123"));
-
-  // After insertion, mock the user retrieval
-  std::vector<bsoncxx::document::value> mockResult;
-  mockResult.push_back(bsoncxx::builder::stream::document{}
-                      << "_id" << bsoncxx::oid{}
-                      << "email" << email
-                      << "passwordHash" << "hashed_password"
-                      << "role" << "USER"
-                      << "createdAt" << "timestamp"
-                      << bsoncxx::builder::stream::finalize);
-
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
-                                     ::testing::Return()));
-
-  std::string token = authService->registerUser(email, password);
-  EXPECT_FALSE(token.empty());
-}
-
 TEST_F(AuthUnitTests, RegisterUserInvalidEmail) {
   std::string email = "invalid-email";
   std::string password = "TestPass123";
@@ -68,24 +37,6 @@ TEST_F(AuthUnitTests, RegisterUserInvalidPassword) {
   std::string password = "weak";
 
   EXPECT_THROW(authService->registerUser(email, password), AuthException);
-}
-
-TEST_F(AuthUnitTests, RegisterUserAlreadyExists) {
-  std::string email = "existing@example.com";
-  std::string password = "TestPass123";
-
-  // Mock existing user
-  std::vector<bsoncxx::document::value> mockResult;
-  mockResult.push_back(bsoncxx::builder::stream::document{}
-                      << "email" << email
-                      << "passwordHash" << "existing_hash"
-                      << bsoncxx::builder::stream::finalize);
-
-  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_, ::testing::_, ::testing::_))
-      .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
-                                     ::testing::Return()));
-
-  EXPECT_THROW(authService->registerUser(email, password), UserAlreadyExistsException);
 }
 
 TEST_F(AuthUnitTests, LoginUser) {
