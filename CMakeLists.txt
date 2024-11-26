@@ -73,6 +73,7 @@ set(TEST_FILES
     test/RouteControllerUnitTests.cpp
     test/AuthUnitTests.cpp
     test/SubscriptionManagerUnitTests.cpp
+    test/DataBaseTest.cpp
 )
 
 set(SOURCE_FILES_NO_MAIN
