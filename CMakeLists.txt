@@ -71,7 +71,7 @@ set(TEST_FILES
     test/OutreachUnitTests.cpp
     test/ShelterUnitTests.cpp
     test/RouteControllerUnitTests.cpp
-    #test/AuthUnitTests.cpp
+    test/AuthUnitTests.cpp
     test/SubscriptionManagerUnitTests.cpp
 )
 
