@@ -8,6 +8,8 @@
 
 #include "DatabaseManager.h"
 
+mongocxx::instance instance{};
+
 class DataBaseTest : public ::testing::Test {
  protected:
   DatabaseManager* DbManager;
