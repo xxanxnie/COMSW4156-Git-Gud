@@ -97,7 +97,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: setup database
-      run: docker-compose up -d
+      run: docker compose up -d
 
     - name: Test
       working-directory: ${{github.workspace}}/build
