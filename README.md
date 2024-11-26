@@ -69,8 +69,83 @@ cd build
 ./GitGudTests
 ```
 
-# Authentication
-The current implementation uses a basic authentication mechanism with hardcoded API keys to control access to various endpoints based on user roles. Requests are authenticated by validating the API key against predefined roles, such as NGOs, clinics, and volunteers. In future iterations, this system will be enhanced to include dynamic API key generation, role-based access control, and improved security features.
+# Authentication and Authorization
+
+## JWT (JSON Web Token)
+
+GitGud uses JWT (JSON Web Token) for secure authentication and authorization. JWTs are used to maintain user sessions and protect API endpoints.
+
+### Token Structure
+
+Each JWT contains the following claims:
+- `iss` (Issuer): "auth-service"
+- `typ` (Type): "JWS"
+- `iat` (Issued At): Timestamp when the token was created
+- `exp` (Expiration Time): Token expiry (24 hours from issuance)
+- `userId`: Unique identifier for the user
+- `email`: User's email address
+- `role`: User's role in the system
+
+### Authentication Flow
+
+1. **Registration** (`POST /auth/register`)
+   ```json
+   {
+     "email": "user@example.com",
+     "password": "SecurePass123"
+   }
+   ```
+   - Password requirements:
+     - Minimum 8 characters
+     - At least 1 uppercase letter
+     - At least 1 lowercase letter
+     - At least 1 number
+
+2. **Login** (`POST /auth/login`)
+   ```json
+   {
+     "email": "user@example.com",
+     "password": "SecurePass123"
+   }
+   ```
+   - Returns a JWT upon successful authentication
+
+### Using the Token
+
+Include the JWT in the Authorization header for protected endpoints:
+```bash
+Authorization: Bearer <your_jwt_token>
+```
+
+### Error Responses
+
+- **401 Unauthorized**: Invalid or missing token
+- **403 Forbidden**: Valid token but insufficient permissions
+- **400 Bad Request**: Invalid email or password format
+- **409 Conflict**: Email already exists (during registration)
+
+### Security Features
+
+- Passwords are hashed using BCrypt
+- JWTs are signed using HS256 algorithm
+- Tokens expire after 24 hours
+- Email validation using regex pattern
+- Password strength requirements enforced
+- Protection against common authentication attacks
+
+### Role-Based Access Control
+
+The following roles are supported:
+- **NGO**: Non-profit Organizations
+- **VOL**: Volunteers
+- **CLN**: Clinics
+- **GOV**: Government
+- **HML**: Homeless
+- **RFG**: Refugees
+- **VET**: Veterans
+- **SUB**: Substance Users
+
+Each role has specific permissions for accessing and modifying resources. Refer to the [User Types](#user-types) section for more details about role-specific capabilities.
 
 # Endpoints
 
