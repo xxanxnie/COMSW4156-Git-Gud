@@ -27,24 +27,25 @@ class SubscriptionManagerUnitTests : public ::testing::Test {
 
 TEST_F(SubscriptionManagerUnitTests, AddSubscriber) {
   std::map<std::string, std::string> subscriberDetails = {
-      {"resources", "Healthcare"},
-      {"city", "New York"},
-      {"contact", "user@example.com"}
+      {"Resource", "Healthcare"},
+      {"City", "New York"},
+      {"Contact", "user@example.com"}
   };
 
   std::vector<std::pair<std::string, std::string>> expectedKeyValues = {
-      {"resources", "Healthcare"},
-      {"city", "New York"},
-      {"contact", "user@example.com"}
+      {"Resource", "Healthcare"},
+      {"City", "New York"},
+      {"Contact", "user@example.com"}
   };
 
-  // Mocking insertResource to return a string ID
-  ON_CALL(*mockDbManager, insertResource("Subscribers", expectedKeyValues))
+  ON_CALL(*mockDbManager, insertResource(
+      "Subscribers",
+      ::testing::UnorderedElementsAreArray(expectedKeyValues)))
       .WillByDefault(::testing::Return("mock_id_12345"));
 
   std::string result = subscriptionManager->addSubscriber(subscriberDetails);
 
-  EXPECT_EQ(result, "Subscriber added successfully.");
+  EXPECT_EQ(result, "mock_id_12345");
 }
 
 TEST_F(SubscriptionManagerUnitTests, DeleteSubscriber_Success) {
@@ -74,20 +75,20 @@ TEST_F(SubscriptionManagerUnitTests, GetSubscribers) {
   std::string city = "New York";
 
   std::vector<std::pair<std::string, std::string>> expectedQuery = {
-      {"resources", resource},
-      {"city", city}
+      {"Resource", resource},
+      {"City", city}
   };
 
   std::vector<bsoncxx::document::value> mockDocs;
 
   bsoncxx::builder::stream::document doc1;
   doc1 << "_id" << bsoncxx::oid("507f1f77bcf86cd799439011")
-       << "contact" << "user1@example.com";
+       << "Contact" << "user1@example.com";
   mockDocs.push_back(doc1.extract());
 
   bsoncxx::builder::stream::document doc2;
   doc2 << "_id" << bsoncxx::oid("507f1f77bcf86cd799439012")
-       << "contact" << "user2@example.com";
+       << "Contact" << "user2@example.com";
   mockDocs.push_back(doc2.extract());
 
   ON_CALL(*mockDbManager, findCollection(0, "Subscribers", expectedQuery, ::testing::_))

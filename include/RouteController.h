@@ -28,9 +28,9 @@ class RouteController {
   Outreach& outreachManager;
   Food& foodManager;
   AuthService& authService;
+  SubscriptionManager& subscriptionManager;
 
   bool authenticateToken(const crow::request& req, crow::response& res);
-  SubscriptionManager subscriptionManager;
 
  public:
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
