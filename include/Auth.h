@@ -91,23 +91,22 @@ public:
     // Role-based authorization
     bool hasRole(const std::string& token, const std::string& requiredRole);
     
+    // Password hashing
+    std::string hashPassword(const std::string& password);
+    bool verifyPassword(const std::string& password, const std::string& hash);
+    // User validation
+    bool isValidEmail(const std::string& email);
+    bool isValidPassword(const std::string& password);
+
 private:
     DatabaseManager& dbManager;
     const std::string collection_name = "Users";
     const int JWT_EXPIRATION_HOURS = 24;
     const std::string JWT_SECRET = "your-secret-key";  // In production, load from env variables
 
-    // Password hashing
-    std::string hashPassword(const std::string& password);
-    bool verifyPassword(const std::string& password, const std::string& hash);
-
     // JWT utilities
     int64_t getCurrentTimestamp();
     int64_t getExpirationTimestamp();
-    
-    // User validation
-    bool isValidEmail(const std::string& email);
-    bool isValidPassword(const std::string& password);
 
     // Database operations
     std::vector<std::pair<std::string, std::string>> createUserDocument(
