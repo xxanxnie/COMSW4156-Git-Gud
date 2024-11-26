@@ -127,6 +127,7 @@ class RouteControllerUnitTests : public ::testing::Test {
     delete mockCounseling;
     delete mockShelter;
     delete mockDbManager;
+    delete mockSubscriptionManager;
   }
 };
 
@@ -702,8 +703,9 @@ TEST_F(RouteControllerUnitTests, AddSubscriberTestAuthorized) {
 
   std::string mockId = "507f191e810c19729de860ea";
 
-  EXPECT_CALL(*mockSubscriptionManager, addSubscriber(subscriberDetails))
-      .WillOnce(::testing::Return(mockId));
+  ON_CALL(*mockSubscriptionManager, addSubscriber(subscriberDetails))
+      .WillByDefault(
+          ::testing::Return(mockId));
 
   routeController->subscribeToResources(req, res);
 
