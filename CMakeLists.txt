@@ -74,6 +74,7 @@ set(TEST_FILES
     test/AuthUnitTests.cpp
     test/SubscriptionManagerUnitTests.cpp
     test/DataBaseTest.cpp
+    test/IntegrationTests.cpp
 )
 
 set(SOURCE_FILES_NO_MAIN
