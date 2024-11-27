@@ -1032,7 +1032,7 @@ void RouteController::addHealthcareService(const crow::request& req,
     std::string city = "";
 
     for (auto element : resource.view()) {
-      if (element.key().to_string() == "city")
+      if (element.key().to_string() == "City")
         city = element.get_utf8().value.to_string();
     }
 
@@ -1243,6 +1243,21 @@ void RouteController::deleteHealthcareService(const crow::request& req,
   }
 }
 
+/**
+ * @brief Handles user registration requests.
+ *
+ * Extracts the email and password from the request body, validates them, 
+ * and registers the user in the system. Returns a token upon successful registration.
+ *
+ * @param req The incoming HTTP request containing the user registration details.
+ * @param res The HTTP response to be sent back to the client.
+ *
+ * @throws UserAlreadyExistsException If a user with the given email already exists.
+ * @throws AuthException If there is an authentication-related issue.
+ * @throws std::exception For any other errors during the registration process.
+ *
+ * @return void This method directly modifies the `res` object to send a response to the client.
+ */
 void RouteController::registerUser(const crow::request& req,
                                    crow::response& res) {
   LOG_INFO("RouteController", "registerUser request body: {}", req.body);
@@ -1290,6 +1305,21 @@ void RouteController::registerUser(const crow::request& req,
   }
 }
 
+/**
+ * @brief Handles user login requests.
+ *
+ * Validates the email and password provided in the request body, 
+ * and authenticates the user. Returns a token upon successful login.
+ *
+ * @param req The incoming HTTP request containing the user login details.
+ * @param res The HTTP response to be sent back to the client.
+ *
+ * @throws InvalidCredentialsException If the provided email or password is incorrect.
+ * @throws AuthException If there is an authentication-related issue.
+ * @throws std::exception For any other errors during the login process.
+ *
+ * @return void This method directly modifies the `res` object to send a response to the client.
+ */
 void RouteController::loginUser(const crow::request& req, crow::response& res) {
   LOG_INFO("RouteController", "loginUser request body: {}", req.body);
   try {
@@ -1334,6 +1364,21 @@ void RouteController::loginUser(const crow::request& req, crow::response& res) {
   }
 }
 
+/**
+ * @brief Handles subscription to resources.
+ *
+ * Authenticates the user, parses the request body for required fields, 
+ * and subscribes the user to specified resources. Returns a success message upon completion.
+ *
+ * @param req The incoming HTTP request containing subscription details.
+ * @param res The HTTP response to be sent back to the client.
+ *
+ * @throws std::invalid_argument If the request body is missing required fields.
+ * @throws std::runtime_error If the user is not authorized to perform this action.
+ * @throws std::exception For any other errors during the subscription process.
+ *
+ * @return void This method directly modifies the `res` object to send a response to the client.
+ */
 void RouteController::subscribeToResources(const crow::request& req,
                                            crow::response& res) {
   if (!authenticateToken(req, res)) {
@@ -1363,32 +1408,53 @@ void RouteController::subscribeToResources(const crow::request& req,
       content[element.key().to_string()] = element.get_utf8().value.to_string();
     }
 
-    if (content.find("resources") == content.end() ||
-        content.find("city") == content.end() ||
-        content.find("contact") == content.end()) {
+    if (content.find("Resource") == content.end() ||
+        content.find("City") == content.end() ||
+        content.find("Contact") == content.end()) {
       res.code = 400;
-      res.write(
-          "Error: Missing required fields (id, resources, city, or contact).");
+      std::string err = 
+              "Error: Missing required fields (id, resource, city, or contact).";
+      res.write(err);
+      LOG_ERROR("RouteController",
+              "subscribeToResources error: code={}, error={}", res.code,
+              err);
       res.end();
       return;
     }
 
-    std::string msg = subscriptionManager.addSubscriber(content);
+    std::string id = subscriptionManager.addSubscriber(content);
 
     res.code = 201;
-    res.write(msg);
+    res.write("Subscription recorded successfully.");
+    LOG_INFO("RouteController",
+             "subscribeToResources success: code={}, id={}", res.code, id);
     res.end();
   } catch (const std::exception& e) {
     res = handleException(e);
+    LOG_ERROR("RouteController",
+              "subscribeToResources error: code={}, error={}", res.code,
+              e.what());
     res.end();
   }
 }
 
+/**
+ * @brief Processes incoming webhook requests.
+ *
+ * Logs the received webhook data and sends a confirmation response.
+ *
+ * @param req The incoming HTTP request containing the webhook data.
+ * @param res The HTTP response to be sent back to the client.
+ *
+ * @throws std::exception If an error occurs while processing the webhook request.
+ *
+ * @return void This method directly modifies the `res` object to send a response to the client.
+ */
 void RouteController::receiveWebhook(const crow::request& req,
                                      crow::response& res) {
   try {
-    std::cout << "Webhook received!" << std::endl;
-    std::cout << "Body: " << req.body << std::endl;
+    LOG_INFO("RouteController",
+              "receiveWebhook: received message: {}", req.body);
 
     res.code = 200;
     res.write("Webhook received successfully.");

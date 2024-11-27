@@ -127,6 +127,7 @@ class RouteControllerUnitTests : public ::testing::Test {
     delete mockCounseling;
     delete mockShelter;
     delete mockDbManager;
+    delete mockSubscriptionManager;
   }
 };
 
@@ -618,3 +619,57 @@ TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestUnauthorized) {
   EXPECT_EQ(res.code, 401);
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
+
+TEST_F(RouteControllerUnitTests, AddSubscriberTestAuthorized) {
+  std::string body =
+      R"({
+        "City": "New York",
+        "Resource": "Healthcare",
+        "Contact": "subscriber@example.com"
+      })";
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  std::map<std::string, std::string> subscriberDetails = {
+      {"City", "New York"},
+      {"Resource", "Healthcare"},
+      {"Contact", "subscriber@example.com"}};
+
+  std::string mockId = "507f191e810c19729de860ea";
+
+  ON_CALL(*mockSubscriptionManager, addSubscriber(subscriberDetails))
+      .WillByDefault(
+          ::testing::Return(mockId));
+
+  routeController->subscribeToResources(req, res);
+
+  EXPECT_EQ(res.code, 201);
+  EXPECT_EQ(res.body, "Subscription recorded successfully.");
+}
+
+TEST_F(RouteControllerUnitTests, AddSubscriberTestUnauthorized) {
+  std::string body =
+      R"({
+        "City": "New York",
+        "Resource": "Healthcare",
+        "Contact": "subscriber@example.com"
+      })";
+  crow::request req;
+  req.add_header("Authorization", "Bearer invalid.token.here");
+  req.body = body;
+  crow::response res{};
+
+  routeController->subscribeToResources(req, res);
+
+  EXPECT_EQ(res.code, 401);
+  EXPECT_EQ(res.body, "Invalid or expired token.");
+}
+
