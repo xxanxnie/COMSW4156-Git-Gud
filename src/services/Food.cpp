@@ -20,7 +20,8 @@ ExpirationDate
  * @brief Constructs a Food object.
  * @param db Reference to the DatabaseManager object.
  */
-Food::Food(DatabaseManager& db) : db(db) {
+Food::Food(DatabaseManager& db, const std::string& collection_name)
+    : db(db), collection_name(collection_name) {
   cols = std::vector<std::string>({"Name", "City", "Address", "Description",
                                    "ContactInfo", "HoursOfOperation",
                                    "TargetUser", "Quantity", "ExpirationDate"});

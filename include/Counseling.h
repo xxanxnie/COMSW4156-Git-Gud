@@ -11,7 +11,7 @@ class DatabaseManager;
 
 class Counseling {
  public:
-  Counseling(DatabaseManager& dbManager);
+  Counseling(DatabaseManager& dbManager, const std::string& collection_name);
   void cleanCache();
   std::string checkInputFormat(std::string content);
   virtual std::string addCounselor(std::string request_body);

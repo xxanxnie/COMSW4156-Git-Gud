@@ -16,7 +16,7 @@ class CounselingUnitTests : public ::testing::Test {
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    counseling = new Counseling(*mockDbManager);
+    counseling = new Counseling(*mockDbManager, "CounselingService");
   }
 
   void TearDown() override {
@@ -63,7 +63,7 @@ TEST_F(CounselingUnitTests, AddCounselor) {
       .WillByDefault(::testing::Invoke(
           [&](const std::string &collectionName,
               const std::vector<std::pair<std::string, std::string>> &content) {
-            EXPECT_EQ(collectionName, "Counseling");
+            EXPECT_EQ(collectionName, "CounselingService");
             EXPECT_EQ(content, expectedContent);
             return "12345";
           }));
@@ -96,7 +96,7 @@ TEST_F(CounselingUnitTests, updateCounseling) {
               const std::vector<std::pair<std::string, std::string>> &content)
               -> bool {
             EXPECT_EQ(resourceId, id_temp);
-            EXPECT_EQ(collectionName, "Counseling");
+            EXPECT_EQ(collectionName, "CounselingService");
             EXPECT_EQ(content, expectedContent);
             return true;
           });
@@ -132,7 +132,7 @@ TEST_F(CounselingUnitTests, DeleteCounselor) {
       .WillByDefault([&](const std::string &collectionName,
                          const std::string &resourceId) -> bool {
         EXPECT_EQ(resourceId, mockId);
-        EXPECT_EQ(collectionName, "Counseling");
+        EXPECT_EQ(collectionName, "CounselingService");
         return true;
       });
 

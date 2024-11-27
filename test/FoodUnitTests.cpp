@@ -16,7 +16,7 @@ class FoodUnitTests : public ::testing::Test {
 
   void SetUp() override {
     mockDbManager = new MockDatabaseManager();
-    food = new Food(*mockDbManager);
+    food = new Food(*mockDbManager, "FoodService");
   }
 
   void TearDown() override {
