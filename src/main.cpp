@@ -48,9 +48,9 @@ int main(int argc, char* argv[]) {
 
   crow::SimpleApp app;
 
-  Shelter shelter(dbManager, "Shelter");
-  Counseling counseling(dbManager);
-  Food food(dbManager);
+  Shelter shelter(dbManager, "ShelterService");
+  Counseling counseling(dbManager, "CounselingService");
+  Food food(dbManager, "FoodService");
   Outreach outreach(dbManager, "OutreachService");
   Healthcare healthcare(dbManager, "HealthcareService");
   AuthService authService(dbManager);
