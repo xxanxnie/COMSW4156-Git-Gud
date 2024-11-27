@@ -20,43 +20,6 @@ crow::response handleException(const std::exception& e) {
   return crow::response{500, "An error has occurred: " + std::string(e.what())};
 }
 
-// Temporary hardcoded API keys and their roles
-std::map<std::string, std::string> validKeys = {
-    // POST/PATCH/DELETE users
-    {"abc123NGO", "NGO"},  // Non-profit Organizations
-    {"def456VOL", "VOL"},  // Volunteers
-    {"ghi789CLN", "CLN"},  // Clinics
-    {"jkl012GOV", "GOV"},  // Government
-
-    // GET users
-    {"hml345HML", "HML"},  // Homeless
-    {"rfg678RFG", "RFG"},  // Refugees
-    {"vet901VET", "VET"},  // Veterans
-    {"sub234SUB", "SUB"}   // Substance Users
-};
-
-bool authenticate(const crow::request& req, const std::string& requiredRole) {
-  auto apiKey = req.get_header_value("API-Key");
-
-  if (validKeys.find(apiKey) != validKeys.end()) {
-    if (validKeys[apiKey] == requiredRole) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-bool authenticatePermissionsToGetAll(const crow::request& req) {
-  return authenticate(req, "HML") || authenticate(req, "RFG") ||
-         authenticate(req, "VET") || authenticate(req, "SUB");
-}
-
-bool authenticatePermissionsToPost(const crow::request& req) {
-  return authenticate(req, "NGO") || authenticate(req, "VOL") ||
-         authenticate(req, "CLN") || authenticate(req, "GOV");
-}
-
 // Add this helper method to RouteController class
 bool RouteController::authenticateToken(const crow::request& req,
                                         crow::response& res) {
