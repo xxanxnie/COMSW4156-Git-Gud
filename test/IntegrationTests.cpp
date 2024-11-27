@@ -3,6 +3,8 @@
 #include "DatabaseManager.h"
 #include "RouteController.h"
 
+mongocxx::instance instance{};
+
 class IntegrationTest : public ::testing::Test {
  protected:
   DatabaseManager* dbManager;
@@ -234,3 +236,143 @@ TEST_F(IntegrationTest, TestGetAllHealthcareServices) {
   EXPECT_NE(resBody.find("222-222-2222"), std::string::npos);
 }
 
+TEST_F(IntegrationTest, TestGetAllOutreachServices) {
+  dbManager->insertResource("OutreachTests", {
+      {"Name", "Emergency Shelter Access"},
+      {"City", "New York"},
+      {"Address", "200 Varick St, New York, NY 10014"},
+      {"Description", "Provide information and assistance for accessing shelters."},
+      {"ContactInfo", "Sarah Johnson, sarah@email.com"},
+      {"HoursOfOperation", "05/01/24 - 12/31/24"},
+      {"TargetAudience", "HML"}
+  });
+
+
+  crow::request req{};
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  crow::response res{};
+
+  routeController->getAllOutreachServices(req, res);
+
+  EXPECT_EQ(res.code, 200);
+
+  auto resBody = res.body;
+  EXPECT_NE(resBody.find("Emergency Shelter Access"), std::string::npos);
+  EXPECT_NE(resBody.find("200 Varick St, New York, NY 10014"), std::string::npos);
+}
+
+TEST_F(IntegrationTest, TestAddOutreachServiceTest) {
+  std::string body =
+      R"({
+    "Name": "Emergency Shelter Access",
+    "City": "New York",
+    "Address": "200 Varick St, New York, NY 10014",
+    "Description": "Provide information and assistance for accessing shelters.",
+    "ContactInfo": "Sarah Johnson, sarah@email.com",
+    "HoursOfOperation": "05/01/24 - 12/31/24",
+    "TargetAudience": "HML"
+})";
+
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  routeController->addOutreachService(req, res);
+
+  EXPECT_EQ(res.code, 201);
+
+  std::vector<bsoncxx::document::value> results;
+  dbManager->findCollection(0, "OutreachTests", {}, results);
+  ASSERT_EQ(results.size(), 1);
+
+  auto doc = bsoncxx::to_json(results[0].view());
+  EXPECT_NE(doc.find("Emergency Shelter Access"), std::string::npos);
+  EXPECT_NE(doc.find("New York"), std::string::npos);
+  EXPECT_NE(doc.find("Sarah Johnson, sarah@email.com"), std::string::npos);
+}
+
+TEST_F(IntegrationTest, TestGetAllShelterTest) {
+  dbManager->insertResource("ShelterTests", {
+      {"Name", "Shelter For All"},
+      {"City", "New York"},
+      {"Address", "200 New St, New York, NY 10014"},
+      {"Description", "A safe space providing temporary shelter forindividuals in need."},
+      {"ContactInfo", "Sarah Johnson, sarah@email.com"},
+      {"HoursOfOperation", "05/01/24 - 12/31/24"},
+      {"ORG", "NGO"},
+      {"TargetUser", "homeless"},
+      {"Capacity", "50"},
+      {"CurrentUse", "10"}
+  });
+
+  crow::request req{};
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  crow::response res{};
+
+  routeController->getShelter(req, res);
+
+  EXPECT_EQ(res.code, 200);
+
+  auto resBody = res.body;
+  EXPECT_NE(resBody.find("Shelter For All"), std::string::npos);
+  EXPECT_NE(resBody.find("200 New St, New York, NY 10014"), std::string::npos);
+}
+
+TEST_F(IntegrationTest, AddShelterTest) {
+  std::string body =
+      R"({
+    "Name": "temp",
+    "City": "New York",
+    "Address": "temp",
+    "Description": "NULL",
+    "ContactInfo": "66664566565",
+    "HoursOfOperation": "2024-01-11",
+    "ORG": "NGO",
+    "TargetUser": "homeless",
+    "Capacity": "100",
+    "CurrentUse": "10"
+})";
+
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  routeController->addShelter(req, res);
+
+  EXPECT_EQ(res.code, 201);
+
+  std::vector<bsoncxx::document::value> results;
+  dbManager->findCollection(0, "ShelterTests", {}, results);
+  ASSERT_EQ(results.size(), 1);
+
+  auto doc = bsoncxx::to_json(results[0].view());
+  EXPECT_NE(doc.find("temp"), std::string::npos);
+  EXPECT_NE(doc.find("New York"), std::string::npos);
+  EXPECT_NE(doc.find("66664566565"), std::string::npos);
+}
