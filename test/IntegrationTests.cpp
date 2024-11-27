@@ -28,8 +28,8 @@ class IntegrationTest : public ::testing::Test {
     dbManager->createCollection("SubscribersTests");
 
     shelter = new Shelter(*dbManager, "ShelterTests");
-    counseling = new Counseling(*dbManager);
-    food = new Food(*dbManager);
+    counseling = new Counseling(*dbManager, "CounselingTests");
+    food = new Food(*dbManager, "FoodTests");
     outreach = new Outreach(*dbManager, "OutreachTests");
     healthcare = new Healthcare(*dbManager, "HealthcareTests");
     authService = new AuthService(*dbManager);
