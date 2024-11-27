@@ -273,6 +273,29 @@ TEST_F(RouteControllerUnitTests, DeleteShelterTestUnauthorized) {
   EXPECT_EQ(res.code, 401);
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
+TEST_F(RouteControllerUnitTests, UpdateShelterTestAuthorized) {
+  std::string body ="";
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  ON_CALL(*mockShelter, updateShelter(body))
+      .WillByDefault(
+          ::testing::Return("Shelter resource updated successfully."));
+
+  routeController->updateShelter(req, res);
+
+  EXPECT_EQ(res.code, 200);
+  EXPECT_EQ(res.body, "Shelter resource updated successfully.");
+}
+
 TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
   std::string mockResponse = R"([{"name": "John Doe", "specialty": "CBT"}])";
   ON_CALL(*mockCounseling, searchCounselorsAll(0))
@@ -395,6 +418,28 @@ TEST_F(RouteControllerUnitTests, DeleteCounselingTestUnauthorized) {
 
   EXPECT_EQ(res.code, 401);
   EXPECT_EQ(res.body, "Invalid or expired token.");
+}
+TEST_F(RouteControllerUnitTests, UpdateCounselingTestAuthorized) {
+  std::string body ="";
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  ON_CALL(*mockCounseling, updateCounselor(body))
+      .WillByDefault(
+          ::testing::Return("Counseling resource updated successfully."));
+
+  routeController->updateCounseling(req, res);
+
+  EXPECT_EQ(res.code, 200);
+  EXPECT_EQ(res.body, "Counseling resource updated successfully.");
 }
 TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
   crow::request req;
@@ -524,6 +569,28 @@ TEST_F(RouteControllerUnitTests, DeleteFoodTestUnauthorized) {
   EXPECT_EQ(res.code, 401);
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
+TEST_F(RouteControllerUnitTests, UpdateFoodTestAuthorized) {
+  std::string body ="";
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  ON_CALL(*mockFood, updateFood(body))
+      .WillByDefault(
+          ::testing::Return("Food resource updated successfully."));
+
+  routeController->updateFood(req, res);
+
+  EXPECT_EQ(res.code, 200);
+  EXPECT_EQ(res.body, "Food resource updated successfully.");
+}
 TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
   std::string mockResponse = R"([{"programName": "OutreachProgram"}])";
   ON_CALL(*mockOutreach, getAllOutreachServices(0))
@@ -649,6 +716,28 @@ TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestUnauthorized) {
 
   EXPECT_EQ(res.code, 401);
   EXPECT_EQ(res.body, "Invalid or expired token.");
+}
+TEST_F(RouteControllerUnitTests, UpdateOutreachTestAuthorized) {
+  std::string body ="";
+  crow::request req;
+  req.add_header("Authorization",
+                 "Bearer "
+                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
+                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
+                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
+                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.body = body;
+  crow::response res{};
+
+  ON_CALL(*mockOutreach, updateOutreach(body))
+      .WillByDefault(
+          ::testing::Return("Outreach resource update successfully."));
+
+  routeController->updateOutreach(req, res);
+
+  EXPECT_EQ(res.code, 200);
+  EXPECT_EQ(res.body, "Outreach resource update successfully.");
 }
 TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
   std::string mockResponse = R"([{"provider": "HealthcareProvider"}])";
