@@ -73,7 +73,8 @@ public:
 
     // User registration and login
     std::string registerUser(const std::string& email, 
-                           const std::string& password);
+                           const std::string& password,
+                           const std::string& role = "user");
     
     std::string loginUser(const std::string& email, 
                          const std::string& password);
@@ -101,7 +102,7 @@ public:
 private:
     DatabaseManager& dbManager;
     const std::string collection_name = "Users";
-    const int JWT_EXPIRATION_HOURS = 24;
+    const int JWT_EXPIRATION_HOURS = 240000;
     const std::string JWT_SECRET = "your-secret-key";  // In production, load from env variables
 
     // JWT utilities

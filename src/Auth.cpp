@@ -15,7 +15,8 @@ AuthService::AuthService() : dbManager(DatabaseManager::getInstance()) {}
 
 // Registration
 std::string AuthService::registerUser(const std::string& email,
-                                      const std::string& password) {
+                                      const std::string& password,
+                                      const std::string& role) {
   // Validate input
   if (!isValidEmail(email)) {
     throw AuthException("Invalid email format");
@@ -46,7 +47,7 @@ std::string AuthService::registerUser(const std::string& email,
     }
 
     auto userView = result[0].view();
-    User newUser(email, hashedPassword);
+    User newUser(email, hashedPassword, role);
     newUser.id = userView["_id"].get_oid().value.to_string();
     return generateJWT(newUser);
   } catch (const std::exception& e) {
