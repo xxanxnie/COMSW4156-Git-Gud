@@ -130,6 +130,20 @@ class RouteControllerUnitTests : public ::testing::Test {
   }
 };
 
+// For GET endpoints (getall), use HML token:
+const std::string validTokenForGet = 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+    "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6"
+    "ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
+    "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+
+// For POST endpoints, use NGO token:
+const std::string validTokenForPost = 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+    "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoi"
+    "YXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9."
+    "HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc";
+
 TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
   std::string mockResponse =
       R"([{"ORG": "NGO", "User": "HML", "location": "NYC"}])";
@@ -137,13 +151,7 @@ TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
 
   routeController->getShelter(req, res);
@@ -161,13 +169,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
       ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   crow::response res{};
 
   ON_CALL(*mockShelter,
@@ -231,13 +233,7 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
   routeController->getCounseling(req, res);
 
@@ -257,13 +253,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
     })";
   crow::request req;
   req.body = body;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   crow::response res{};
 
   ON_CALL(*mockCounseling, addCounselor(body))
@@ -317,13 +307,7 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
   crow::response res;
 
   // Set valid API key for GET operations
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
 
   std::string mockResponse =
       "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
@@ -341,13 +325,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
   crow::response res;
 
   // Set valid API key for POST operations
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
 
   // Add all required fields
   req.body =
@@ -411,13 +389,7 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
   routeController->getAllOutreachServices(req, res);
 
@@ -437,13 +409,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
     "TargetAudience":"HML"
 })";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -501,13 +467,7 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
   routeController->getAllHealthcareServices(req, res);
 
@@ -527,13 +487,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   "contactInfo": "123-456-7890"
 })";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -596,13 +550,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       "contactInfo": "123-456-7890"
     })";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -642,13 +590,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
