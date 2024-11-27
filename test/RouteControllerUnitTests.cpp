@@ -628,13 +628,7 @@ TEST_F(RouteControllerUnitTests, AddSubscriberTestAuthorized) {
         "Contact": "subscriber@example.com"
       })";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
