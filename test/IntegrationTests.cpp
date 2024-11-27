@@ -3,8 +3,6 @@
 #include "DatabaseManager.h"
 #include "RouteController.h"
 
-mongocxx::instance instance{};
-
 class IntegrationTest : public ::testing::Test {
  protected:
   DatabaseManager* dbManager;
