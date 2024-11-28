@@ -242,13 +242,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteShelterTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -279,13 +273,7 @@ TEST_F(RouteControllerUnitTests, DeleteShelterTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, UpdateShelterTestAuthorized) {
   std::string body ="";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -376,13 +364,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteCounselingTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -413,13 +395,7 @@ TEST_F(RouteControllerUnitTests, DeleteCounselingTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, UpdateCounselingTestAuthorized) {
   std::string body ="";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -515,13 +491,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteFoodTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -551,13 +521,7 @@ TEST_F(RouteControllerUnitTests, DeleteFoodTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, UpdateFoodTestAuthorized) {
   std::string body ="";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -650,13 +614,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -687,13 +645,7 @@ TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, UpdateOutreachTestAuthorized) {
   std::string body ="";
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
