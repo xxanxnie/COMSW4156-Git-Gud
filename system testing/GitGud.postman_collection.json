@@ -1,0 +1,1052 @@
+{
+	"info": {
+		"_postman_id": "ff2c36f6-dc87-4c1b-bc74-334055ed89eb",
+		"name": "API Documentation #reference",
+		"description": "This template contains a boilerplate for documentation that you can quickly customize and reuse.\n\n### How to use this template:\n\n- Replace the content given brackets (()) with your API's details.\n- Tips are formatted in `codespan` - feel free to read and remove them.\n    \n\n---\n\n`Start with a brief overview of what your API offers.`\n\nThe ((product name)) provides many API products, tools, and resources that enable you to ((add product value here)).\n\n`You can also list the APIs you offer, link to the relevant pages, or do both in this section.`\n\n## **Getting started guide**\n\n`List the steps or points required to start using your APIs. Make sure to cover everything required to reach success with your API as quickly as possible.`\n\nTo start using the ((add APIs here)), you need to -\n\n`The points given below are from The Postman API's documentation. You can reference it to write your own getting started guide.`\n\n- You must use a valid API Key to send requests to the API endpoints. You can get your API key from Postman's [integrations dashboard](https://go.postman.co/settings/me/api-keys).\n- The API has [rate and usage limits](https://learning.postman.com/docs/developer/postman-api/postman-api-rate-limits/).\n- The API only responds to HTTPS-secured communications. Any requests sent via HTTP return an HTTP 301 redirect to the corresponding HTTPS resources.\n- The API returns request responses in JSON format. When an API request returns an error, it is sent in the JSON response as an error key.\n    \n\n## Authentication\n\n`Add details on the authorization keys/tokens required, steps that cover how to get them, and the relevant error codes.`\n\nThe ((product name)) API uses ((add your API's authorization type)) for authentication.\n\n`The details given below are from the Postman API's documentation. You can reference it to write your own authentication section.`\n\nPostman uses API keys for authentication. You can generate a Postman API key in the [API keys](https://postman.postman.co/settings/me/api-keys) section of your Postman account settings.\n\nYou must include an API key in each request to the Postman API with the X-Api-Key request header.\n\n### Authentication error response\n\nIf an API key is missing, malformed, or invalid, you will receive an HTTP 401 Unauthorized response code.\n\n## Rate and usage limits\n\n`Use this section to cover your APIs' terms of use. Include API limits, constraints, and relevant error codes, so consumers understand the permitted API usage and practices.`\n\n`The example given below is from The Postman API's documentation. Use it as a reference to write your APIs' terms of use.`\n\nAPI access rate limits apply at a per-API key basis in unit time. The limit is 300 requests per minute. Also, depending on your plan, you may have usage limits. If you exceed either limit, your request will return an HTTP 429 Too Many Requests status code.\n\nEach API response returns the following set of headers to help you identify your use status:\n\n| Header | Description |\n| --- | --- |\n| `X-RateLimit-Limit` | The maximum number of requests that the consumer is permitted to make per minute. |\n| `X-RateLimit-Remaining` | The number of requests remaining in the current rate limit window. |\n| `X-RateLimit-Reset` | The time at which the current rate limit window resets in UTC epoch seconds. |\n\n### 503 response\n\nAn HTTP `503` response from our servers indicates there is an unexpected spike in API access traffic. The server is usually operational within the next five minutes. If the outage persists or you receive any other form of an HTTP `5XX` error, [contact support](https://support.postman.com/hc/en-us/requests/new/).\n\n### **Need some help?**\n\n`Add links that customers can refer to whenever they need help.`\n\nIn case you have questions, go through our tutorials ((link to your video or help documentation here)). Or visit our FAQ page ((link to the relevant page)).\n\nOr you can check out our community forum, there’s a good chance our community has an answer for you. Visit our developer forum ((link to developer forum)) to review topics, ask questions, and learn from others.\n\n`You can also document or add links to libraries, code examples, and other resources needed to make a request.`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39583486",
+		"_collection_link": "https://gitgud-7774.postman.co/workspace/GITGUD_2024FALL~5b9b9763-c937-4bb4-95c8-d3edeb766799/collection/39269466-ff2c36f6-dc87-4c1b-bc74-334055ed89eb?action=share&source=collection_link&creator=39583486"
+	},
+	"item": [
+		{
+			"name": "Shelter",
+			"item": [
+				{
+					"name": "GetALL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "hml345HML",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "0.0.0.0:8080/resources/shelter/getAll",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"shelter",
+								"getAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n  \"id\" : \"672c2976bac5c977c8079031\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/shelter/delete",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"shelter",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"id\" :\"6747eeca4e893631b90fa104\",\n  \"Name\" : \"dasd\",\n    \"City\" : \"New York\",\n    \"Address\": \"sadasd\",\n    \"Description\" : \"NULL\",\n    \"ContactInfo\" : \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"ORG\":\"NGO\",\n    \"TargetUser\" :\"HML\",\n    \"Capacity\" : \"100\",\n    \"CurrentUse\": \"10\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/shelter/update",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"shelter",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\" : \"temp\",\n    \"City\" : \"New York\",\n    \"Address\": \"temp\",\n    \"Description\" : \"NULL\",\n    \"ContactInfo\" : \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"ORG\":\"NGO\",\n    \"TargetUser\" :\"HML\",\n    \"Capacity\" : \"100\",\n    \"CurrentUse\": \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/shelter/add",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"shelter",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Counseling",
+			"item": [
+				{
+					"name": "GetALL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "hml345HML",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "0.0.0.0:8080/resources/counseling/getAll?start=0",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"counseling",
+								"getAll"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\": \"New York Psychological Association\",\n    \"City\": \"New York\",\n    \"Address\": \"211 E 43rd St, New York, NY 10017\",\n    \"Description\": \"Provides mental health counseling and therapy services.\",\n    \"ContactInfo\": \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"counselorName\": \"Jack\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/counseling/add",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"counseling",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\" :\"6747ef014e893631b90fa105\",\n    \"Name\": \"New York Psychological Association\",\n    \"City\": \"New York\",\n    \"Address\": \"211 E 43rd St, New York, NY 10017\",\n    \"Description\": \"Provides mental health counseling and therapy services.\",\n    \"ContactInfo\": \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"counselorName\": \"Sam\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/counseling/update",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"counseling",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n  \"id\" : \"6741013be041115bdc0c8b75\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/counseling/delete",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"counseling",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Food",
+			"item": [
+				{
+					"name": "GetALL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "hml345HML",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "0.0.0.0:8080/resources/food/getAll?start=0",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"food",
+								"getAll"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\" : \"OrganicFarm\",\n    \"City\" : \"New York\",\n    \"Address\": \"temp\",\n    \"Description\" : \"Vegetables\",\n    \"ContactInfo\" : \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"TargetUser\" :\"HML\",\n    \"Quantity\" : \"100\",\n    \"ExpirationDate\": \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/food/add",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"food",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\" :\"6747ef484e893631b90fa107\",\n    \"Name\" : \"try\",\n    \"City\" : \"New York\",\n    \"Address\": \"temp\",\n    \"Description\" : \"Vegetables\",\n    \"ContactInfo\" : \"66664566565\",\n    \"HoursOfOperation\": \"2024-01-11\",\n    \"TargetUser\" :\"HML\",\n    \"Quantity\" : \"100\",\n    \"ExpirationDate\": \"10\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/food/update",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"food",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n  \"id\" : \"6741015ae041115bdc0c8b78\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/food/delete",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"food",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Healthcare",
+			"item": [
+				{
+					"name": "GetALL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "hml345HML",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "0.0.0.0:8080/resources/healthcare/getAll",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"healthcare",
+								"getAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "ghi789CLN",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"My New Hospital\",\n  \"City\" : \"New York\",\n  \"Address\": \"456 New St\",\n  \"Description\": \"General Checkup\",\n  \"HoursOfOperation\": \"9 AM - 5 PM\",\n  \"eligibilityCriteria\": \"Adults\",\n  \"ContactInfo\": \"123-456-7890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/healthcare/add",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"healthcare",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"6747efc04e893631b90fa108\",\n    \"Name\": \"My New Hospital\",\n    \"City\": \"New York\",\n    \"Address\": \"456 New St\",\n    \"Description\": \"General Checkup\",\n    \"HoursOfOperation\": \"9 AM - 5 PM\",\n    \"eligibilityCriteria\": \"Adults\",\n    \"ContactInfo\": \"123-456-7890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/healthcare/update",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"healthcare",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n  \"id\" : \"673d5fbdd5b00329b0067493\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/healthcare/delete",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"healthcare",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Outreach",
+			"item": [
+				{
+					"name": "GetALL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "hml345HML",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "0.0.0.0:8080/resources/outreach/getAll",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"outreach",
+								"getAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\":\"Emergency Shelter Access\",\n    \"City\":\"New York\",\n    \"Address\":\"200 Varick St, New York, NY 10014\",\n    \"Description\":\"Provide information and assistance for accessing shelters.\",\n    \"ContactInfo\":\"Sarah Johnson, sarah@email.com\",\n    \"HoursOfOperation\":\"05/01/24 - 12/31/24\",\n    \"TargetAudience\":\"HML\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/outreach/add",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"outreach",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"6747efdb4e893631b90fa109\",\n    \"Name\": \"Emergency Shelter Access\",\n    \"City\": \"New York\",\n    \"Address\": \"200 Varick St, New York, NY 10014\",\n    \"Description\": \"Provide information and assistance for accessing shelters.\",\n    \"ContactInfo\": \"Sarah Johnson, sarah@email.com\",\n    \"HoursOfOperation\": \"05/01/24 - 12/31/24\",\n    \"TargetAudience\": \"HML\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/outreach/update",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"outreach",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "API-Key",
+								"value": "abc123NGO",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n  \"id\" : \"673e5b62974f89f4a006c641\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "0.0.0.0:8080/resources/outreach/delete",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"outreach",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscribe",
+			"item": [
+				{
+					"name": "Add subscriber",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Resource\": \"healthcare\",\n    \"City\": \"NYC\", \n    \"Contact\": \"surani_maria@yahoo.com\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8080/resources/subscribe",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"resources",
+								"subscribe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-API-Key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://farming-simulator.pstmn.io"
+		}
+	]
+}
