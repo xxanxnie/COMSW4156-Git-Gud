@@ -13,6 +13,7 @@
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Net/SMTPClientSession.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SecureSMTPClientSession.h"
@@ -163,7 +164,7 @@ void SubscriptionManager::sendEmail(const std::string& to,
     SecureSMTPClientSession secure(pSSLSocket);
 
     secure.login();
-    bool tlsStarted = secure.startTLS(pContext);
+    secure.startTLS(pContext);
     secure.login(SMTPClientSession::AUTH_LOGIN, sUserName, sPassword);
 
     message.setSender(from);
