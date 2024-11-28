@@ -88,6 +88,16 @@ void RouteController::getShelter(const crow::request& req,
     return;
   }
 
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
+
   try {
     int start = 0;
     auto start_param = req.url_params.get("start");
@@ -124,7 +134,15 @@ void RouteController::addShelter(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in addShelter");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = shelterManager.addShelter(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -172,7 +190,15 @@ void RouteController::updateShelter(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in updateShelter");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = shelterManager.updateShelter(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -222,7 +248,15 @@ void RouteController::deleteShelter(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in deleteShelter");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string id = "";
@@ -273,6 +307,17 @@ void RouteController::getCounseling(const crow::request& req,
     return;
   }
 
+
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
+
   try {
     int start = 0;
     auto start_param = req.url_params.get("start");
@@ -320,7 +365,15 @@ void RouteController::addCounseling(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in addCounseling");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = counselingManager.addCounselor(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -371,7 +424,15 @@ void RouteController::updateCounseling(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in updateCounseling");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = counselingManager.updateCounselor(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -424,7 +485,15 @@ void RouteController::deleteCounseling(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in deleteCounseling");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string id = "";
@@ -475,7 +544,15 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     LOG_ERROR("RouteController", "Authentication failed in addFood");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = foodManager.addFood(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -524,6 +601,16 @@ void RouteController::getAllFood(const crow::request& req,
   LOG_INFO("RouteController", "getAllFood called with URL: {}", req.url);
   if (!authenticateToken(req, res)) {
     LOG_ERROR("RouteController", "Authentication failed in getAllFood");
+    return;
+  }
+
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
     return;
   }
 
@@ -577,7 +664,15 @@ void RouteController::deleteFood(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in deleteFood");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string id = "";
@@ -627,7 +722,15 @@ void RouteController::updateFood(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in updateFood");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = foodManager.updateFood(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -679,7 +782,15 @@ void RouteController::addOutreachService(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in addOutreachService");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = outreachManager.addOutreachService(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -734,6 +845,16 @@ void RouteController::getAllOutreachServices(const crow::request& req,
     return;
   }
 
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
+
   try {
     int start = 0;
     auto start_param = req.url_params.get("start");
@@ -781,7 +902,15 @@ void RouteController::updateOutreach(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in updateOutreach");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = outreachManager.updateOutreach(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -829,7 +958,15 @@ void RouteController::deleteOutreach(const crow::request& req,
     LOG_ERROR("RouteController", "Authentication failed in deleteOutreach");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string id = "";
@@ -879,7 +1016,15 @@ void RouteController::addHealthcareService(const crow::request& req,
               "Authentication failed in addHealthcareService");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = healthcareManager.addHealthcareService(req.body);
 
@@ -943,7 +1088,15 @@ void RouteController::getAllHealthcareServices(const crow::request& req,
               "Authentication failed in getAllHealthcareServices");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     int start = 0;
     auto start_param = req.url_params.get("start");
@@ -994,7 +1147,15 @@ void RouteController::updateHealthcareService(const crow::request& req,
               "Authentication failed in updateHealthcareService");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     std::string result = healthcareManager.updateHealthcare(req.body);
     if (result.find("Error") != std::string::npos) {
@@ -1048,7 +1209,15 @@ void RouteController::deleteHealthcareService(const crow::request& req,
               "Authentication failed in deleteHealthcareService");
     return;
   }
-
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
+    return;
+  }
   try {
     auto resource = bsoncxx::from_json(req.body);
     std::string id = "";
@@ -1108,9 +1277,10 @@ void RouteController::registerUser(const crow::request& req,
 
     std::string email = resource["email"].get_utf8().value.to_string();
     std::string password = resource["password"].get_utf8().value.to_string();
+    std::string role = resource["role"].get_utf8().value.to_string();
 
     AuthService& authService = AuthService::getInstance();
-    std::string token = authService.registerUser(email, password);
+    std::string token = authService.registerUser(email, password, role);
 
     res.code = 201;
     res.write(token);
@@ -1211,11 +1381,22 @@ void RouteController::loginUser(const crow::request& req, crow::response& res) {
  */
 void RouteController::subscribeToResources(const crow::request& req,
                                            crow::response& res) {
-  LOG_INFO("RouteController", "subscribeToResources request body: {}",
-           req.body);
   if (!authenticateToken(req, res)) {
     LOG_ERROR("RouteController",
-              "Authentication failed in subscribeToResources");
+              "Authentication failed in deleteHealthcareService");
+    return;
+  }
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")&&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML")&&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG")&&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET")&&
+      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
+    res.code = 403;
+    res.write("Insufficient permissions to access this resource.");
+    res.end();
     return;
   }
 

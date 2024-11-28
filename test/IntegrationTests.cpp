@@ -3,6 +3,19 @@
 #include "DatabaseManager.h"
 #include "RouteController.h"
 
+// For GET endpoints (getall), use HML token:
+const std::string validTokenForGet = 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+    "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6"
+    "ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
+    "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+
+// For POST endpoints, use NGO token:
+const std::string validTokenForPost = 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+    "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoi"
+    "YXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9."
+    "HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc";
 class IntegrationTest : public ::testing::Test {
  protected:
   DatabaseManager* dbManager;
@@ -75,13 +88,7 @@ TEST_F(IntegrationTest, TestAddHealthcareService) {
 })";
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -125,13 +132,7 @@ TEST_F(IntegrationTest, TestUpdateHealthcareService) {
 })";
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = updateBody;
   crow::response res{};
 
@@ -166,13 +167,7 @@ TEST_F(IntegrationTest, TestDeleteHealthcareService) {
   std::string deleteBody = R"({"id": ")" + id + R"("})";
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = deleteBody;
   crow::response res{};
 
@@ -212,13 +207,7 @@ TEST_F(IntegrationTest, TestGetAllHealthcareServices) {
   healthcare->addHealthcareService(body2);
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
 
   routeController->getAllHealthcareServices(req, res);
@@ -247,13 +236,7 @@ TEST_F(IntegrationTest, TestGetAllOutreachServices) {
 
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
 
   routeController->getAllOutreachServices(req, res);
@@ -278,13 +261,7 @@ TEST_F(IntegrationTest, TestAddOutreachServiceTest) {
 })";
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
@@ -317,13 +294,7 @@ TEST_F(IntegrationTest, TestGetAllShelterTest) {
   });
 
   crow::request req{};
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForGet);
   crow::response res{};
 
   routeController->getShelter(req, res);
@@ -351,13 +322,7 @@ TEST_F(IntegrationTest, AddShelterTest) {
 })";
 
   crow::request req;
-  req.add_header("Authorization",
-                 "Bearer "
-                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-                 "eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MjU5NjE0OTI0OCwia"
-                 "WF0IjoxNzMyMTQ5MjQ4LCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJyb2xlIjoidX"
-                 "NlciIsInVzZXJJZCI6IjY3M2U4MDAwZDM1YTZiNGEzYzAwNTU5MiJ9."
-                 "2TlZ1tnhclP708JotgxCLls0ekXX_Dmq9t5noG_xlOE");
+  req.add_header("Authorization", "Bearer " + validTokenForPost);
   req.body = body;
   crow::response res{};
 
