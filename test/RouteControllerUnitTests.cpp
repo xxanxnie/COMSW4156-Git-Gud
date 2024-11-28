@@ -825,7 +825,7 @@ TEST_F(RouteControllerUnitTests, AddSubscriberTestAuthorized) {
         "Contact": "subscriber@example.com"
       })";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   req.body = body;
   crow::response res{};
 

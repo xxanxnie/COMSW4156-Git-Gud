@@ -1428,11 +1428,7 @@ void RouteController::subscribeToResources(const crow::request& req,
               "Authentication failed in deleteHealthcareService");
     return;
   }
-  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")&&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML")&&
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {
