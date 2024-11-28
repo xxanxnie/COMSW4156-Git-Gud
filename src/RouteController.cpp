@@ -1438,33 +1438,6 @@ void RouteController::subscribeToResources(const crow::request& req,
   }
 }
 
-/**
- * @brief Processes incoming webhook requests.
- *
- * Logs the received webhook data and sends a confirmation response.
- *
- * @param req The incoming HTTP request containing the webhook data.
- * @param res The HTTP response to be sent back to the client.
- *
- * @throws std::exception If an error occurs while processing the webhook request.
- *
- * @return void This method directly modifies the `res` object to send a response to the client.
- */
-void RouteController::receiveWebhook(const crow::request& req,
-                                     crow::response& res) {
-  try {
-    LOG_INFO("RouteController",
-              "receiveWebhook: received message: {}", req.body);
-
-    res.code = 200;
-    res.write("Webhook received successfully.");
-    res.end();
-  } catch (const std::exception& e) {
-    res = handleException(e);
-    res.end();
-  }
-}
-
 void RouteController::initRoutes(crow::SimpleApp& app) {
   CROW_ROUTE(app, "/").methods(crow::HTTPMethod::GET)(
       [this](const crow::request& req, crow::response& res) { index(res); });
@@ -1601,11 +1574,5 @@ void RouteController::initRoutes(crow::SimpleApp& app) {
       .methods(crow::HTTPMethod::POST)(
           [this](const crow::request& req, crow::response& res) {
             subscribeToResources(req, res);
-          });
-
-  CROW_ROUTE(app, "/webhook")
-      .methods(crow::HTTPMethod::POST)(
-          [this](const crow::request& req, crow::response& res) {
-            receiveWebhook(req, res);
           });
 }

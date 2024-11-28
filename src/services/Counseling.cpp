@@ -24,8 +24,9 @@ Hours of Operation
  * @brief Constructs a Counseling object.
  * @param dbManager Reference to the DatabaseManager object.
  */
-Counseling::Counseling(DatabaseManager &dbManager)
-    : dbManager(dbManager), collection_name("Counseling") {
+Counseling::Counseling(DatabaseManager& dbManager,
+                       const std::string& collection_name)
+    : dbManager(dbManager), collection_name(collection_name) {
   cols = std::vector<std::string>({"Name", "counselorName", "City", "Address",
                                    "Description", "ContactInfo",
                                    "HoursOfOperation"});

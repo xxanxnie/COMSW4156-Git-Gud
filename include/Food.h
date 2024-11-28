@@ -11,10 +11,11 @@
 class Food {
  private:
   DatabaseManager& db;
+  std::string collection_name;
   std::vector<std::string> cols;
 
  public:
-  Food(DatabaseManager& db);
+  Food(DatabaseManager& db, const std::string& collection_name);
   void cleanCache();
   std::string checkInputFormat(std::string content);
   std::unordered_map<std::string, std::string> format;

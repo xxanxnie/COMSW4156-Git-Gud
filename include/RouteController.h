@@ -52,7 +52,6 @@ class RouteController {
       const std::map<std::string, std::string>& params, const std::string& key);  
   
   void subscribeToResources(const crow::request& req, crow::response& res);
-  void receiveWebhook(const crow::request& req, crow::response& res);
 
   // Shelter-related handlers
   void addShelter(const crow::request& req, crow::response& res);
