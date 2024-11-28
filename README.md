@@ -6,6 +6,8 @@ GitGud is a comprehensive API designed to support various social welfare initiat
 
 **Project management:** https://github.com/users/xxanxnie/projects/7/views/1
 
+**CLIENT:** https://github.com/xxanxnie/COMSW4156-Git-Gud-Client
+
 # User Types
 
 Our services cater to a diverse range of users, each with unique needs:
