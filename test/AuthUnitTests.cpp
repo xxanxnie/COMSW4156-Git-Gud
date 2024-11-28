@@ -9,6 +9,9 @@
 #include "Auth.h"
 #include "MockDatabaseManager.h"
 
+const std::string validTokenForGet = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ.N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A"; // Add a valid JWT token
+const std::string validTokenForPost = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc"; // Add a valid JWT token
+
 class AuthUnitTests : public ::testing::Test {
  protected:
   MockDatabaseManager* mockDbManager;
@@ -138,4 +141,113 @@ TEST_F(AuthUnitTests, ValidatePassword) {
   EXPECT_FALSE(authService->isValidPassword("NoDigits"));
   EXPECT_FALSE(authService->isValidPassword("nocaps123"));
   EXPECT_FALSE(authService->isValidPassword("NOCAPS123"));
+}
+
+// Test getCurrentTimestamp and getExpirationTimestamp
+TEST_F(AuthUnitTests, TimestampTests) {
+    // Test getCurrentTimestamp
+    int64_t timestamp1 = authService->getCurrentTimestamp();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    int64_t timestamp2 = authService->getCurrentTimestamp();
+    
+    EXPECT_GT(timestamp2, timestamp1);  // Second timestamp should be greater
+    
+    // Test getExpirationTimestamp
+    int64_t currentTime = authService->getCurrentTimestamp();
+    int64_t expirationTime = authService->getExpirationTimestamp();
+    
+    // Expiration should be JWT_EXPIRATION_HOURS hours ahead
+    EXPECT_EQ(expirationTime - currentTime, 24 * 36000000);  // Assuming JWT_EXPIRATION_HOURS is 24
+}
+
+// Test createUserDocument
+TEST_F(AuthUnitTests, CreateUserDocumentTest) {
+    std::string email = "test@example.com";
+    std::string passwordHash = "hashedpassword123";
+    std::string role = "USER";
+    
+    auto document = authService->createUserDocument(email, passwordHash, role);
+    
+    // Check all fields are present and correct
+    EXPECT_EQ(document.size(), 4);  // Should have 4 fields
+    
+    // Check each field
+    EXPECT_EQ(document[0].first, "email");
+    EXPECT_EQ(document[0].second, email);
+    
+    EXPECT_EQ(document[1].first, "passwordHash");
+    EXPECT_EQ(document[1].second, passwordHash);
+    
+    EXPECT_EQ(document[2].first, "role");
+    EXPECT_EQ(document[2].second, role);
+    
+    EXPECT_EQ(document[3].first, "createdAt");
+    // Verify createdAt is a valid timestamp (should be close to current time)
+    int64_t createdAt = std::stoll(document[3].second);
+    int64_t currentTime = authService->getCurrentTimestamp();
+    EXPECT_NEAR(createdAt, currentTime, 2);  // Within 2 seconds
+}
+
+// Test authenticateToken
+TEST_F(AuthUnitTests, AuthenticateTokenTest) {
+    // Test valid token
+    crow::request reqValid;
+    reqValid.add_header("Authorization", "Bearer " + validTokenForGet);
+    EXPECT_TRUE(authenticateToken(reqValid));
+    
+    // Test invalid token
+    crow::request reqInvalid;
+    reqInvalid.add_header("Authorization", "Bearer invalid.token.here");
+    EXPECT_FALSE(authenticateToken(reqInvalid));
+    
+    // Test missing token
+    crow::request reqMissing;
+    EXPECT_FALSE(authenticateToken(reqMissing));
+    
+    // Test malformed header
+    crow::request reqMalformed;
+    reqMalformed.add_header("Authorization", "malformed_header");
+    EXPECT_FALSE(authenticateToken(reqMalformed));
+}
+
+// Test authorizeRole
+TEST_F(AuthUnitTests, AuthorizeRoleTest) {
+    // Test HML role with GET request
+    crow::request reqHML;
+    reqHML.method = crow::HTTPMethod::GET;
+    reqHML.add_header("Authorization", "Bearer " + validTokenForGet);
+    EXPECT_TRUE(authorizeRole(reqHML, "HML"));
+    EXPECT_FALSE(authorizeRole(reqHML, "NGO"));
+    
+    // Test NGO role with POST request
+    crow::request reqNGO;
+    reqNGO.method = crow::HTTPMethod::POST;
+    reqNGO.add_header("Authorization", "Bearer " + validTokenForPost);
+    EXPECT_TRUE(authorizeRole(reqNGO, "NGO"));
+    EXPECT_FALSE(authorizeRole(reqNGO, "HML"));
+    
+    // Test invalid token
+    crow::request reqInvalid;
+    reqInvalid.add_header("Authorization", "Bearer invalid.token.here");
+    EXPECT_FALSE(authorizeRole(reqInvalid, "HML"));
+    
+    // Test missing token
+    crow::request reqMissing;
+    EXPECT_FALSE(authorizeRole(reqMissing, "NGO"));
+}
+
+// Test token extraction helper
+TEST_F(AuthUnitTests, ExtractTokenTest) {
+    // Valid Bearer token
+    std::string validHeader = "Bearer " + validTokenForGet;
+    EXPECT_EQ(extractToken(validHeader), validTokenForGet);
+    
+    // Invalid format
+    EXPECT_TRUE(extractToken("InvalidFormat").empty());
+    
+    // Empty header
+    EXPECT_TRUE(extractToken("").empty());
+    
+    // Bearer with no token
+    EXPECT_TRUE(extractToken("Bearer ").empty());
 }
