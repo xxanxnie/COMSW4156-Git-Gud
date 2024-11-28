@@ -50,8 +50,8 @@ TEST_F(OutreachServiceUnitTests, GetAllOutreachServices) {
       << "Contact Info" << "Sarah Johnson, sarah@email.com"
       << bsoncxx::builder::stream::finalize);
 
-  ON_CALL(*mockDbManager,
-          findCollection(::testing::_,::testing::_, ::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager, findCollection(::testing::_, ::testing::_,
+                                         ::testing::_, ::testing::_))
       .WillByDefault(::testing::DoAll(::testing::SetArgReferee<3>(mockResult),
                                       ::testing::Return()));
 

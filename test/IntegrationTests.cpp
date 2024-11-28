@@ -1,21 +1,29 @@
+// Copyright 2024 COMSW4156-Git-Gud
 #include <gtest/gtest.h>
+
 #include <bsoncxx/json.hpp>
+
 #include "DatabaseManager.h"
 #include "RouteController.h"
 
 // For GET endpoints (getall), use HML token:
-const std::string validTokenForGet = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-    "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6"
-    "ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
-    "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+std::string getValidTokenForGet() {
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
+         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
+         "NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
+         "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+}
 
 // For POST endpoints, use NGO token:
-const std::string validTokenForPost = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-    "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoi"
-    "YXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9."
-    "HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc";
+std::string getValidTokenForPost() {
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
+         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
+         "NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-"
+         "j2q6qgA7pOYolwc";
+}
+
 class IntegrationTest : public ::testing::Test {
  protected:
   DatabaseManager* dbManager;
@@ -48,9 +56,9 @@ class IntegrationTest : public ::testing::Test {
     authService = new AuthService(*dbManager);
     subscriptionManager = new SubscriptionManager(*dbManager);
 
-    routeController = new RouteController(
-        *dbManager, *shelter, *counseling, *healthcare, *outreach, *food,
-        *authService, *subscriptionManager);
+    routeController = new RouteController(*dbManager, *shelter, *counseling,
+                                          *healthcare, *outreach, *food,
+                                          *authService, *subscriptionManager);
   }
 
   void TearDown() override {
@@ -88,7 +96,7 @@ TEST_F(IntegrationTest, TestAddHealthcareService) {
 })";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   req.body = body;
   crow::response res{};
 
@@ -132,7 +140,7 @@ TEST_F(IntegrationTest, TestUpdateHealthcareService) {
 })";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = updateBody;
   crow::response res{};
 
@@ -167,7 +175,7 @@ TEST_F(IntegrationTest, TestDeleteHealthcareService) {
   std::string deleteBody = R"({"id": ")" + id + R"("})";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = deleteBody;
   crow::response res{};
 
@@ -207,7 +215,7 @@ TEST_F(IntegrationTest, TestGetAllHealthcareServices) {
   healthcare->addHealthcareService(body2);
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
 
   routeController->getAllHealthcareServices(req, res);
@@ -224,19 +232,19 @@ TEST_F(IntegrationTest, TestGetAllHealthcareServices) {
 }
 
 TEST_F(IntegrationTest, TestGetAllOutreachServices) {
-  dbManager->insertResource("OutreachTests", {
-      {"Name", "Emergency Shelter Access"},
-      {"City", "New York"},
-      {"Address", "200 Varick St, New York, NY 10014"},
-      {"Description", "Provide information and assistance for accessing shelters."},
-      {"ContactInfo", "Sarah Johnson, sarah@email.com"},
-      {"HoursOfOperation", "05/01/24 - 12/31/24"},
-      {"TargetAudience", "HML"}
-  });
-
+  dbManager->insertResource(
+      "OutreachTests",
+      {{"Name", "Emergency Shelter Access"},
+       {"City", "New York"},
+       {"Address", "200 Varick St, New York, NY 10014"},
+       {"Description",
+        "Provide information and assistance for accessing shelters."},
+       {"ContactInfo", "Sarah Johnson, sarah@email.com"},
+       {"HoursOfOperation", "05/01/24 - 12/31/24"},
+       {"TargetAudience", "HML"}});
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   crow::response res{};
 
   routeController->getAllOutreachServices(req, res);
@@ -245,7 +253,8 @@ TEST_F(IntegrationTest, TestGetAllOutreachServices) {
 
   auto resBody = res.body;
   EXPECT_NE(resBody.find("Emergency Shelter Access"), std::string::npos);
-  EXPECT_NE(resBody.find("200 Varick St, New York, NY 10014"), std::string::npos);
+  EXPECT_NE(resBody.find("200 Varick St, New York, NY 10014"),
+            std::string::npos);
 }
 
 TEST_F(IntegrationTest, TestAddOutreachServiceTest) {
@@ -261,7 +270,7 @@ TEST_F(IntegrationTest, TestAddOutreachServiceTest) {
 })";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -280,21 +289,22 @@ TEST_F(IntegrationTest, TestAddOutreachServiceTest) {
 }
 
 TEST_F(IntegrationTest, TestGetAllShelterTest) {
-  dbManager->insertResource("ShelterTests", {
-      {"Name", "Shelter For All"},
-      {"City", "New York"},
-      {"Address", "200 New St, New York, NY 10014"},
-      {"Description", "A safe space providing temporary shelter forindividuals in need."},
-      {"ContactInfo", "Sarah Johnson, sarah@email.com"},
-      {"HoursOfOperation", "05/01/24 - 12/31/24"},
-      {"ORG", "NGO"},
-      {"TargetUser", "homeless"},
-      {"Capacity", "50"},
-      {"CurrentUse", "10"}
-  });
+  dbManager->insertResource(
+      "ShelterTests",
+      {{"Name", "Shelter For All"},
+       {"City", "New York"},
+       {"Address", "200 New St, New York, NY 10014"},
+       {"Description",
+        "A safe space providing temporary shelter forindividuals in need."},
+       {"ContactInfo", "Sarah Johnson, sarah@email.com"},
+       {"HoursOfOperation", "05/01/24 - 12/31/24"},
+       {"ORG", "NGO"},
+       {"TargetUser", "homeless"},
+       {"Capacity", "50"},
+       {"CurrentUse", "10"}});
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
 
   routeController->getShelter(req, res);
@@ -322,7 +332,7 @@ TEST_F(IntegrationTest, AddShelterTest) {
 })";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 

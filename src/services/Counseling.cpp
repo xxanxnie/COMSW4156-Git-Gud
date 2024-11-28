@@ -2,15 +2,17 @@
 
 #include "Counseling.h"
 
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
 #include <iostream>
 #include <sstream>
 #include <utility>
 #include <vector>
 
 #include "DatabaseManager.h"
+
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+
 /*
 Name
 counselorName

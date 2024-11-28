@@ -2,7 +2,6 @@
 
 #include "RouteController.h"
 
-#include <bsoncxx/json.hpp>
 #include <exception>
 #include <iostream>
 #include <map>
@@ -12,6 +11,8 @@
 #include "Healthcare.h"
 #include "Logger.h"
 #include "Outreach.h"
+
+#include <bsoncxx/json.hpp>
 
 crow::response handleException(const std::exception& e) {
   std::cerr << "Error: " << e.what() << std::endl;

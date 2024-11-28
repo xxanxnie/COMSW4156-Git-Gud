@@ -3,9 +3,6 @@
 #include <csignal>
 #include <iostream>
 #include <map>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
 #include <string>
 
 #include "../external_libraries/Crow/include/crow.h"
@@ -17,6 +14,10 @@
 #include "RouteController.h"
 #include "Shelter.h"
 #include "SubscriptionManager.h"
+
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
 
 /**
  *  Method to handle proper termination protocols

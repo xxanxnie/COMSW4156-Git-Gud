@@ -1,11 +1,17 @@
+// Copyright 2024 COMSW4156-Git-Gud
+
 #include "Auth.h"
 
 #include <jwt-cpp/jwt.h>
 
-#include <bcrypt/BCrypt.hpp>
+#include <cstdlib>
+
+#include <chrono> // NOLINT(build/c++11)
+#include <regex> // NOLINT(build/c++11)
+
 #include <bsoncxx/json.hpp>
-#include <chrono>
-#include <regex>
+#include <bcrypt/BCrypt.hpp>
+
 
 // Constructor
 AuthService::AuthService(DatabaseManager& dbManager) : dbManager(dbManager) {}

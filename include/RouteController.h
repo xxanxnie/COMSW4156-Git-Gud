@@ -10,13 +10,13 @@
 #include <string>
 
 #include "../external_libraries/Crow/include/crow.h"
+#include "Auth.h"
 #include "Counseling.h"
 #include "DatabaseManager.h"
 #include "Food.h"
 #include "Healthcare.h"
 #include "Outreach.h"
 #include "Shelter.h"
-#include "Auth.h"
 #include "SubscriptionManager.h"
 
 class RouteController {
@@ -36,7 +36,8 @@ class RouteController {
   RouteController(DatabaseManager& dbManager, Shelter& shelterManager,
                   Counseling& counselingManager, Healthcare& healthcareManager,
                   Outreach& outreachManager, Food& foodManager,
-                  AuthService& authService, SubscriptionManager& subscriptionManager)
+                  AuthService& authService,
+                  SubscriptionManager& subscriptionManager)
       : dbManager(dbManager),
         shelterManager(shelterManager),
         counselingManager(counselingManager),
@@ -49,8 +50,8 @@ class RouteController {
   void initRoutes(crow::SimpleApp& app);
   void index(crow::response& res);
   std::optional<std::string> get_param(
-      const std::map<std::string, std::string>& params, const std::string& key);  
-  
+      const std::map<std::string, std::string>& params, const std::string& key);
+
   void subscribeToResources(const crow::request& req, crow::response& res);
 
   // Shelter-related handlers

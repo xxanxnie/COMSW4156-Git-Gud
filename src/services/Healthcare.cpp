@@ -2,12 +2,14 @@
 
 #include "Healthcare.h"
 
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/oid.hpp>
 #include <iostream>
 #include <unordered_set>
 
 #include "DatabaseManager.h"
+
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/oid.hpp>
+
 /*
 Name:	provider
 City

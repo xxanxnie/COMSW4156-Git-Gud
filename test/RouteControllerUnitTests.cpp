@@ -25,7 +25,8 @@ class MockShelter : public Shelter {
 
 class MockCounseling : public Counseling {
  public:
-  explicit MockCounseling(DatabaseManager* dbManager, const std::string& collection_name)
+  explicit MockCounseling(DatabaseManager* dbManager,
+                          const std::string& collection_name)
       : Counseling(*dbManager, "CounselingTests") {}
 
   MOCK_METHOD(std::string, addCounselor, (std::string request_body),
@@ -39,8 +40,8 @@ class MockCounseling : public Counseling {
 
 class MockFood : public Food {
  public:
-  explicit MockFood(DatabaseManager* db, const std::string& collection_name) : 
-      Food(*db, "FoodTests") {}
+  explicit MockFood(DatabaseManager* db, const std::string& collection_name)
+      : Food(*db, "FoodTests") {}
 
   MOCK_METHOD(std::string, addFood, ((std::string request_body)), (override));
   MOCK_METHOD(std::string, getAllFood, (int start), (override));
@@ -58,8 +59,8 @@ class MockOutreachService : public Outreach {
   MOCK_METHOD(std::string, addOutreachService, (std::string request_body),
               (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (int start), (override));
-  MOCK_METHOD(std::string, deleteOutreach,
-              (std::string counselorId), (override));
+  MOCK_METHOD(std::string, deleteOutreach, (std::string counselorId),
+              (override));
   MOCK_METHOD(std::string, updateOutreach, (std::string request_body),
               (override));
 };
@@ -82,7 +83,7 @@ class MockHealthcareService : public Healthcare {
 
 class MockAuthService : public AuthService {
  public:
-  MockAuthService(DatabaseManager& dbManager) : AuthService(dbManager) {}
+  explicit MockAuthService(DatabaseManager& dbManager) : AuthService(dbManager) {}
 };
 
 class MockSubscriptionManager : public SubscriptionManager {
@@ -143,18 +144,22 @@ class RouteControllerUnitTests : public ::testing::Test {
 };
 
 // For GET endpoints (getall), use HML token:
-const std::string validTokenForGet = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-    "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3MzI2ODAwMjcsImlzcyI6"
-    "ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
-    "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+std::string getValidTokenForGet() {
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
+         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
+         "NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
+         "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
+}
 
 // For POST endpoints, use NGO token:
-const std::string validTokenForPost = 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-    "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMjY3OTk5MCwiaXNzIjoi"
-    "YXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9."
-    "HrxegAGsSbQqX8h1m3F-o8fkuf4-j2q6qgA7pOYolwc";
+std::string getValidTokenForPost() {
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
+         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
+         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
+         "NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-"
+         "j2q6qgA7pOYolwc";
+}
 
 TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
   std::string mockResponse =
@@ -163,7 +168,7 @@ TEST_F(RouteControllerUnitTests, GetShelterTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
 
   routeController->getShelter(req, res);
@@ -181,7 +186,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
       ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}";
   crow::request req;
   req.body = body;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   crow::response res{};
 
   ON_CALL(*mockShelter,
@@ -242,7 +247,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteShelterTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -271,9 +276,9 @@ TEST_F(RouteControllerUnitTests, DeleteShelterTestUnauthorized) {
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
 TEST_F(RouteControllerUnitTests, UpdateShelterTestAuthorized) {
-  std::string body ="";
+  std::string body = "";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -293,7 +298,7 @@ TEST_F(RouteControllerUnitTests, GetCounselingTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
   routeController->getCounseling(req, res);
 
@@ -313,7 +318,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
     })";
   crow::request req;
   req.body = body;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   crow::response res{};
 
   ON_CALL(*mockCounseling, addCounselor(body))
@@ -364,7 +369,7 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteCounselingTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -393,9 +398,9 @@ TEST_F(RouteControllerUnitTests, DeleteCounselingTestUnauthorized) {
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
 TEST_F(RouteControllerUnitTests, UpdateCounselingTestAuthorized) {
-  std::string body ="";
+  std::string body = "";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -413,7 +418,7 @@ TEST_F(RouteControllerUnitTests, GetAllFoodTestAuthorized) {
   crow::response res;
 
   // Set valid API key for GET operations
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
 
   std::string mockResponse =
       "[{\"name\": \"FoodBank\", \"location\": \"NYC\"}]";
@@ -431,7 +436,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
   crow::response res;
 
   // Set valid API key for POST operations
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
 
   // Add all required fields
   req.body =
@@ -491,7 +496,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteFoodTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -519,15 +524,14 @@ TEST_F(RouteControllerUnitTests, DeleteFoodTestUnauthorized) {
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
 TEST_F(RouteControllerUnitTests, UpdateFoodTestAuthorized) {
-  std::string body ="";
+  std::string body = "";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
   ON_CALL(*mockFood, updateFood(body))
-      .WillByDefault(
-          ::testing::Return("Food resource updated successfully."));
+      .WillByDefault(::testing::Return("Food resource updated successfully."));
 
   routeController->updateFood(req, res);
 
@@ -540,7 +544,7 @@ TEST_F(RouteControllerUnitTests, GetAllOutreachServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
   routeController->getAllOutreachServices(req, res);
 
@@ -560,7 +564,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
     "TargetAudience":"HML"
 })";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -614,7 +618,7 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -643,9 +647,9 @@ TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestUnauthorized) {
   EXPECT_EQ(res.body, "Invalid or expired token.");
 }
 TEST_F(RouteControllerUnitTests, UpdateOutreachTestAuthorized) {
-  std::string body ="";
+  std::string body = "";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -664,7 +668,7 @@ TEST_F(RouteControllerUnitTests, GetAllHealthcareServicesTestAuthorized) {
       .WillByDefault(::testing::Return(mockResponse));
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + validTokenForGet);
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
   routeController->getAllHealthcareServices(req, res);
 
@@ -684,7 +688,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   "contactInfo": "123-456-7890"
 })";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -747,7 +751,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       "contactInfo": "123-456-7890"
     })";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -784,7 +788,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -821,7 +825,7 @@ TEST_F(RouteControllerUnitTests, AddSubscriberTestAuthorized) {
         "Contact": "subscriber@example.com"
       })";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + validTokenForPost);
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 

@@ -1,120 +1,118 @@
 #ifndef AUTH_H
 #define AUTH_H
 
-#include <string>
 #include <memory>
-#include <stdexcept>
 #include <optional>
-#include "DatabaseManager.h"
+#include <stdexcept>
+#include <string>
+
 #include "../external_libraries/Crow/include/crow.h"
+#include "DatabaseManager.h"
 
 // Custom exceptions for authentication
 class AuthException : public std::runtime_error {
-public:
-    explicit AuthException(const std::string& message) : std::runtime_error(message) {}
+ public:
+  explicit AuthException(const std::string& message)
+      : std::runtime_error(message) {}
 };
 
 class InvalidCredentialsException : public AuthException {
-public:
-    InvalidCredentialsException() : AuthException("Invalid email or password") {}
+ public:
+  InvalidCredentialsException() : AuthException("Invalid email or password") {}
 };
 
 class UserAlreadyExistsException : public AuthException {
-public:
-    UserAlreadyExistsException() : AuthException("User with this email already exists") {}
+ public:
+  UserAlreadyExistsException()
+      : AuthException("User with this email already exists") {}
 };
 
 // User model
 struct User {
-    std::string id;
-    std::string email;
-    std::string passwordHash;
-    std::string role;
-    std::string createdAt;
+  std::string id;
+  std::string email;
+  std::string passwordHash;
+  std::string role;
+  std::string createdAt;
 
-    // Updated constructor
-    User(const std::string& email, 
-         const std::string& passwordHash,
-         const std::string& role = "user")
-        : email(email)
-        , passwordHash(passwordHash)
-        , role(role) {}
-    
-    // Default constructor
-    User() = default;
+  // Updated constructor
+  User(const std::string& email, const std::string& passwordHash,
+       const std::string& role = "user")
+      : email(email), passwordHash(passwordHash), role(role) {}
+
+  // Default constructor
+  User() = default;
 };
 
 // JWT payload structure
 struct JWTPayload {
-    std::string userId;
-    std::string email;
-    std::string role;
-    int64_t exp;  // Expiration time
+  std::string userId;
+  std::string email;
+  std::string role;
+  int64_t exp;  // Expiration time
 };
 
 class AuthService {
-private:
-    // Private constructor for singleton pattern
-    AuthService();
-    
-    // Delete copy constructor and assignment operator
-    AuthService(const AuthService&) = delete;
-    AuthService& operator=(const AuthService&) = delete;
+ private:
+  // Private constructor for singleton pattern
+  AuthService();
 
-public:
-    // Static method to get the singleton instance
-    static AuthService& getInstance() {
-        static AuthService instance;
-        return instance;
-    }
-    
-    explicit AuthService(DatabaseManager& dbManager);
-    ~AuthService() = default;
+  // Delete copy constructor and assignment operator
+  AuthService(const AuthService&) = delete;
+  AuthService& operator=(const AuthService&) = delete;
 
-    // User registration and login
-    std::string registerUser(const std::string& email, 
+ public:
+  // Static method to get the singleton instance
+  static AuthService& getInstance() {
+    static AuthService instance;
+    return instance;
+  }
+
+  explicit AuthService(DatabaseManager& dbManager);
+  ~AuthService() = default;
+
+  // User registration and login
+  std::string registerUser(const std::string& email,
                            const std::string& password,
                            const std::string& role = "user");
-    
-    std::string loginUser(const std::string& email, 
-                         const std::string& password);
-    
-    // JWT operations
-    std::string generateJWT(const User& user);
-    bool verifyJWT(const std::string& token);
-    std::optional<JWTPayload> decodeJWT(const std::string& token);
 
-    // User operations
-    std::optional<User> findUserByEmail(const std::string& email);
-    bool updateUserPassword(const std::string& userId, const std::string& newPassword);
-    bool deleteUser(const std::string& userId);
+  std::string loginUser(const std::string& email, const std::string& password);
 
-    // Role-based authorization
-    bool hasRole(const std::string& token, const std::string& requiredRole);
-    
-    // Password hashing
-    std::string hashPassword(const std::string& password);
-    bool verifyPassword(const std::string& password, const std::string& hash);
-    // User validation
-    bool isValidEmail(const std::string& email);
-    bool isValidPassword(const std::string& password);
-    // JWT utilities
-    int64_t getCurrentTimestamp();
-    int64_t getExpirationTimestamp();
+  // JWT operations
+  std::string generateJWT(const User& user);
+  bool verifyJWT(const std::string& token);
+  std::optional<JWTPayload> decodeJWT(const std::string& token);
 
-    // Database operations
-    std::vector<std::pair<std::string, std::string>> createUserDocument(
-        const std::string& email,
-        const std::string& passwordHash,
-        const std::string& role = "user"
-    );
-private:
-    DatabaseManager& dbManager;
-    const std::string collection_name = "Users";
-    const int JWT_EXPIRATION_HOURS = 240000;
-    const std::string JWT_SECRET = "your-secret-key";  // In production, load from env variables
+  // User operations
+  std::optional<User> findUserByEmail(const std::string& email);
+  bool updateUserPassword(const std::string& userId,
+                          const std::string& newPassword);
+  bool deleteUser(const std::string& userId);
 
+  // Role-based authorization
+  bool hasRole(const std::string& token, const std::string& requiredRole);
 
+  // Password hashing
+  std::string hashPassword(const std::string& password);
+  bool verifyPassword(const std::string& password, const std::string& hash);
+  // User validation
+  bool isValidEmail(const std::string& email);
+  bool isValidPassword(const std::string& password);
+  // JWT utilities
+  int64_t getCurrentTimestamp();
+  int64_t getExpirationTimestamp();
+
+  // Database operations
+  std::vector<std::pair<std::string, std::string>> createUserDocument(
+      const std::string& email, const std::string& passwordHash,
+      const std::string& role = "user");
+
+ private:
+  DatabaseManager& dbManager;
+  const std::string collection_name = "Users";
+  const int JWT_EXPIRATION_HOURS = 240000;
+  const std::string JWT_SECRET =
+      "your-secret-key";  // In production, load from env variables
 };
 
 // Middleware function for token verification
@@ -126,4 +124,4 @@ bool authorizeRole(const crow::request& req, const std::string& requiredRole);
 // Helper function to extract token from Authorization header
 std::string extractToken(const std::string& authHeader);
 
-#endif // AUTH_H
+#endif  // AUTH_H

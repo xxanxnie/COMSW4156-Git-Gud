@@ -1,4 +1,5 @@
 [100%] Running cpplint for Google C++ Style Guide compliance
+Done processing include/Auth.h
 Done processing include/Counseling.h
 Done processing include/DatabaseManager.h
 Done processing include/Food.h
@@ -6,18 +7,24 @@ Done processing include/Healthcare.h
 Done processing include/Outreach.h
 Done processing include/RouteController.h
 Done processing include/Shelter.h
+Done processing src/Auth.cpp
 Done processing src/DatabaseManager.cpp
 Done processing src/RouteController.cpp
+Done processing src/SubscriptionManager.cpp
 Done processing src/main.cpp
 Done processing src/services/Counseling.cpp
 Done processing src/services/Food.cpp
 Done processing src/services/Healthcare.cpp
 Done processing src/services/Outreach.cpp
 Done processing src/services/Shelter.cpp
+Done processing test/AuthUnitTests.cpp
 Done processing test/CounselingUnitTests.cpp
+Done processing test/DataBaseTest.cpp
 Done processing test/FoodUnitTests.cpp
 Done processing test/HealthcareUnitTests.cpp
+Done processing test/IntegrationTests.cpp
 Done processing test/OutreachUnitTests.cpp
 Done processing test/RouteControllerUnitTests.cpp
 Done processing test/ShelterUnitTests.cpp
+Done processing test/SubscriptionManagerUnitTests.cpp
 [100%] Built target cpplint
