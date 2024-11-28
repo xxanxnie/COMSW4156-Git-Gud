@@ -155,6 +155,17 @@ void RouteController::addShelter(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("shelter", city);
+
       LOG_INFO("RouteController", "addShelter success: code={}, response={}",
                res.code, result);
     }
@@ -386,6 +397,16 @@ void RouteController::addCounseling(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("counseling", city);
       LOG_INFO("RouteController", "addCounseling success: code={}, response={}",
                res.code, result);
     }
@@ -565,6 +586,16 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("food", city);
       LOG_INFO("RouteController", "addFood success: code={}, response={}",
                res.code, result);
     }
@@ -803,6 +834,16 @@ void RouteController::addOutreachService(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("outreach", city);
       LOG_INFO("RouteController",
                "addOutreachService success: code={}, response={}", res.code,
                result);
