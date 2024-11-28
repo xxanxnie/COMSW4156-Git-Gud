@@ -2,7 +2,6 @@
 
 #include "RouteController.h"
 
-#include <bsoncxx/json.hpp>
 #include <exception>
 #include <iostream>
 #include <map>
@@ -12,6 +11,8 @@
 #include "Healthcare.h"
 #include "Logger.h"
 #include "Outreach.h"
+
+#include <bsoncxx/json.hpp>
 
 crow::response handleException(const std::exception& e) {
   std::cerr << "Error: " << e.what() << std::endl;
@@ -154,6 +155,17 @@ void RouteController::addShelter(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("shelter", city);
+
       LOG_INFO("RouteController", "addShelter success: code={}, response={}",
                res.code, result);
     }
@@ -385,6 +397,16 @@ void RouteController::addCounseling(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("counseling", city);
       LOG_INFO("RouteController", "addCounseling success: code={}, response={}",
                res.code, result);
     }
@@ -564,6 +586,16 @@ void RouteController::addFood(const crow::request& req, crow::response& res) {
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("food", city);
       LOG_INFO("RouteController", "addFood success: code={}, response={}",
                res.code, result);
     }
@@ -802,6 +834,16 @@ void RouteController::addOutreachService(const crow::request& req,
     } else {
       res.code = 201;
       res.write(result);
+
+      auto resource = bsoncxx::from_json(req.body);
+      std::string city = "";
+
+      for (auto element : resource.view()) {
+        if (element.key().to_string() == "City")
+          city = element.get_utf8().value.to_string();
+      }
+
+      subscriptionManager.notifySubscribers("outreach", city);
       LOG_INFO("RouteController",
                "addOutreachService success: code={}, response={}", res.code,
                result);
@@ -1386,11 +1428,7 @@ void RouteController::subscribeToResources(const crow::request& req,
               "Authentication failed in deleteHealthcareService");
     return;
   }
-  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "NGO") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VOL") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "CLN") &&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "GOV")&&
-      !authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML")&&
+  if (!authService.hasRole(extractToken(req.get_header_value("Authorization")), "HML")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "RFG")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "VET")&&
       !authService.hasRole(extractToken(req.get_header_value("Authorization")), "SUB")) {

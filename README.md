@@ -6,6 +6,8 @@ GitGud is a comprehensive API designed to support various social welfare initiat
 
 **Project management:** https://github.com/users/xxanxnie/projects/7/views/1
 
+**CLIENT:** https://github.com/xxanxnie/COMSW4156-Git-Gud-Client
+
 # User Types
 
 Our services cater to a diverse range of users, each with unique needs:
@@ -22,6 +24,10 @@ Our services cater to a diverse range of users, each with unique needs:
 - **Clinics (CLN)**: Healthcare facilities that partner with our services to provide medical support.
 - **Government (GOV)**: Local and state agencies that help coordinate resources and services.
 
+# Special Features
+
+The **SubscriptionManager** class allows users to subscribe to specific resources (e.g., food, shelter) in a designated city through the /resources/subscribe endpoint. Users provide their contact information (email or webhook URL), and their preferences are stored in the database. When an update is made to the resource in the specified city using the add endpoint, the system automatically notifies all subscribers via their preferred contact method (email or webhook). This ensures subscribers stay informed about critical updates for resources they care about.
+
 # External Libraries Installation
 
 The following libraries need to be installed:
@@ -32,9 +38,9 @@ External Libraries:
 - **Asio**: A cross-platform C++ library for network and low-level I/O programming. (https://think-async.com/Asio/)
 - **mongocxx**: The official C++ driver for MongoDB. (https://www.mongodb.com/docs/languages/cpp/cpp-driver/current/get-started/download-and-install/)
 
-**These libraries will be automatically installed when you run the `setup.sh` script.**
+**Dependencies will be automatically installed when you run the `setup.sh` script.**
 
-Requirements:
+Additional requirements:
 - **Linux**
   ```bash
   sudo apt-get update
@@ -206,6 +212,7 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Success: HTTP 200 Status Code is returned, "Outreach resource deleted successfully.."
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
 **Shelter**
   1. Add Shelter Service
   - **Expected Input (JSON):**
@@ -269,6 +276,7 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Success: HTTP 200 Status Code is returned, "Shelter resource deleted successfully.."
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
 **Healthcare**
   1. Add Healthcare Service
   - **Expected Input (JSON):**
@@ -326,6 +334,7 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Success: HTTP 200 Status Code is returned, "Healthcare resource deleted successfully.."
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
 **Counseling**
   1. Add Counseling Service
   - **Expected Input (JSON):**
@@ -384,6 +393,7 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Success: HTTP 200 Status Code is returned, "Counseling resource deleted successfully.."
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
+
 **Food**
   1. Add Food Resource
   - **Expected Input (JSON):**
@@ -444,6 +454,22 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
 
+**Subscription**
+  1. Subscribe to Resources
+  - **Expected Input (JSON):**
+  ```json
+  {
+    "Resource": "Food",
+    "City": "New York",
+    "Contact": "user@example.com"
+  }
+  ```
+  - **Endpoint:** `POST /resources/subscribe`
+  - **Description:** This endpoint allows clients to subscribe to updates for a specific resource in a given city. It expects a POST request containing the resource type, city, and contact information in the request body.
+    * Upon Success: HTTP 200 Status Code is returned, "Subscription recorded successfully."
+    * Upon Failure: A 400 Status Code is returned if required fields (Resource, City, Contact) are missing.
+    * Upon Unauthorized: If the request is not authenticated or lacks the necessary role (HML, RFG, VET, SUB), a 403 Status Code is returned with the message "Insufficient permissions to access this resource."
+
 # Branch Coverage
 
 This project uses **GCOV** (coverage tool) and **LCOV** (graphical front-end for GCOV) to generate branch coverage reports for C++ code. After building the project using CMake in the build folder, run `make coverage` which will automatically open the HTML file to view the branch coverage report. If coverage needs to be run again, it may be necessary to clean previous coverage data by using the following commands to delete old `.gcda` and `.gcno` files and rebuild the project:
@@ -474,6 +500,44 @@ make -C build cpplint > docs/cpplint_output.txt
 The below shows the style check output for the current state of the project.
 
 ![Style Check](docs/stylecheck.png)
+
+# Static Analysis Check
+
+The style checking is done using **clang-tidy** with minimal specific checks enabled for static analysis to avoid unnecessary noise.
+
+**Steps to run:**
+
+1. **Install LLVM and Clang tools** (assumes macOS and Homebrew):
+    ```shell
+    brew install llvm
+    brew --prefix llvm 
+    // copy this path and paste it below
+    echo 'export PATH="YOUR_PATH_TO_LLVM:$PATH"' >> ~/.zshrc 
+    source ~/.zshrc
+    ```
+
+2. **Navigate to the build directory**:
+    ```shell
+    cd build
+    ```
+
+3. **Generate build files with the flag to generate `compile_commands.json` enabled**:
+    ```shell
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=true ..
+    ```
+
+4. **Run `clang-tidy` with the generated compile commands**:
+    ```shell
+    cd ..
+    clang-tidy src/*.cpp src/services/*.cpp include/*.h -p build/compile_commands.json > clang-tidy-results.txt 2>&1
+    ```
+
+    The output file `clang-tidy-results.txt` will contain the results of the static analysis. In our case, all warning originate form **non-user code**.
+
+
+The below shows the style check output for the current state of the project.
+
+![Style Check](docs/static_analysis.png)
 
 # Setup MongoDb Database
 1. Install docker

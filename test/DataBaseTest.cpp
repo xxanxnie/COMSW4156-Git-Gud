@@ -31,7 +31,8 @@ TEST_F(DataBaseTest, Checksetup) {
 }
 
 TEST_F(DataBaseTest, InsertResourceTest) {
-  std::string id = DbManager->insertResource("test", {{"Name", "Resource A"}, {"Type", "Test"}});
+  std::string id = DbManager->insertResource(
+      "test", {{"Name", "Resource A"}, {"Type", "Test"}});
   EXPECT_FALSE(id.empty());
 
   std::vector<bsoncxx::document::value> result;
@@ -44,7 +45,8 @@ TEST_F(DataBaseTest, InsertResourceTest) {
 }
 
 TEST_F(DataBaseTest, DeleteResourceTest) {
-  std::string id = DbManager->insertResource("test", {{"Name", "Resource B"}, {"Type", "Test"}});
+  std::string id = DbManager->insertResource(
+      "test", {{"Name", "Resource B"}, {"Type", "Test"}});
   EXPECT_FALSE(id.empty());
 
   bool success = DbManager->deleteResource("test", id);
@@ -56,7 +58,8 @@ TEST_F(DataBaseTest, DeleteResourceTest) {
 }
 
 TEST_F(DataBaseTest, UpdateResourceTest) {
-  std::string id = DbManager->insertResource("test", {{"Name", "Resource C"}, {"Type", "OldType"}});
+  std::string id = DbManager->insertResource(
+      "test", {{"Name", "Resource C"}, {"Type", "OldType"}});
   EXPECT_FALSE(id.empty());
 
   DbManager->updateResource("test", id, {{"Type", "NewType"}});
@@ -83,14 +86,17 @@ TEST_F(DataBaseTest, PrintCollectionTest) {
 }
 
 TEST_F(DataBaseTest, GetResourcesTest) {
-  DbManager->insertResource("Resources", {{"type", "Food"}, {"Name", "Resource G"}});
-  DbManager->insertResource("Resources", {{"type", "Food"}, {"Name", "Resource H"}});
-  DbManager->insertResource("Resources", {{"type", "Shelter"}, {"Name", "Resource I"}});
+  DbManager->insertResource("Resources",
+                            {{"type", "Food"}, {"Name", "Resource G"}});
+  DbManager->insertResource("Resources",
+                            {{"type", "Food"}, {"Name", "Resource H"}});
+  DbManager->insertResource("Resources",
+                            {{"type", "Shelter"}, {"Name", "Resource I"}});
 
   auto resources = DbManager->getResources("Food");
   auto doc = bsoncxx::to_json(resources.view());
 
   EXPECT_NE(doc.find("Resource G"), std::string::npos);
   EXPECT_NE(doc.find("Resource H"), std::string::npos);
-  EXPECT_EQ(doc.find("Resource I"), std::string::npos); 
+  EXPECT_EQ(doc.find("Resource I"), std::string::npos);
 }

@@ -3,10 +3,11 @@
 #include "DatabaseManager.h"
 
 #include <algorithm>
+#include <iostream>
+
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <iostream>
 
 DatabaseManager::DatabaseManager(const std::string &uri,
                                  bool skipInitialization) {
