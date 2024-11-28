@@ -210,7 +210,7 @@ Each role has specific permissions for accessing and modifying resources. Refer 
     * Upon Success: HTTP 200 Status Code is returned, "Outreach resource deleted successfully.."
     * Upon Failure: An error message is returned
     * Upon Unauthorized: If the request is not coming from an approved client, a 403 Status Code is returned with the message "Unauthorized"
-    
+
 **Shelter**
   1. Add Shelter Service
   - **Expected Input (JSON):**
@@ -498,6 +498,44 @@ make -C build cpplint > docs/cpplint_output.txt
 The below shows the style check output for the current state of the project.
 
 ![Style Check](docs/stylecheck.png)
+
+# Static Analysis Check
+
+The style checking is done using **clang-tidy** with minimal specific checks enabled for static analysis to avoid unnecessary noise.
+
+**Steps to run:**
+
+1. **Install LLVM and Clang tools** (assumes macOS and Homebrew):
+    ```shell
+    brew install llvm
+    brew --prefix llvm 
+    // copy this path and paste it below
+    echo 'export PATH="YOUR_PATH_TO_LLVM:$PATH"' >> ~/.zshrc 
+    source ~/.zshrc
+    ```
+
+2. **Navigate to the build directory**:
+    ```shell
+    cd build
+    ```
+
+3. **Generate build files with the flag to generate `compile_commands.json` enabled**:
+    ```shell
+    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=true ..
+    ```
+
+4. **Run `clang-tidy` with the generated compile commands**:
+    ```shell
+    cd ..
+    clang-tidy src/*.cpp src/services/*.cpp include/*.h -p build/compile_commands.json > clang-tidy-results.txt 2>&1
+    ```
+
+    The output file `clang-tidy-results.txt` will contain the results of the static analysis. In our case, all warning originate form **non-user code**.
+
+
+The below shows the style check output for the current state of the project.
+
+![Style Check](docs/static_analysis.png)
 
 # Setup MongoDb Database
 1. Install docker
