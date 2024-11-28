@@ -9,7 +9,7 @@
 #include "Auth.h"
 #include "MockDatabaseManager.h"
 
-std::string getValidTokenForGet() {
+inline std::string getValidTokenForGet() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
          "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
          "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
@@ -17,7 +17,7 @@ std::string getValidTokenForGet() {
          "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
 }
 
-std::string getValidTokenForPost() {
+inline std::string getValidTokenForPost() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
          "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
          "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
@@ -253,7 +253,7 @@ TEST_F(AuthUnitTests, AuthorizeRoleTest) {
 TEST_F(AuthUnitTests, ExtractTokenTest) {
   // Valid Bearer token
   std::string validHeader = "Bearer " + getValidTokenForGet();
-  EXPECT_EQ(extractToken(validHeader), getValidTokenForPost());
+  EXPECT_EQ(extractToken(validHeader), getValidTokenForGet());
 
   // Invalid format
   EXPECT_TRUE(extractToken("InvalidFormat").empty());

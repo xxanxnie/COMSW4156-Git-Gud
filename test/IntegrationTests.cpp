@@ -7,7 +7,7 @@
 #include "RouteController.h"
 
 // For GET endpoints (getall), use HML token:
-std::string getValidTokenForGet() {
+inline std::string getValidTokenForGet() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
          "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
          "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
@@ -16,7 +16,7 @@ std::string getValidTokenForGet() {
 }
 
 // For POST endpoints, use NGO token:
-std::string getValidTokenForPost() {
+inline std::string getValidTokenForPost() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
          "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
          "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
@@ -96,7 +96,7 @@ TEST_F(IntegrationTest, TestAddHealthcareService) {
 })";
 
   crow::request req;
-  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
+  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   req.body = body;
   crow::response res{};
 
@@ -244,7 +244,7 @@ TEST_F(IntegrationTest, TestGetAllOutreachServices) {
        {"TargetAudience", "HML"}});
 
   crow::request req{};
-  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
+  req.add_header("Authorization", "Bearer " + getValidTokenForGet());
   crow::response res{};
 
   routeController->getAllOutreachServices(req, res);
