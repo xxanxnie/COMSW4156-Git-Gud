@@ -46,10 +46,10 @@ TEST_F(DataBaseTest, InsertResourceTest) {
 
 TEST_F(DataBaseTest, DeleteResourceTest) {
   std::string id = DbManager->insertResource(
-      "test", {{"Name", "Resource B"}, {"Type", "Test"}});
+      "test", {{"Name", "Resource B"}, {"Type", "Test"}, {"authToken", "52"}});
   EXPECT_FALSE(id.empty());
 
-  bool success = DbManager->deleteResource("test", id);
+  bool success = DbManager->deleteResource("test", id, "52");
   EXPECT_TRUE(success);
 
   std::vector<bsoncxx::document::value> result;

@@ -17,15 +17,15 @@ class Outreach {
 
   std::string collection_name;
   void cleanCache();
-  std::string checkInputFormat(std::string content);
+  std::string checkInputFormat(std::string content, std::string request_auth);
   std::unordered_map<std::string, std::string> format;
-  virtual std::string addOutreachService(std::string request_body);
+  virtual std::string addOutreachService(std::string request_bod, std::string request_auth);
 
   std::vector<std::pair<std::string, std::string>> createDBContent();
 
   virtual std::string getAllOutreachServices(int start = 0);
-  virtual std::string deleteOutreach(std::string id);
-  virtual std::string updateOutreach(std::string request_body);
+  virtual std::string deleteOutreach(std::string id, std::string request_auth);
+  virtual std::string updateOutreach(std::string request_body, std::string request_auth);
 
   std::string printOutreachServices(
       const std::vector<bsoncxx::document::value>& services) const;

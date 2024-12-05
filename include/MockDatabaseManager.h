@@ -30,7 +30,8 @@ class MockDatabaseManager : public DatabaseManager {
       (override));
 
   MOCK_METHOD(bool, deleteResource,
-              (const std::string &collectionName, (const std::string &id)),
+              (const std::string &collectionName, (const std::string &id), 
+              (const std::string &authToken)),
               (override));
 };
 

@@ -55,7 +55,7 @@ TEST_F(CounselingUnitTests, AddCounselor) {
         "HoursOfOperation": "2024-01-11",
         "counselorName": "Jack"
     })";
-  counseling->checkInputFormat(input);
+  counseling->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       counseling->createDBContent();
 
@@ -68,7 +68,7 @@ TEST_F(CounselingUnitTests, AddCounselor) {
             return "12345";
           }));
 
-  std::string result = counseling->addCounselor(input);
+  std::string result = counseling->addCounselor(input, "456");
 
   EXPECT_EQ(result, "12345");
 }
@@ -85,7 +85,7 @@ TEST_F(CounselingUnitTests, updateCounseling) {
         "HoursOfOperation": "2024-01-11",
         "counselorName": "Jack"
   })";
-  counseling->checkInputFormat(input);
+  counseling->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       counseling->createDBContent();
   std::string id_temp = "123456789";
@@ -101,7 +101,7 @@ TEST_F(CounselingUnitTests, updateCounseling) {
             return true;
           });
 
-  std::string result = counseling->updateCounselor(input);
+  std::string result = counseling->updateCounselor(input, "456");
   EXPECT_EQ(result, "Success");
 
   // Verify the updated data can be retrieved
@@ -128,15 +128,17 @@ TEST_F(CounselingUnitTests, updateCounseling) {
 TEST_F(CounselingUnitTests, DeleteCounselor) {
   std::string mockId = "123";
 
-  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault([&](const std::string &collectionName,
-                         const std::string &resourceId) -> bool {
+                         const std::string &resourceId,
+                         const std::string &authToken) -> bool {
         EXPECT_EQ(resourceId, mockId);
         EXPECT_EQ(collectionName, "CounselingService");
         return true;
       });
 
-  std::string result = counseling->deleteCounselor(mockId);
+  std::string result = counseling->deleteCounselor(mockId, "456");
   EXPECT_EQ(result, "Success");
 
   // Verify deletion by checking empty results

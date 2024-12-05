@@ -26,8 +26,8 @@ Hours of Operation
  * @brief Constructs a Counseling object.
  * @param dbManager Reference to the DatabaseManager object.
  */
-Counseling::Counseling(DatabaseManager& dbManager,
-                       const std::string& collection_name)
+Counseling::Counseling(DatabaseManager &dbManager,
+                       const std::string &collection_name)
     : dbManager(dbManager), collection_name(collection_name) {
   cols = std::vector<std::string>({"Name", "counselorName", "City", "Address",
                                    "Description", "ContactInfo",
@@ -46,9 +46,11 @@ void Counseling::cleanCache() {
  * @brief Validates the input format and extracts the ID if provided.
  * @param content The input JSON string containing counselor data.
  * @return The extracted ID as a string.
- * @throws std::invalid_argument If the input is missing required fields or contains invalid fields.
+ * @throws std::invalid_argument If the input is missing required fields or
+ * contains invalid fields.
  */
-std::string Counseling::checkInputFormat(std::string content) {
+std::string Counseling::checkInputFormat(std::string content,
+                                         std::string authToken) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
   for (auto element : resource.view()) {
@@ -64,6 +66,8 @@ std::string Counseling::checkInputFormat(std::string content) {
           "Counseling: The request with unrelative argument.");
     }
   }
+
+  format["authToken"] = authToken;
   for (auto property : format) {
     if (property.second == "") {
       cleanCache();
@@ -78,10 +82,11 @@ std::string Counseling::checkInputFormat(std::string content) {
  * @param request_body A JSON string containing the counselor data.
  * @return The ID of the newly added counselor or an error message.
  */
-std::string Counseling::addCounselor(std::string request_body) {
+std::string Counseling::addCounselor(std::string request_body,
+                                     std::string request_auth) {
   try {
     cleanCache();
-    checkInputFormat(request_body);
+    checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
@@ -109,8 +114,9 @@ std::vector<std::pair<std::string, std::string>> Counseling::createDBContent() {
  * @return "Success" if the operation succeeds.
  * @throws std::runtime_error If the specified document is not found.
  */
-std::string Counseling::deleteCounselor(const std::string &counselorId) {
-  if (dbManager.deleteResource(collection_name, counselorId)) {
+std::string Counseling::deleteCounselor(const std::string &counselorId,
+                                        std::string request_auth) {
+  if (dbManager.deleteResource(collection_name, counselorId, request_auth)) {
     return "Success";
   }
   throw std::runtime_error(
@@ -139,10 +145,11 @@ std::string Counseling::searchCounselorsAll(int start) {
  * @param request_body A JSON string containing updated counselor data.
  * @return "Success" if the update succeeds or an error message.
  */
-std::string Counseling::updateCounselor(std::string request_body) {
+std::string Counseling::updateCounselor(std::string request_body,
+                                        std::string request_auth) {
   try {
     cleanCache();
-    std::string id = checkInputFormat(request_body);
+    std::string id = checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception &e) {

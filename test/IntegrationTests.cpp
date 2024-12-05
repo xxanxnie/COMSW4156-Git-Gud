@@ -9,8 +9,10 @@
 // For GET endpoints (getall), use HML token:
 inline std::string getValidTokenForGet() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
-         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
+         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3M"
+         "z"
+         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI"
+         "2"
          "NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
          "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
 }
@@ -18,8 +20,10 @@ inline std::string getValidTokenForGet() {
 // For POST endpoints, use NGO token:
 inline std::string getValidTokenForPost() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
-         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
+         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczM"
+         "j"
+         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY"
+         "3"
          "NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-"
          "j2q6qgA7pOYolwc";
 }
@@ -126,7 +130,7 @@ TEST_F(IntegrationTest, TestUpdateHealthcareService) {
   "ContactInfo": "987-654-3210"
 })";
 
-  std::string id = healthcare->addHealthcareService(initialBody);
+  std::string id = healthcare->addHealthcareService(initialBody, "456");
 
   std::string updateBody = R"({
   "id": ")" + id + R"(",
@@ -170,7 +174,8 @@ TEST_F(IntegrationTest, TestDeleteHealthcareService) {
   "ContactInfo": "123-123-1234"
 })";
 
-  std::string id = healthcare->addHealthcareService(body);
+  std::string id = healthcare->addHealthcareService(
+      body, "Bearer " + getValidTokenForPost());
 
   std::string deleteBody = R"({"id": ")" + id + R"("})";
 
@@ -211,8 +216,8 @@ TEST_F(IntegrationTest, TestGetAllHealthcareServices) {
   "ContactInfo": "222-222-2222"
 })";
 
-  healthcare->addHealthcareService(body1);
-  healthcare->addHealthcareService(body2);
+  healthcare->addHealthcareService(body1, "456");
+  healthcare->addHealthcareService(body2, "456");
 
   crow::request req;
   req.add_header("Authorization", "Bearer " + getValidTokenForGet());

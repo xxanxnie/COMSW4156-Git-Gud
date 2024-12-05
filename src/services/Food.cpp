@@ -48,7 +48,7 @@ void Food::cleanCache() {
  * @throws std::invalid_argument If the input is empty, missing required fields,
  * or contains invalid data.
  */
-std::string Food::checkInputFormat(std::string content) {
+std::string Food::checkInputFormat(std::string content, std::string authToken) {
   if (content.empty()) {
     throw std::invalid_argument("Invalid input: Request body cannot be empty.");
   }
@@ -70,6 +70,8 @@ std::string Food::checkInputFormat(std::string content) {
   if (capacity <= 0) {
     throw std::invalid_argument("The request with invalid argument.");
   }
+
+  format["authToken"] = authToken;
   for (auto property : format) {
     if (property.second == "") {
       throw std::invalid_argument("The request missing some properties.");
@@ -110,10 +112,10 @@ std::vector<std::pair<std::string, std::string>> Food::createDBContent() {
  * @exception std::exception Throws if an error occurs during the database
  * insertion.
  */
-std::string Food::addFood(std::string request_body) {
+std::string Food::addFood(std::string request_body, std::string request_auth) {
   try {
     cleanCache();
-    checkInputFormat(request_body);
+    checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     std::string ID = db.insertResource("Food", content_new);
     return ID;
@@ -135,8 +137,8 @@ std::string Food::addFood(std::string request_body) {
  * @throws std::runtime_error If the specified document is not found in the
  * database.
  */
-std::string Food::deleteFood(const std::string& id) {
-  if (db.deleteResource("Food", id)) {
+std::string Food::deleteFood(const std::string& id, std::string request_auth) {
+  if (db.deleteResource("Food", id, request_auth)) {
     return "SUC";
   }
   throw std::runtime_error("Food Document with the specified _id not found.");
@@ -186,10 +188,11 @@ std::string Food::getAllFood(int start) {
  *
  * @throws std::exception If an error occurs during database update.
  */
-std::string Food::updateFood(std::string request_body) {
+std::string Food::updateFood(std::string request_body,
+                             std::string request_auth) {
   try {
     cleanCache();
-    std::string id = checkInputFormat(request_body);
+    std::string id = checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     db.updateResource("Food", id, content_new);
     return "Success";

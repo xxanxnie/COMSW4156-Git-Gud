@@ -16,10 +16,14 @@ class MockShelter : public Shelter {
   explicit MockShelter(DatabaseManager* dbManager)
       : Shelter(*dbManager, "ShelterTest") {}
 
-  MOCK_METHOD(std::string, addShelter, (std::string request_body), (override));
-  MOCK_METHOD(std::string, deleteShelter, (std::string id), (override));
+  MOCK_METHOD(std::string, addShelter,
+              (std::string request_body, (std::string request_auth)),
+              (override));
+  MOCK_METHOD(std::string, deleteShelter,
+              (std::string id, (std::string request_auth)), (override));
   MOCK_METHOD(std::string, searchShelterAll, (int start), (override));
-  MOCK_METHOD(std::string, updateShelter, (std::string request_body),
+  MOCK_METHOD(std::string, updateShelter,
+              (std::string request_body, (std::string request_auth)),
               (override));
 };
 
@@ -29,12 +33,15 @@ class MockCounseling : public Counseling {
                           const std::string& collection_name)
       : Counseling(*dbManager, "CounselingTests") {}
 
-  MOCK_METHOD(std::string, addCounselor, (std::string request_body),
+  MOCK_METHOD(std::string, addCounselor,
+              (std::string request_body, (std::string request_auth)),
               (override));
-  MOCK_METHOD(std::string, deleteCounselor, (const std::string& counselorId),
+  MOCK_METHOD(std::string, deleteCounselor,
+              (const std::string& counselorId, (std::string request_auth)),
               (override));
   MOCK_METHOD(std::string, searchCounselorsAll, (int start), (override));
-  MOCK_METHOD(std::string, updateCounselor, (std::string request_body),
+  MOCK_METHOD(std::string, updateCounselor,
+              (std::string request_body, (std::string request_auth)),
               (override));
 };
 
@@ -43,11 +50,16 @@ class MockFood : public Food {
   explicit MockFood(DatabaseManager* db, const std::string& collection_name)
       : Food(*db, "FoodTests") {}
 
-  MOCK_METHOD(std::string, addFood, ((std::string request_body)), (override));
-  MOCK_METHOD(std::string, getAllFood, (int start), (override));
-  MOCK_METHOD(std::string, deleteFood, (const std::string& counselorId),
+  MOCK_METHOD(std::string, addFood,
+              ((std::string request_body), (std::string request_auth)),
               (override));
-  MOCK_METHOD(std::string, updateFood, (std::string request_body), (override));
+  MOCK_METHOD(std::string, getAllFood, (int start), (override));
+  MOCK_METHOD(std::string, deleteFood,
+              (const std::string& counselorId, (std::string request_auth)),
+              (override));
+  MOCK_METHOD(std::string, updateFood,
+              (std::string request_body, (std::string request_auth)),
+              (override));
 };
 
 class MockOutreachService : public Outreach {
@@ -56,12 +68,15 @@ class MockOutreachService : public Outreach {
                       const std::string& collection_name)
       : Outreach(*dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addOutreachService, (std::string request_body),
+  MOCK_METHOD(std::string, addOutreachService,
+              (std::string request_body, (std::string request_auth)),
               (override));
   MOCK_METHOD(std::string, getAllOutreachServices, (int start), (override));
-  MOCK_METHOD(std::string, deleteOutreach, (std::string counselorId),
+  MOCK_METHOD(std::string, deleteOutreach,
+              (std::string counselorId, (std::string request_auth)),
               (override));
-  MOCK_METHOD(std::string, updateOutreach, (std::string request_body),
+  MOCK_METHOD(std::string, updateOutreach,
+              (std::string request_body, (std::string request_auth)),
               (override));
 };
 
@@ -71,14 +86,19 @@ class MockHealthcareService : public Healthcare {
                         const std::string& collection_name)
       : Healthcare(*dbManager, collection_name) {}
 
-  MOCK_METHOD(std::string, addHealthcareService, ((std::string request_body)),
+  // Mock methods
+  MOCK_METHOD(std::string, addHealthcareService,
+              ((const std::string request_body),
+               (const std::string request_auth)),
               (override));
   MOCK_METHOD(std::string, getAllHealthcareServices, (int start), (override));
-
-  MOCK_METHOD(std::string, updateHealthcare, (std::string request_body),
+  MOCK_METHOD(std::string, updateHealthcare,
+              ((const std::string request_body),
+               (const std::string request_auth)),
               (override));
-
-  MOCK_METHOD(std::string, deleteHealthcare, ((std::string)), (override));
+  MOCK_METHOD(std::string, deleteHealthcare,
+              ((const std::string id), (const std::string request_auth)),
+              (override));
 };
 
 class MockAuthService : public AuthService {
@@ -146,8 +166,10 @@ class RouteControllerUnitTests : public ::testing::Test {
 // For GET endpoints (getall), use HML token:
 inline std::string getValidTokenForGet() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3Mz"
-         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI2"
+         "eyJlbWFpbCI6ImFkYWFAZ21haWwuY29tIiwiZXhwIjoyNTk2NjgwMDI3LCJpYXQiOjE3M"
+         "z"
+         "I2ODAwMjcsImlzcyI6ImF1dGgtc2VydmljZSIsInJvbGUiOiJITUwiLCJ1c2VySWQiOiI"
+         "2"
          "NzQ2OTk1YjFiZmFiODQ2NDEwNjZjNjMifQ."
          "N0l6jhy5WfHEQCqq82OMPsoSPFobNMlyEHQ0M3Qo87A";
 }
@@ -155,8 +177,10 @@ inline std::string getValidTokenForGet() {
 // For POST endpoints, use NGO token:
 inline std::string getValidTokenForPost() {
   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9."
-         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczMj"
-         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY3"
+         "eyJlbWFpbCI6ImFkYUBnbWFpbC5jb20iLCJleHAiOjI1OTY2Nzk5OTAsImlhdCI6MTczM"
+         "j"
+         "Y3OTk5MCwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwicm9sZSI6Ik5HTyIsInVzZXJJZCI6IjY"
+         "3"
          "NDY5OTM2MWJmYWI4NDY0MTA2NmM2MiJ9.HrxegAGsSbQqX8h1m3F-o8fkuf4-"
          "j2q6qgA7pOYolwc";
 }
@@ -189,13 +213,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestAuthorized) {
   req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   crow::response res{};
 
-  ON_CALL(*mockShelter,
-          addShelter(
-              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
-              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
-              "\"66664566565\",\"HoursOfOperation\": "
-              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
+  ON_CALL(*mockShelter, addShelter(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);
@@ -230,13 +248,7 @@ TEST_F(RouteControllerUnitTests, AddShelterTestUnauthorized) {
   req.add_header("Authorization", "Bearer invalid.token.here");
   crow::response res{};
 
-  ON_CALL(*mockShelter,
-          addShelter(
-              "{\"Name\" : \"temp\",\"City\" : \"New York\",\"Address\": "
-              "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
-              "\"66664566565\",\"HoursOfOperation\": "
-              "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-              ":\"homeless\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}"))
+  ON_CALL(*mockShelter, addShelter(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addShelter(req, res);
@@ -253,7 +265,8 @@ TEST_F(RouteControllerUnitTests, DeleteShelterTestAuthorized) {
 
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockShelter, deleteShelter(id))
+  ON_CALL(*mockShelter,
+          deleteShelter(id, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Shelter resource deleted successfully."));
 
@@ -282,7 +295,8 @@ TEST_F(RouteControllerUnitTests, UpdateShelterTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockShelter, updateShelter(body))
+  ON_CALL(*mockShelter,
+          updateShelter(body, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Shelter resource updated successfully."));
 
@@ -321,7 +335,8 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestAuthorized) {
   req.add_header("Authorization", "Bearer " + getValidTokenForPost());
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor(body))
+  ON_CALL(*mockCounseling,
+          addCounselor(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Suc"));
 
   routeController->addCounseling(req, res);
@@ -358,7 +373,8 @@ TEST_F(RouteControllerUnitTests, AddCounselingTestUnauthorized) {
   req.add_header("Authorization", "Bearer invalid.token.here");
   crow::response res{};
 
-  ON_CALL(*mockCounseling, addCounselor(body))
+  ON_CALL(*mockCounseling,
+          addCounselor(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addCounseling(req, res);
@@ -375,7 +391,8 @@ TEST_F(RouteControllerUnitTests, DeleteCounselingTestAuthorized) {
 
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockCounseling, deleteCounselor(id))
+  ON_CALL(*mockCounseling,
+          deleteCounselor(id, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Counseling resource deleted successfully."));
 
@@ -404,7 +421,8 @@ TEST_F(RouteControllerUnitTests, UpdateCounselingTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockCounseling, updateCounselor(body))
+  ON_CALL(*mockCounseling,
+          updateCounselor(body, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Counseling resource updated successfully."));
 
@@ -446,7 +464,7 @@ TEST_F(RouteControllerUnitTests, AddFoodTest) {
       "\"quantity\": \"100\", "
       "\"expirationDate\": \"2024-12-31\"}";
 
-  ON_CALL(*mockFood, addFood(::testing::_))
+  ON_CALL(*mockFood, addFood(req.body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addFood(req, res);
@@ -486,7 +504,8 @@ TEST_F(RouteControllerUnitTests, AddFoodTestUnauthorized) {
   req.add_header("Authorization", "Bearer invalid.token.here");
   crow::response res{};
 
-  ON_CALL(*mockFood, addFood(input)).WillByDefault(::testing::Return("12345"));
+  ON_CALL(*mockFood, addFood(input, req.get_header_value("Authorization")))
+      .WillByDefault(::testing::Return("12345"));
 
   routeController->addFood(req, res);
 
@@ -502,7 +521,7 @@ TEST_F(RouteControllerUnitTests, DeleteFoodTestAuthorized) {
 
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockFood, deleteFood(id))
+  ON_CALL(*mockFood, deleteFood(id, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Food resource deleted successfully."));
 
   routeController->deleteFood(req, res);
@@ -530,7 +549,7 @@ TEST_F(RouteControllerUnitTests, UpdateFoodTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockFood, updateFood(body))
+  ON_CALL(*mockFood, updateFood(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Food resource updated successfully."));
 
   routeController->updateFood(req, res);
@@ -568,7 +587,8 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService(body))
+  ON_CALL(*mockOutreach,
+          addOutreachService(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);
@@ -607,7 +627,8 @@ TEST_F(RouteControllerUnitTests, AddOutreachServiceTestUnauthorized) {
   req.add_header("Authorization", "Bearer invalid.token.here");
   crow::response res{};
 
-  ON_CALL(*mockOutreach, addOutreachService(body))
+  ON_CALL(*mockOutreach,
+          addOutreachService(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addOutreachService(req, res);
@@ -624,7 +645,8 @@ TEST_F(RouteControllerUnitTests, DeleteOutreachServiceTestAuthorized) {
 
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockOutreach, deleteOutreach(id))
+  ON_CALL(*mockOutreach,
+          deleteOutreach(id, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Outreach resource deleted successfully."));
 
@@ -653,7 +675,8 @@ TEST_F(RouteControllerUnitTests, UpdateOutreachTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockOutreach, updateOutreach(body))
+  ON_CALL(*mockOutreach,
+          updateOutreach(body, req.get_header_value("Authorization")))
       .WillByDefault(
           ::testing::Return("Outreach resource update successfully."));
 
@@ -692,7 +715,8 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestAuthorized) {
   req.body = body;
   crow::response res{};
 
-  ON_CALL(*mockHealthcare, addHealthcareService(body))
+  ON_CALL(*mockHealthcare,
+          addHealthcareService(body, req.get_header_value("Authorization")))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
@@ -729,7 +753,7 @@ TEST_F(RouteControllerUnitTests, AddHealthcareServiceTestUnauthorized) {
   req.add_header("Authorization", "Bearer invalid.token.here");
   crow::response res{};
 
-  ON_CALL(*mockHealthcare, addHealthcareService(body))
+  ON_CALL(*mockHealthcare, addHealthcareService(body, "456"))
       .WillByDefault(::testing::Return("Success"));
 
   routeController->addHealthcareService(req, res);
@@ -761,7 +785,7 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestAuthorized) {
       {"operatingHours", "24/7"},    {"contactInfo", "987-654-3210"}};
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockHealthcare, updateHealthcare(body))
+  ON_CALL(*mockHealthcare, updateHealthcare(body, "456"))
       .WillByDefault(
           ::testing::Return("Healthcare resource update successfully."));
 
@@ -788,15 +812,21 @@ TEST_F(RouteControllerUnitTests, UpdateHealthcareServiceTestUnauthorized) {
 TEST_F(RouteControllerUnitTests, DeleteHealthcareServiceTestAuthorized) {
   std::string body = R"({"id": "507f191e810c19729de860ea"})";
   crow::request req;
-  req.add_header("Authorization", "Bearer " + getValidTokenForPost());
+
+  // Add the Authorization header with "Bearer " prefix
+  std::string fullToken = "Bearer " + getValidTokenForPost();
+  req.add_header("Authorization", fullToken);
   req.body = body;
   crow::response res{};
 
   std::string id = "507f191e810c19729de860ea";
 
-  ON_CALL(*mockHealthcare, deleteHealthcare(id))
-      .WillByDefault(
-          ::testing::Return("Healthcare record deleted successfully."));
+  // Strip "Bearer " part to match the expected valid token
+  std::string validToken = getValidTokenForPost();
+
+  EXPECT_CALL(*mockHealthcare, deleteHealthcare(id, fullToken))
+      .Times(1)
+      .WillOnce(::testing::Return("Healthcare record deleted successfully."));
 
   routeController->deleteHealthcareService(req, res);
 

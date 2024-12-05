@@ -28,7 +28,8 @@ TEST_F(ShelterUnitTests, AddNewShelter) {
       "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
       "\"66664566565\",\"HoursOfOperation\": "
       "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}");
+      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}",
+      "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       shelter->createDBContent();
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
@@ -44,7 +45,8 @@ TEST_F(ShelterUnitTests, AddNewShelter) {
       "\"temp\",\"Description\" : \"NULL\",\"ContactInfo\" : "
       "\"66664566565\",\"HoursOfOperation\": "
       "\"2024-01-11\",\"ORG\":\"NGO\",\"TargetUser\" "
-      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}");
+      ":\"HML\",\"Capacity\" : \"100\",\"CurrentUse\": \"10\"}",
+      "456");
   EXPECT_EQ(ret, "12345");
 }
 
@@ -78,7 +80,8 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
         "HoursOfOperation" : "2024-01-11", 
         "ContactInfo" : "66664566565", "Description" : "NULL", 
         "Address" : "temp", "City" : "New York", "Name" : "temp"
-        })");
+        })",
+                            "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       shelter->createDBContent();
   std::string id_temp = "123456789";
@@ -99,19 +102,22 @@ TEST_F(ShelterUnitTests, UpdateShelter) {
         "HoursOfOperation" : "2024-01-11", 
         "ContactInfo" : "66664566565", "Description" : "NULL", 
         "Address" : "temp", "City" : "New York", "Name" : "temp"
-        })");
+        })",
+      "456");
   EXPECT_EQ(ret, "Update");
 }
 
 TEST_F(ShelterUnitTests, DeleteShelter) {
   std::string id_temp = "123456789";
-  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
-                         const std::string& resourceId) {
+                         const std::string& resourceId,
+                         const std::string& authToken) {
         EXPECT_EQ(resourceId, id_temp);
         EXPECT_EQ(collectionName, "ShelterTest");
         return 1;
       });
-  std::string ret = shelter->deleteShelter(id_temp);
+  std::string ret = shelter->deleteShelter(id_temp, "456");
   EXPECT_EQ(ret, "SUC");
 }

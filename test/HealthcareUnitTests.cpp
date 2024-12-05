@@ -61,7 +61,7 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
 })";
 
   // for comparison in mock call
-  healthcareService->checkInputFormat(input);
+  healthcareService->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       healthcareService->createDBContent();
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
@@ -73,7 +73,7 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
             return "12345";
           }));
 
-  std::string result = healthcareService->addHealthcareService(input);
+  std::string result = healthcareService->addHealthcareService(input, "456");
 
   EXPECT_EQ(result, "12345");
 }
@@ -81,15 +81,17 @@ TEST_F(HealthcareServiceUnitTests, AddNewHealthcareService) {
 TEST_F(HealthcareServiceUnitTests, DeleteHealthcare) {
   std::string mockId = "123";
 
-  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
-                         const std::string& resourceId) -> bool {
+                         const std::string& resourceId,
+                         const std::string& authToken) -> bool {
         EXPECT_EQ(resourceId, mockId);
         EXPECT_EQ(collectionName, "HealthcareTest");
         return true;
       });
 
-  std::string result = healthcareService->deleteHealthcare(mockId);
+  std::string result = healthcareService->deleteHealthcare(mockId, "");
   EXPECT_EQ(result, "Healthcare record deleted successfully.");
 
   std::vector<bsoncxx::document::value> mockResult;
@@ -113,7 +115,7 @@ TEST_F(HealthcareServiceUnitTests, UpdateHealthcare) {
   "eligibilityCriteria": "Adults",
   "ContactInfo": "123-456-7890"
 })";
-  healthcareService->checkInputFormat(input);
+  healthcareService->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       healthcareService->createDBContent();
   ON_CALL(*mockDbManager,
@@ -128,7 +130,7 @@ TEST_F(HealthcareServiceUnitTests, UpdateHealthcare) {
             return true;
           });
 
-  std::string result = healthcareService->updateHealthcare(input);
+  std::string result = healthcareService->updateHealthcare(input, "456");
   EXPECT_EQ(result, "Update");
 
   std::vector<bsoncxx::document::value> mockResult;

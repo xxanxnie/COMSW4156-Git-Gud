@@ -17,15 +17,15 @@ class Food {
  public:
   Food(DatabaseManager& db, const std::string& collection_name);
   void cleanCache();
-  std::string checkInputFormat(std::string content);
+  std::string checkInputFormat(std::string content, std::string request_auth);
   std::unordered_map<std::string, std::string> format;
-  virtual std::string addFood(std::string request_body);
+  virtual std::string addFood(std::string request_body, std::string request_auth);
   std::vector<std::pair<std::string, std::string>> createDBContent();
   virtual std::string getAllFood(int start = 0);
 
-  virtual std::string updateFood(std::string request_body);
+  virtual std::string updateFood(std::string request_body, std::string request_auth);
 
-  virtual std::string deleteFood(const std::string& id);
+  virtual std::string deleteFood(const std::string& id, std::string request_auth);
 };
 
 #endif

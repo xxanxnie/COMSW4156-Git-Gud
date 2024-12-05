@@ -38,8 +38,16 @@ void DatabaseManager::findCollection(
     std::vector<bsoncxx::document::value> &result) {
   auto collection = (*conn)["GitGud"][collectionName];
   mongocxx::options::find options;
-  options.limit(20);    // Limit results to 20 documents
-  options.skip(start);  // Skip the first 10 documents
+  options.limit(20);  // Limit results to 20 documents
+  options.skip(start);
+
+  std::string excludeField = "authToken";
+  bsoncxx::builder::stream::document projectionBuilder;
+  projectionBuilder << excludeField
+                    << 0;  // Exclude the field by setting it to 0
+  options.projection(projectionBuilder.view());
+
+  // Perform the query
   auto cursor = collection.find(createDocument(keyValues).view(), options);
 
   for (auto &&doc : cursor) {
@@ -70,20 +78,39 @@ std::string DatabaseManager::insertResource(
 }
 
 bool DatabaseManager::deleteResource(const std::string &collectionName,
-                                     const std::string &resourceId) {
+                                     const std::string &resourceId,
+                                     const std::string &authToken) {
   auto collection = (*conn)["GitGud"][collectionName];
 
+  // Build the filter to find the document by _id
   bsoncxx::builder::stream::document filter_builder;
   bsoncxx::oid oid(resourceId);
   filter_builder << "_id" << oid;
 
+  // Retrieve the document first
+  auto document = collection.find_one(filter_builder.view());
+  if (!document) {
+    std::cout << "No document found with the given _id.\n";
+    return false;
+  }
+
+  // Check if the document contains the expected auth token
+  auto doc_view = document->view();
+  auto auth_field = doc_view["authToken"];
+  if (!auth_field || std::string(auth_field.get_utf8().value) != authToken) {
+    std::cout << "Invalid permissions: auth token mismatch.\n";
+    return false;
+  }
+
+  // Proceed with deletion if the auth token matches
   auto result = collection.delete_one(filter_builder.view());
   if (result && result->deleted_count() > 0) {
     std::cout << "Document deleted successfully.\n";
-    return 1;
+    return true;
   } else {
-    std::cout << "No document found with the given _id.\n";
-    return 0;
+    std::cout
+        << "Failed to delete document. It might have already been deleted.\n";
+    return false;
   }
 }
 
@@ -108,7 +135,8 @@ void DatabaseManager::updateResource(
                                    << "_id" << oid
                                    << bsoncxx::builder::stream::finalize);
   if (!check) {
-    throw std::invalid_argument("The request with wrong id.");
+    throw std::invalid_argument(
+        "The request with wrong id or invalid permissions.");
   }
   auto result = collection.update_one(bsoncxx::builder::stream::document{}
                                           << "_id" << oid

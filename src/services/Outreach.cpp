@@ -13,11 +13,13 @@ Hours of Operation
 
 /**
  * @brief Constructs an Outreach object.
- * 
- * Initializes the Outreach object with a reference to the database manager and the collection name.
- * 
+ *
+ * Initializes the Outreach object with a reference to the database manager and
+ * the collection name.
+ *
  * @param dbManager A reference to the DatabaseManager for database operations.
- * @param collection_name The name of the collection where outreach services are stored.
+ * @param collection_name The name of the collection where outreach services are
+ * stored.
  */
 Outreach::Outreach(DatabaseManager& dbManager,
                    const std::string& collection_name)
@@ -29,7 +31,7 @@ Outreach::Outreach(DatabaseManager& dbManager,
 }
 /**
  * @brief Clears the internal cache.
- * 
+ *
  * Resets all properties to empty strings in preparation for new input.
  */
 void Outreach::cleanCache() {
@@ -39,16 +41,20 @@ void Outreach::cleanCache() {
 }
 /**
  * @brief Validates and parses the input JSON string for an outreach service.
- * 
- * Ensures all required fields are present and valid. Extracts the ID if provided.
- * 
+ *
+ * Ensures all required fields are present and valid. Extracts the ID if
+ * provided.
+ *
  * @param content A JSON string containing the outreach service data.
- * 
- * @return The extracted ID as a string, or an empty string if no ID is provided.
- * 
- * @throws std::invalid_argument If required fields are missing or unexpected fields are present.
+ *
+ * @return The extracted ID as a string, or an empty string if no ID is
+ * provided.
+ *
+ * @throws std::invalid_argument If required fields are missing or unexpected
+ * fields are present.
  */
-std::string Outreach::checkInputFormat(std::string content) {
+std::string Outreach::checkInputFormat(std::string content,
+                                       std::string authToken) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
   for (auto element : resource.view()) {
@@ -64,6 +70,8 @@ std::string Outreach::checkInputFormat(std::string content) {
           "Outreach: The request with unrelative argument.");
     }
   }
+
+  format["authToken"] = authToken;
   for (auto property : format) {
     if (property.second == "") {
       cleanCache();
@@ -75,15 +83,17 @@ std::string Outreach::checkInputFormat(std::string content) {
 }
 /**
  * @brief Adds a new outreach service to the database.
- * 
+ *
  * @param request_body A JSON string containing the outreach service data.
- * 
- * @return The ID of the newly added outreach service, or an error message if the operation fails.
+ *
+ * @return The ID of the newly added outreach service, or an error message if
+ * the operation fails.
  */
-std::string Outreach::addOutreachService(std::string request_body) {
+std::string Outreach::addOutreachService(std::string request_body,
+                                         std::string request_auth) {
   try {
     cleanCache();
-    checkInputFormat(request_body);
+    checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
@@ -94,8 +104,9 @@ std::string Outreach::addOutreachService(std::string request_body) {
 }
 
 /**
- * @brief Formats the outreach service data into key-value pairs for database storage.
- * 
+ * @brief Formats the outreach service data into key-value pairs for database
+ * storage.
+ *
  * @return A vector of key-value pairs representing the outreach service data.
  */
 std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
@@ -108,19 +119,21 @@ std::vector<std::pair<std::string, std::string>> Outreach::createDBContent() {
 
 /**
  * @brief Retrieves all outreach services from the database.
- * 
- * Queries the database and retrieves all documents in the outreach services collection.
- * 
+ *
+ * Queries the database and retrieves all documents in the outreach services
+ * collection.
+ *
  * @param start The starting index for pagination.
- * 
- * @return A JSON string containing all outreach services, or an empty array ("[]") if none are found.
+ *
+ * @return A JSON string containing all outreach services, or an empty array
+ * ("[]") if none are found.
  */
 std::string Outreach::getAllOutreachServices(int start) {
   std::vector<bsoncxx::document::value> result;
   dbManager.findCollection(start, collection_name, {}, result);
   if (result.size() > 0) {
     bsoncxx::builder::basic::array arrayBuilder;
-    for (const auto &doc : result) {
+    for (const auto& doc : result) {
       arrayBuilder.append(doc.view());
     }
     std::cout << printOutreachServices(result);
@@ -132,9 +145,10 @@ std::string Outreach::getAllOutreachServices(int start) {
 
 /**
  * @brief Converts a list of outreach services into a human-readable format.
- * 
- * @param services A vector of BSON documents representing the outreach services.
- * 
+ *
+ * @param services A vector of BSON documents representing the outreach
+ * services.
+ *
  * @return A formatted string containing the details of all outreach services.
  */
 std::string Outreach::printOutreachServices(
@@ -153,30 +167,33 @@ std::string Outreach::printOutreachServices(
 }
 /**
  * @brief Deletes an outreach service from the database.
- * 
+ *
  * @param id The ID of the outreach service to delete.
- * 
+ *
  * @return A success message if the deletion is successful.
- * 
+ *
  * @throws std::runtime_error If the specified outreach service is not found.
  */
-std::string Outreach::deleteOutreach(std::string id) {
-  if (dbManager.deleteResource(collection_name, id)) {
+std::string Outreach::deleteOutreach(std::string id, std::string request_auth) {
+  if (dbManager.deleteResource(collection_name, id, request_auth)) {
     return "Outreach Service deleted successfully.";
   }
   throw std::runtime_error("Document with the specified _id not found.");
 }
 /**
  * @brief Updates an existing outreach service in the database.
- * 
- * @param request_body A JSON string containing the updated outreach service data.
- * 
- * @return A success message if the operation is successful, or an error message if it fails.
+ *
+ * @param request_body A JSON string containing the updated outreach service
+ * data.
+ *
+ * @return A success message if the operation is successful, or an error message
+ * if it fails.
  */
-std::string Outreach::updateOutreach(std::string request_body) {
+std::string Outreach::updateOutreach(std::string request_body,
+                                     std::string request_auth) {
   try {
     cleanCache();
-    std::string id = checkInputFormat(request_body);
+    std::string id = checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception& e) {

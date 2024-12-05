@@ -80,7 +80,7 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
     "HoursOfOperation":"05/01/24 - 12/31/24",
     "TargetAudience":"HML"
 })";
-  outreachService->checkInputFormat(input);
+  outreachService->checkInputFormat(input, "456");
 
   std::vector<std::pair<std::string, std::string>> expectedContent =
       outreachService->createDBContent();
@@ -94,7 +94,7 @@ TEST_F(OutreachServiceUnitTests, AddNewOutreachService) {
             return "12345";
           }));
 
-  std::string result = outreachService->addOutreachService(input);
+  std::string result = outreachService->addOutreachService(input, "456");
 
   EXPECT_EQ(result, "12345");
 }
@@ -110,7 +110,7 @@ TEST_F(OutreachServiceUnitTests, UpdateOutreach) {
     "HoursOfOperation":"05/01/24 - 12/31/24",
     "TargetAudience":"HML"
 })";
-  outreachService->checkInputFormat(input);
+  outreachService->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       outreachService->createDBContent();
   std::string id_temp = "123456789";
@@ -123,19 +123,21 @@ TEST_F(OutreachServiceUnitTests, UpdateOutreach) {
             EXPECT_EQ(collectionName, "Outreach");
             EXPECT_EQ(content, expectedContent);
           });
-  std::string ret = outreachService->updateOutreach(input);
+  std::string ret = outreachService->updateOutreach(input, "456");
   EXPECT_EQ(ret, "Outreach Service updated successfully.");
 }
 
 TEST_F(OutreachServiceUnitTests, DeleteOutreach) {
   std::string id_temp = "123456789";
-  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
-                         const std::string& resourceId) {
+                         const std::string& resourceId,
+                         const std::string& authToken) {
         EXPECT_EQ(resourceId, id_temp);
         EXPECT_EQ(collectionName, "Outreach");
         return 1;
       });
-  std::string ret = outreachService->deleteOutreach(id_temp);
+  std::string ret = outreachService->deleteOutreach(id_temp, "456");
   EXPECT_EQ(ret, "Outreach Service deleted successfully.");
 }

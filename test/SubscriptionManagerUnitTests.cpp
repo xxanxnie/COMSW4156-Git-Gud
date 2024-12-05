@@ -49,7 +49,7 @@ TEST_F(SubscriptionManagerUnitTests, AddSubscriber) {
 TEST_F(SubscriptionManagerUnitTests, DeleteSubscriber_Success) {
   std::string subscriberId = "12345";
 
-  ON_CALL(*mockDbManager, deleteResource("Subscribers", subscriberId))
+  ON_CALL(*mockDbManager, deleteResource("Subscribers", subscriberId, ""))
       .WillByDefault(::testing::Return(true));
 
   std::string result = subscriptionManager->deleteSubscriber(subscriberId);
@@ -60,7 +60,7 @@ TEST_F(SubscriptionManagerUnitTests, DeleteSubscriber_Success) {
 TEST_F(SubscriptionManagerUnitTests, DeleteSubscriber_NotFound) {
   std::string subscriberId = "12345";
 
-  ON_CALL(*mockDbManager, deleteResource("Subscribers", subscriberId))
+  ON_CALL(*mockDbManager, deleteResource("Subscribers", subscriberId, ""))
       .WillByDefault(::testing::Return(false));
 
   std::string result = subscriptionManager->deleteSubscriber(subscriberId);
