@@ -22,9 +22,11 @@ Hours of Operation
 
 /**
  * @brief Constructs a Healthcare object.
- * 
- * @param dbManager A reference to the DatabaseManager object for database operations.
- * @param collection_name The name of the collection where healthcare services are stored.
+ *
+ * @param dbManager A reference to the DatabaseManager object for database
+ * operations.
+ * @param collection_name The name of the collection where healthcare services
+ * are stored.
  */
 Healthcare::Healthcare(DatabaseManager& dbManager,
                        const std::string& collection_name)
@@ -35,7 +37,8 @@ Healthcare::Healthcare(DatabaseManager& dbManager,
   cleanCache();
 }
 /**
- * @brief Clears the internal cache by resetting all properties to empty strings.
+ * @brief Clears the internal cache by resetting all properties to empty
+ * strings.
  */
 void Healthcare::cleanCache() {
   for (auto name : cols) {
@@ -44,17 +47,20 @@ void Healthcare::cleanCache() {
 }
 /**
  * @brief Validates and parses the input JSON string for a healthcare service.
- * 
- * Checks the input JSON string to ensure all required fields are present and valid. 
- * Extracts the ID if provided.
- * 
+ *
+ * Checks the input JSON string to ensure all required fields are present and
+ * valid. Extracts the ID if provided.
+ *
  * @param content A JSON string containing the healthcare service data.
- * 
- * @return The extracted ID as a string, or an empty string if no ID is provided.
- * 
- * @throws std::invalid_argument If required fields are missing or unexpected fields are present.
+ *
+ * @return The extracted ID as a string, or an empty string if no ID is
+ * provided.
+ *
+ * @throws std::invalid_argument If required fields are missing or unexpected
+ * fields are present.
  */
-std::string Healthcare::checkInputFormat(std::string content) {
+std::string Healthcare::checkInputFormat(std::string content,
+                                         std::string authToken) {
   auto resource = bsoncxx::from_json(content);
   std::string id;
   for (auto element : resource.view()) {
@@ -71,6 +77,7 @@ std::string Healthcare::checkInputFormat(std::string content) {
     }
   }
 
+  format["authToken"] = authToken;
   for (auto property : format) {
     if (property.second == "") {
       cleanCache();
@@ -82,15 +89,17 @@ std::string Healthcare::checkInputFormat(std::string content) {
 }
 /**
  * @brief Adds a new healthcare service to the database.
- * 
+ *
  * @param request_body A JSON string containing the healthcare service data.
- * 
- * @return The ID of the newly added healthcare service, or an error message if the operation fails.
+ *
+ * @return The ID of the newly added healthcare service, or an error message if
+ * the operation fails.
  */
-std::string Healthcare::addHealthcareService(std::string request_body) {
+std::string Healthcare::addHealthcareService(std::string request_body,
+                                             std::string request_auth) {
   try {
     cleanCache();
-    checkInputFormat(request_body);
+    checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     std::string ID = dbManager.insertResource(collection_name, content_new);
     return ID;
@@ -101,8 +110,9 @@ std::string Healthcare::addHealthcareService(std::string request_body) {
 }
 
 /**
- * @brief Converts the healthcare service data into key-value pairs for database storage.
- * 
+ * @brief Converts the healthcare service data into key-value pairs for database
+ * storage.
+ *
  * @return A vector of key-value pairs representing the healthcare service.
  */
 std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
@@ -115,12 +125,14 @@ std::vector<std::pair<std::string, std::string>> Healthcare::createDBContent() {
 
 /**
  * @brief Retrieves all healthcare services from the database.
- * 
- * Queries the database for all documents in the healthcare services collection and returns them in JSON format.
- * 
+ *
+ * Queries the database for all documents in the healthcare services collection
+ * and returns them in JSON format.
+ *
  * @param start The starting index for pagination.
- * 
- * @return A JSON string containing all healthcare services, or an empty array ("[]") if none are found.
+ *
+ * @return A JSON string containing all healthcare services, or an empty array
+ * ("[]") if none are found.
  */
 std::string Healthcare::getAllHealthcareServices(int start) {
   std::vector<bsoncxx::document::value> result;
@@ -137,15 +149,18 @@ std::string Healthcare::getAllHealthcareServices(int start) {
 }
 /**
  * @brief Updates an existing healthcare service in the database.
- * 
- * @param request_body A JSON string containing the updated healthcare service data.
- * 
- * @return "Update" if the operation is successful, or an error message if it fails.
+ *
+ * @param request_body A JSON string containing the updated healthcare service
+ * data.
+ *
+ * @return "Update" if the operation is successful, or an error message if it
+ * fails.
  */
-std::string Healthcare::updateHealthcare(std::string request_body) {
+std::string Healthcare::updateHealthcare(std::string request_body,
+                                         std::string request_auth) {
   try {
     cleanCache();
-    std::string id = checkInputFormat(request_body);
+    std::string id = checkInputFormat(request_body, request_auth);
     auto content_new = createDBContent();
     dbManager.updateResource(collection_name, id, content_new);
   } catch (const std::exception& e) {
@@ -155,27 +170,30 @@ std::string Healthcare::updateHealthcare(std::string request_body) {
 }
 /**
  * @brief Deletes a healthcare service from the database.
- * 
+ *
  * @param id The ID of the healthcare service to delete.
- * 
- * @return A success message if the service is deleted, or an error if the operation fails.
- * 
+ *
+ * @return A success message if the service is deleted, or an error if the
+ * operation fails.
+ *
  * @throws std::runtime_error If the specified healthcare record is not found.
  */
-std::string Healthcare::deleteHealthcare(std::string id) {
-  if (dbManager.deleteResource(collection_name, id)) {
+std::string Healthcare::deleteHealthcare(std::string id,
+                                         std::string authToken) {
+  if (dbManager.deleteResource(collection_name, id, authToken)) {
     return "Healthcare record deleted successfully.";
   }
 
   throw std::runtime_error(
-      "Deletion failed: No healthcare record found matching the provided ID.");
+      "Deletion failed: No healthcare record found matching the provided ID or "
+      "invalid permissions.");
 }
 
 /**
  * @brief Converts a vector of healthcare services into a human-readable string.
- * 
+ *
  * @param services A vector of BSON documents representing healthcare services.
- * 
+ *
  * @return A formatted string containing the details of all healthcare services.
  */
 std::string Healthcare::printHealthcareServices(

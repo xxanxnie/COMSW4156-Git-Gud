@@ -60,7 +60,7 @@ TEST_F(FoodUnitTests, addFood) {
     "Quantity" : "100",
     "ExpirationDate": "10"
   })";
-  food->checkInputFormat(input);
+  food->checkInputFormat(input, "456");
   auto target = food->createDBContent();
   ON_CALL(*mockDbManager, insertResource(::testing::_, ::testing::_))
       .WillByDefault(
@@ -71,7 +71,7 @@ TEST_F(FoodUnitTests, addFood) {
             return "1234";
           });
 
-  auto ID = food->addFood(input);
+  auto ID = food->addFood(input, "456");
 
   std::vector<bsoncxx::document::value> mockResult;
   mockResult.push_back(bsoncxx::builder::stream::document{}
@@ -102,15 +102,17 @@ TEST_F(FoodUnitTests, addFood) {
 TEST_F(FoodUnitTests, deleteFood) {
   std::string mockId = "123";
 
-  ON_CALL(*mockDbManager, deleteResource(::testing::_, ::testing::_))
+  ON_CALL(*mockDbManager,
+          deleteResource(::testing::_, ::testing::_, ::testing::_))
       .WillByDefault([&](const std::string& collectionName,
-                         const std::string& resourceId) -> bool {
+                         const std::string& resourceId,
+                         const std::string authToken) -> bool {
         EXPECT_EQ(resourceId, mockId);
         EXPECT_EQ(collectionName, "Food");
         return true;
       });
 
-  std::string result = food->deleteFood(mockId);
+  std::string result = food->deleteFood(mockId, "456");
   EXPECT_EQ(result, "SUC");
 
   // Verify deletion by checking empty results
@@ -138,7 +140,7 @@ TEST_F(FoodUnitTests, updateFood) {
     "Quantity" : "100",
     "ExpirationDate": "2024-01-11"
   })";
-  food->checkInputFormat(input);
+  food->checkInputFormat(input, "456");
   std::vector<std::pair<std::string, std::string>> expectedContent =
       food->createDBContent();
   std::string id_temp = "123456789";
@@ -154,7 +156,7 @@ TEST_F(FoodUnitTests, updateFood) {
             return true;
           });
 
-  std::string result = food->updateFood(input);
+  std::string result = food->updateFood(input, "456");
   EXPECT_EQ(result, "Success");
 
   // Verify the updated data can be retrieved

@@ -8,6 +8,7 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 
+#include "Logger.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Net/MailMessage.h"
@@ -18,8 +19,6 @@
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SecureSMTPClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
-
-#include "Logger.h"
 
 using Poco::SharedPtr;
 using Poco::Net::AcceptCertificateHandler;
@@ -62,7 +61,7 @@ std::string SubscriptionManager::addSubscriber(
  * @throws std::exception If there is an error during the database operation.
  */
 std::string SubscriptionManager::deleteSubscriber(const std::string& id) {
-  if (dbManager.deleteResource("Subscribers", id)) {
+  if (dbManager.deleteResource("Subscribers", id, "")) {
     return "Subscriber deleted successfully.";
   } else {
     return "Error: Subscriber not found.";
@@ -97,11 +96,10 @@ std::map<std::string, std::string> SubscriptionManager::getSubscribers(
   return subscribers;
 }
 
-
 /**
  * @brief Notifies subscribers about an update to a resource in a city.
  *
- * Sends notifications to subscribers via email or webhook, depending on the 
+ * Sends notifications to subscribers via email or webhook, depending on the
  * format of their contact information.
  *
  * @param resource The resource type that has an update.
@@ -111,7 +109,8 @@ std::map<std::string, std::string> SubscriptionManager::getSubscribers(
  */
 void SubscriptionManager::notifySubscribers(const std::string& resource,
                                             const std::string& city) {
-  LOG_INFO("SubscriptionManager", "Sending notifications for resource {}, city {}", resource, city);
+  LOG_INFO("SubscriptionManager",
+           "Sending notifications for resource {}, city {}", resource, city);
   std::map<std::string, std::string> subscribers =
       getSubscribers(resource, city);
 
@@ -130,7 +129,8 @@ void SubscriptionManager::notifySubscribers(const std::string& resource,
 /**
  * @brief Sends an email to a specified recipient.
  *
- * Uses a secure SMTP connection to send an email containing a subject and content.
+ * Uses a secure SMTP connection to send an email containing a subject and
+ * content.
  *
  * @param to The recipient's email address.
  * @param subject The subject of the email.
@@ -205,7 +205,8 @@ void SubscriptionManager::sendWebhook(const std::string& url,
     CURLcode res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      LOG_ERROR("SubscriptionManager", "curl_easy_perform() failed: {}", curl_easy_strerror(res));
+      LOG_ERROR("SubscriptionManager", "curl_easy_perform() failed: {}",
+                curl_easy_strerror(res));
     } else {
       LOG_INFO("SubscriptionManager", "Webhook sent successfully to: {}", url);
     }

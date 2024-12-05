@@ -4,12 +4,6 @@
 
 #include <jwt-cpp/jwt.h>
 
-#include <cstdlib>
-
-#include <chrono> // NOLINT(build/c++11)
-#include <regex> // NOLINT(build/c++11)
-
-#include <bsoncxx/json.hpp>
 #include <bcrypt/BCrypt.hpp>
 
 

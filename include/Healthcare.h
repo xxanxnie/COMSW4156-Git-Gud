@@ -13,13 +13,13 @@ class Healthcare {
 
   Healthcare(DatabaseManager& dbManager, const std::string& collection_name);
   void cleanCache();
-  std::string checkInputFormat(std::string content);
-  virtual std::string addHealthcareService(std::string request_body);
+  std::string checkInputFormat(std::string content, std::string authToken);
+  virtual std::string addHealthcareService(std::string request_body, std::string request_auth);
 
   virtual std::string getAllHealthcareServices(int start = 0);
 
-  virtual std::string deleteHealthcare(std::string id);
-  virtual std::string updateHealthcare(std::string request_body);
+  virtual std::string deleteHealthcare(std::string id, std::string request_auth);
+  virtual std::string updateHealthcare(std::string request_body, std::string request_auth);
 
   //   virtual std::string validateHealthcareServiceInput(
   //       const std::map<std::string, std::string>& content);

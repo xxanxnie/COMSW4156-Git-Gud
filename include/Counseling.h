@@ -13,11 +13,11 @@ class Counseling {
  public:
   Counseling(DatabaseManager& dbManager, const std::string& collection_name);
   void cleanCache();
-  std::string checkInputFormat(std::string content);
-  virtual std::string addCounselor(std::string request_body);
-  virtual std::string deleteCounselor(const std::string& counselorId);
+  std::string checkInputFormat(std::string content, std::string request_auth);
+  virtual std::string addCounselor(std::string request_body, std::string request_auth);
+  virtual std::string deleteCounselor(const std::string& counselorId, std::string request_auth);
   virtual std::string searchCounselorsAll(int start = 0);
-  virtual std::string updateCounselor(std::string request_body);
+  virtual std::string updateCounselor(std::string request_body, std::string request_auth);
   std::vector<std::pair<std::string, std::string>> createDBContent();
 
  private:
