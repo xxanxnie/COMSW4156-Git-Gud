@@ -32,6 +32,7 @@ set(INCLUDE_PATHS
     ${BOOST_ROOT}
     ${CROW_INCLUDE_DIR}
     ${ASIO_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIRS}
     /usr/local/include/mongocxx/v_noabi
     /usr/local/include/bsoncxx/v_noabi
     /usr/local/include/libmongoc-1.0
@@ -48,7 +49,15 @@ set(INCLUDE_PATHS
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${MONGO_CXX_ROOT}/build)
 
 # Set paths for OpenSSL libraries
-set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@3")
+if (APPLE)
+    set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@3")
+else()
+    set(OPENSSL_ROOT_DIR "/usr")
+    set(OPENSSL_INCLUDE_DIR "/usr/include")
+    set(OPENSSL_CRYPTO_LIBRARY "/usr/lib/x86_64-linux-gnu/libcrypto.so")
+    set(OPENSSL_SSL_LIBRARY "/usr/lib/x86_64-linux-gnu/libssl.so")
+endif()
+
 find_package(OpenSSL REQUIRED)
 
 set(SOURCE_FILES 
