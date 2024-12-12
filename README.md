@@ -98,7 +98,8 @@ Each JWT contains the following claims:
    ```json
    {
      "email": "user@example.com",
-     "password": "SecurePass123"
+     "password": "SecurePass123",
+     "role": "HML"
    }
    ```
    - Password requirements:
