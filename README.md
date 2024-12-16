@@ -98,9 +98,14 @@ Each JWT contains the following claims:
    ```json
    {
      "email": "user@example.com",
-     "password": "SecurePass123"
+     "password": "SecurePass123",
+     "role": "HML"
    }
    ```
+   - Role is optional, but can be HML, RFG, VET, SUB, NGO, VOL, CLN, GOV for now.
+     - Different roles have different permissions.
+       - NGO, VOL, CLN, GOV can add resources.
+       - HML, RFG, VET, SUB can subscribe to resources.
    - Password requirements:
      - Minimum 8 characters
      - At least 1 uppercase letter
